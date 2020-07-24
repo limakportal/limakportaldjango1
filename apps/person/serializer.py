@@ -1,9 +1,9 @@
 from rest_framework import serializers
-from .models import Personel
+from .models import Person
 
-class PersonelSerializer(serializers.ModelSerializer):
+class PersonSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Personel
+        model = Person
         fields = ('__all__')
         # fields = [
         #     'id',

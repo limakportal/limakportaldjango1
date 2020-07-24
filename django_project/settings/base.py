@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'apps.person',
+    'apps.gender',
 ]
 
 MIDDLEWARE = [
@@ -76,11 +77,12 @@ WSGI_APPLICATION = 'django_project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'weglgprj ',
-        'USER': 'weglgprj ',
+        'NAME': 'weglgprj',
+        'USER': 'weglgprj',
         'PASSWORD': 'M4kYoyFFR7bJPItTxvHr9gEkBuyNzfTa',
         'HOST': 'kandula.db.elephantsql.com',
         'PORT': '5432',
