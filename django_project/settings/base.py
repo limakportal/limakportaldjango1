@@ -25,7 +25,7 @@ SECRET_KEY = 'j!#7xkols%&2esg4*^q!a=uwveesg&yp93#jme2)@vdrsu!h$3'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['pythondemoproject.herokuapp.com']
+ALLOWED_HOSTS = ['limakportalpython.herokuapp.com','127.0.0.1']
 
 
 # Application definition
@@ -79,10 +79,10 @@ WSGI_APPLICATION = 'django_project.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'wbcjxkyw',
-        'USER': 'wbcjxkyw',
-        'PASSWORD': 'kFIjFLx0fAqqqvhL5N1qR5O-4NZbkXQg',
-        'HOST': 'ruby.db.elephantsql.com',
+        'NAME': 'weglgprj ',
+        'USER': 'weglgprj ',
+        'PASSWORD': 'M4kYoyFFR7bJPItTxvHr9gEkBuyNzfTa',
+        'HOST': 'kandula.db.elephantsql.com',
         'PORT': '5432',
     }
 }
