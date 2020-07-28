@@ -29,4 +29,5 @@ urlpatterns = [
     path('',include('apps.status.urls')),
     path('',include('apps.maritalstatus.urls')),
     path('',include('apps.nationality.urls')),
+    path('',include('apps.user.urls')),
 ]
