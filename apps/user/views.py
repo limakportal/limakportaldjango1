@@ -1,4 +1,3 @@
-import jwt
 from .models import User
 from .serializer import UserSerializer
 from rest_framework.decorators import api_view
@@ -23,8 +22,8 @@ def Login(request):
             res = {
                 'error': 'can not authenticate with the given credentials or the account has been deactivated'}
             return Response(res, status=status.HTTP_403_FORBIDDEN)
-    except KeyError:
-        res = {'error': 'please provide a email and a password'}
+    except KeyError as e:
+        res = {'error': e}
         return Response(res)
 
     
