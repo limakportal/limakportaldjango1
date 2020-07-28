@@ -40,6 +40,15 @@ INSTALLED_APPS = [
     'rest_framework',
     'apps.person',
     'apps.gender',
+    'apps.right',
+    'apps.righthistory',
+    'apps.rightstatus',
+    'apps.righttype',
+    'apps.personhistory',
+    'apps.personelinformation',
+    'apps.status',
+    'apps.maritalstatus',
+    'apps.nationality',
 ]
 
 MIDDLEWARE = [
