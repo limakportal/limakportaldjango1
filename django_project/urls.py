@@ -30,7 +30,7 @@ urlpatterns = [
     path('',include('apps.maritalstatus.urls')),
     path('',include('apps.nationality.urls')),
     path('',include('apps.user.urls')),
-    path('',include('apps.districts.urls')),
+    path('',include('apps.district.urls')),
     path('',include('apps.city.urls')),
     path('',include('apps.title.urls')),
     path('',include('apps.organizationtype.urls')),
