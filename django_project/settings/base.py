@@ -50,7 +50,14 @@ INSTALLED_APPS = [
     'apps.status',
     'apps.maritalstatus',
     'apps.nationality',
-    'apps.user'
+    'apps.user',
+    'apps.district',
+    'apps.city',
+    'apps.title',
+    'apps.organizationtype',
+    'apps.organization',
+    'apps.staff',
+
 ]
 JWT_AUTH = {
  
