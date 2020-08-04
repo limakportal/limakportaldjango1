@@ -19,7 +19,7 @@ class Person(models.Model):
     Telephone = models.CharField(max_length=50,blank=True,null=True)
     BirthDate = models.DateField(max_length=50,blank=True,null=True)
     State = models.IntegerField(blank=True,null=True)
-    Gender = models.ForeignKey(Gender,on_delete=models.CASCADE)
+    Gender = models.ForeignKey(Gender,related_name='Gender',on_delete=models.CASCADE)
     MaritalStatusID = models.ForeignKey(MaritalStatus,on_delete=models.CASCADE)
     RegisteredProvinceID = models.ForeignKey(City,on_delete=models.CASCADE,related_name='RegisteredProvinceID')
     PlaceOfRegistryID = models.ForeignKey(City,on_delete=models.CASCADE,related_name='PlaceOfRegistryID')
