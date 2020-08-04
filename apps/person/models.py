@@ -29,7 +29,7 @@ class Person(models.Model):
     FathersName = models.CharField(max_length=50,blank=True,null=True)
     BloodType = models.CharField(max_length=50,blank=True,null=True)
     Email = models.CharField(max_length=50,blank=True,null=True)
-    Picture = models.BinaryField(max_length=(1<<24)-1)
+    Picture = models.BinaryField(max_length=(1<<24)-1,blank=True,null=True)
 
     # def __str__(self):
     #     return self.Name
