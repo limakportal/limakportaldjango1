@@ -1,8 +1,10 @@
 from .models import Person
 from .serializer import PersonSerializer
-from rest_framework.authtoken.views import APIView
+from rest_framework.authtoken.views import APIView 
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 # import logging
 
 
@@ -10,6 +12,7 @@ from rest_framework import status
 
 
 class PersonAPIView(APIView):
+    @permission_classes((IsAuthenticated, ))
     def get(self,request):
         persons = Person.objects.all().order_by('id')
         serializer = PersonSerializer(persons,many=True)
