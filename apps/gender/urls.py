@@ -1,8 +1,8 @@
 from django.urls import path
-from .views import GenderAPIView 
+from .views import GenderAPIView , GenderDetails
 
 
 urlpatterns = [ 
-    path('gender/', GenderAPIView.as_view()),
-    # path('gender/detail/<int:id>/', PersonDetails.as_view()),
+    path('genders/', GenderAPIView.as_view()),
+    path('genders/<int:id>/', GenderDetails.as_view()),
 ]

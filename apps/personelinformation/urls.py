@@ -3,6 +3,6 @@ from .views import PersonelInformationAPIView , PersonelInformationDetails
 
 
 urlpatterns = [ 
-    path('personelinformations/', PersonelInformationAPIView.as_view()),
-    path('personelinformation/<int:id>/', PersonelInformationDetails.as_view()),
+    path('personalinformations/', PersonelInformationAPIView.as_view()),
+    path('personalinformations/<int:id>/', PersonelInformationDetails.as_view()),
 ]

@@ -31,6 +31,7 @@ ALLOWED_HOSTS = ['limakportalpython.herokuapp.com','127.0.0.1']
 # Application definition
 
 INSTALLED_APPS = [
+    #django apps
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -39,6 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
+
+    #project apps
     'apps.person',
     'apps.gender',
     'apps.right',

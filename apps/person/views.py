@@ -1,15 +1,10 @@
 from .models import Person
 from .serializer import PersonSerializer
-from rest_framework.authtoken.views import APIView 
+from rest_framework.views import APIView 
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
-# import logging
-
-
-# Create your views here.
-
 
 class PersonAPIView(APIView):
     @permission_classes((IsAuthenticated, ))
@@ -19,7 +14,6 @@ class PersonAPIView(APIView):
         return Response(serializer.data)
 
     def post(self,request):
-        # logger.error('Something went wrong!')
         serializer = PersonSerializer(data = request.data)
         if serializer.is_valid():
             serializer.save()

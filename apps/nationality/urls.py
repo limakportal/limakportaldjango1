@@ -1,8 +1,8 @@
 from django.urls import path
-from .views import NationalityAPIView
+from .views import NationalityAPIView , NationalityDetails
 
 
 urlpatterns = [ 
     path('nationalities/', NationalityAPIView.as_view()),
-    # path('gender/detail/<int:id>/', PersonDetails.as_view()),
+    path('nationalities/<int:id>/', NationalityDetails.as_view()),
 ]

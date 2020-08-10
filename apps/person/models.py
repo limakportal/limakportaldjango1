@@ -3,9 +3,7 @@ from apps.gender.models import Gender
 from apps.maritalstatus.models import MaritalStatus
 from apps.city.models import City
 from apps.nationality.models import Nationality
-
-# Create your models here.
-
+from apps.personelinformation.models import PersonelInformation
 
 class Person(models.Model):
     class Meta:
@@ -30,6 +28,7 @@ class Person(models.Model):
     BloodType = models.CharField(max_length=50,blank=True,null=True)
     Email = models.CharField(max_length=50,blank=True,null=True)
     Picture = models.BinaryField(max_length=(1<<24)-1,blank=True,null=True)
+    PersonelInformation = models.ForeignKey(PersonelInformation,related_name='PersonelInformation',on_delete=models.CASCADE)
 
     # def __str__(self):
     #     return self.Name
