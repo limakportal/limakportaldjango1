@@ -6,11 +6,11 @@ from apps.city.serializer import CitySerializer
 from apps.maritalstatus.serializer import MaritalStatusSerializer
 
 class PersonSerializer(serializers.ModelSerializer):
-    Gender = GenderSerializer(read_only=True)
-    Nationality = NationalitySerializer(read_only=True)
-    RegisteredProvinceID = NationalitySerializer(read_only=True)
-    PlaceOfRegistryID = NationalitySerializer(read_only=True)
-    MaritalStatusID = NationalitySerializer(read_only=True)
+    # Gender = GenderSerializer()
+    # Nationality = NationalitySerializer()
+    # RegisteredProvinceID = NationalitySerializer()
+    # PlaceOfRegistryID = NationalitySerializer()
+    # MaritalStatusID = NationalitySerializer()
 
     class Meta:
         model = Person

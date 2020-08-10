@@ -2,9 +2,6 @@ from django.db import models
 from apps.status.models import Status
 from apps.city.models import City
 
-# Create your models here.
-
-
 class District(models.Model):
     class Meta:
         db_table = 'District'

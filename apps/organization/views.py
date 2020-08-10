@@ -1,6 +1,6 @@
 from .models import Organization
-from .serializer import OrganizationSerializer
-from rest_framework.authtoken.views import APIView
+from .serializer import OrganizationSerializer , OrganizationTreeSerializer
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -17,6 +17,12 @@ class OrganizationAPIView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class OrganizationTreeList(APIView):
+    def get(self,request):
+        organizations = Organization.objects.filter(UpperOrganization=None)
+        serializer = OrganizationTreeSerializer(organizations,many=True)
+        return Response(serializer.data)
 
 
 class OrganizationDetails(APIView):

@@ -3,6 +3,6 @@ from .views import OrganizationTypeAPIView , OrganizationTypeDetails
 
 
 urlpatterns = [ 
-    path('organizationtypes/', OrganizationTypeAPIView.as_view()),
-    path('organizationtype/', OrganizationTypeDetails.as_view()),
+    path('organizationTypes/', OrganizationTypeAPIView.as_view()),
+    path('organizationTypes/<int:id>/', OrganizationTypeDetails.as_view()),
 ]

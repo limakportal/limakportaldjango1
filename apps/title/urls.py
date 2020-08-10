@@ -4,5 +4,5 @@ from .views import TitleAPIView , TitleDetails
 
 urlpatterns = [ 
     path('titles/', TitleAPIView.as_view()),
-    path('Title/', TitleDetails.as_view()),
+    path('titles/<int:id>/', TitleDetails.as_view()),
 ]

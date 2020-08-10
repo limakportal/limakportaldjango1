@@ -10,4 +10,11 @@ class Organization(models.Model):
     Status = models.ForeignKey(Status,on_delete=models.CASCADE)
     OrganizationType = models.ForeignKey(OrganizationType, on_delete=models.CASCADE)
     UpperOrganization = models.ForeignKey('self', on_delete = models.CASCADE,null=True)
+
+    def children(self):
+        return Organization.objects.filter(UpperOrganization=self)
+
+    @property
+    def any_children(self):
+        return Organization.objects.filter(UpperOrganization = self).exists()
     

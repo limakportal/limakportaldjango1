@@ -3,6 +3,6 @@ from .views import RightTypeAPIView , RightTypeDetails
 
 
 urlpatterns = [ 
-    path('righttypes/', RightTypeAPIView.as_view()),
-    path('righttype/<int:id>/', RightTypeDetails.as_view()),
+    path('rightTypes/', RightTypeAPIView.as_view()),
+    path('rightTypes/<int:id>/', RightTypeDetails.as_view()),
 ]
