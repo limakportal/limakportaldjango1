@@ -1,11 +1,8 @@
 from rest_framework import serializers
 from rest_framework.serializers import SerializerMethodField
-
 from .models import Organization
 from apps.organizationtype.serializer import OrganizationTypeSerializer
 from apps.status.serializer import StatusSerializer
-
-
 
 class OrganizationSerializer(serializers.ModelSerializer):
     class Meta:

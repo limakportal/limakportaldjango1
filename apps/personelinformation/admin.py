@@ -1,3 +1,4 @@
 from django.contrib import admin
+from .models import PersonelInformation
 
-# Register your models here.
+admin.site.register(PersonelInformation)

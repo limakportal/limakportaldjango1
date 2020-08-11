@@ -2,9 +2,6 @@ from django.db import models
 from apps.right.models import Right
 from apps.rightstatus.models import RightStatus
 
-# Create your models here.
-
-
 class RightHistory(models.Model):
     class Meta:
         db_table = 'RightHistory'

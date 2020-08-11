@@ -1,13 +1,8 @@
 from .models import RightHistory
 from .serializer import RightHistorySerializer
-from rest_framework.authtoken.views import APIView
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-# import logging
-
-
-# Create your views here.
-
 
 class RightHistoryAPIView(APIView):
     def get(self,request):
@@ -16,14 +11,11 @@ class RightHistoryAPIView(APIView):
         return Response(serializer.data)
 
     def post(self,request):
-        # logger.error('Something went wrong!')
         serializer = RightHistorySerializer(data = request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-            # return Response({"message":"Personel Eklendi","status":"201"}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        # return Response({"message":serializer.errors,"status":"400"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class RightHistoryDetails(APIView):

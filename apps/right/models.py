@@ -3,10 +3,9 @@ from apps.person.models import Person
 from apps.righttype.models import RightType
 from apps.rightstatus.models import RightStatus
 
-# Create your models here.
-
 
 class Right(models.Model):
+
     class Meta:
         db_table = 'Right'
 

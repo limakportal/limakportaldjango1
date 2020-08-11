@@ -4,5 +4,5 @@ from .views import PersonHistoryAPIView , PersonHistoryDetails
 
 urlpatterns = [ 
     path('personhistories/', PersonHistoryAPIView.as_view()),
-    path('personhistory/<int:id>/', PersonHistoryDetails.as_view()),
+    path('personhistories/<int:id>/', PersonHistoryDetails.as_view()),
 ]
