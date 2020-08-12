@@ -12,3 +12,12 @@ class RightSerializer(serializers.ModelSerializer):
     class Meta:
         model = Right
         fields = ('__all__')
+
+class RightWithApproverSerializer(serializers.ModelSerializer):
+    # Person = PersonSerializer()
+    # RightStatus = RightStatusSerializer()
+    # RightType = RightTypeSerializer()
+    # Approver1 = PersonSerializer()
+    class Meta:
+        model = Right
+        fields = ('__all__')

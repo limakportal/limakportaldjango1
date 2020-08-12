@@ -1,5 +1,5 @@
 from .models import Right
-from .serializer import RightSerializer
+from .serializer import RightSerializer , RightWithApproverSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -46,3 +46,9 @@ class RightDetails(APIView):
         right = self.get_object(id)
         right.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+class RightWithApproverAPIView(APIView):
+    def get(self,request):
+        rights = Right.objects.all().order_by('id')
+        serializer = RightWithApproverSerializer(rights,many=True)
+        return Response(serializer.data)
