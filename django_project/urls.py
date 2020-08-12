@@ -37,4 +37,5 @@ urlpatterns = [
     path('',include('apps.organization.urls')),
     path('',include('apps.staff.urls')),
     path('',include('apps.account.urls')),
+    path('',include('apps.personeducation.urls')),
 ]
