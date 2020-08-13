@@ -6,73 +6,86 @@ from apps.city.serializer import CitySerializer
 from apps.maritalstatus.serializer import MaritalStatusSerializer
 from apps.personelinformation.serializer import PersonelInformationSerializer
 from apps.personelinformation.models import PersonelInformation
+from apps.personidentity.models import PersonIdentity
+from apps.personidentity.serializer import PersonIdentitySerializer
+from apps.personbusiness.models import PersonBusiness
+from apps.personbusiness.serializer import PersonBusinessSerializer
+from apps.personeducation.models import PersonEducation
+from apps.personeducation.serializer import PersonEducationSerializer
+from apps.personfamily.models import PersonFamily
+from apps.personfamily.serializer import PersonFamilySerializer
 
 class PersonSerializer(serializers.ModelSerializer):
-    # Id = serializers.CharField(source='id')
-    # NationalityId = serializers.CharField( read_only=True,source='Nationality')
-
     class Meta:
-        model = Person
-        
+        model = Person       
         fields = ('__all__')
-        # fields = (
-        #     'Id',
-        #     'Name',
-        #     'Surname',
-        #     'IdentityID',
-        #     'Address',
-        #     'Telephone',
-        #     # 'BirthDate',
-        #     'State',
-        #     'IdentitySerialNumber',
-        #     'IdentityVolumeNo',
-        #     # 'MothersName',
-        #     # 'FathersName',
-        #     # 'BloodType',
-        #     'Email',
-        #     'Picture',
-        #     'NationalityId',
-        #     # 'Gender',
-        #     # 'MaritalStatusID',
-        #     # 'RegisteredProvinceID',
-        #     'PlaceOfRegistryID'
-        # )
+
 
 class PersonViewSerializer(serializers.ModelSerializer):
-
-    Id = serializers.CharField(source='id')
-    NationalityId = serializers.CharField(source='Nationality')
-
-    PersonelInformation = serializers.SerializerMethodField()
-    
-    def get_PersonelInformation(self, person):       
-        return PersonelInformationSerializer(PersonelInformation.objects.get(Person=person.id)).data
-
-   
-
     class Meta:
         model = Person        
         fields = (
-            'Id',
+            'id',
             'Name',
             'Surname',
             'IdentityID',
             'Address',
             'Telephone',
-            # 'BirthDate',
             'State',
             'IdentitySerialNumber',
             'IdentityVolumeNo',
-            # 'MothersName',
-            # 'FathersName',
-            # 'BloodType',
             'Email',
             'Picture',
-            'NationalityId',
-            # 'Gender',
-            # 'MaritalStatusID',
-            # 'RegisteredProvinceID',
+            'Nationality',
             'PlaceOfRegistryID',
-            'PersonelInformation'
+            'PersonelInformation',
+            'PersonIdentity',
+            'PersonBusiness',
+            'PersonEducation',
+            'PersonFamily'
         )
+
+    # Id = serializers.CharField(source='id')
+    # NationalityId = serializers.CharField(source='Nationality')
+
+    PersonelInformation = serializers.SerializerMethodField()
+    PersonIdentity = serializers.SerializerMethodField()
+    PersonBusiness = serializers.SerializerMethodField()
+    PersonEducation = serializers.SerializerMethodField()
+    PersonFamily = serializers.SerializerMethodField()
+    
+    def get_PersonelInformation(self, person):       
+        return PersonelInformationSerializer(PersonelInformation.objects.get(Person=person.id)).data
+
+    def get_PersonIdentity(self,obj):
+        try:
+            personIdentity = PersonIdentity.objects.get(Person=obj.id)
+            serializer = PersonIdentitySerializer(personIdentity)
+            return serializer.data
+        except:
+            return None
+
+    def get_PersonBusiness(self,obj):
+        try:
+            personBusiness = PersonBusiness.objects.get(Person = obj.id)
+            serializer = PersonBusinessSerializer(personBusiness)
+            return serializer.data
+        except:
+            return None
+
+    def get_PersonEducation(self,obj):
+        personEducations = PersonEducation.objects.filter(Person = obj.id)
+        serializer = PersonEducationSerializer(personEducations,many=True)
+        return serializer.data
+
+    def get_PersonFamily(self,obj):
+        personFamilys = PersonFamily.objects.filter(Person = obj.id)
+        serializer = PersonFamilySerializer(personFamilys , many = True)
+        return serializer.data
+
+
+
+        
+
+
 
