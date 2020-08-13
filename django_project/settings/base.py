@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'apps.account',
     'apps.personeducation',
     'apps.personidentity',
+    'apps.personfamily',
 
 ]
 
