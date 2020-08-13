@@ -20,3 +20,6 @@ class Right(models.Model):
     RightStatus = models.ForeignKey(RightStatus, on_delete = models.CASCADE)
     RightNumber = models.IntegerField(blank=True,null=True)
     DenyExplanation = models.CharField(max_length=50,blank=True)
+
+    def __str__(self):
+        return self.Person.Name

@@ -13,3 +13,6 @@ class PersonelInformation(models.Model):
     LimakEnterDate = models.DateField(auto_now_add=True,max_length=50,blank=True,null=True)
     Person = models.ForeignKey(Person,related_name='Person',on_delete=models.CASCADE)
 
+    def __str__(self):
+        return self.Person.Name
+

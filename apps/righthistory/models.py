@@ -10,3 +10,6 @@ class RightHistory(models.Model):
     ChangedBy = models.IntegerField(blank=True,null=True)
     ChangedDate = models.DateField(auto_now_add=True,max_length=50,blank=True,null=True)
     RightStatus = models.ForeignKey(RightStatus,on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.Right

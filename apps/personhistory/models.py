@@ -15,5 +15,8 @@ class PersonHistory(models.Model):
     TerminationDate = models.DateField(auto_now_add=True,max_length=50,blank=True,null=True)
 
 
+    def __str__(self):
+        return self.Person.Name
+
 
 

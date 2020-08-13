@@ -29,8 +29,8 @@ class Person(models.Model):
     Picture = models.BinaryField(max_length=(1<<24)-1,blank=True,null=True)
 
 
-    # def __str__(self):
-    #     return self.Name
+    def __str__(self):
+        return self.Name
 
 
 

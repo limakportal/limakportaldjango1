@@ -25,4 +25,7 @@ class PersonIdentity(models.Model):
     MilitaryDischargeData = models.DateField(blank=True, null=True)
     PreviousLastname = models.CharField(max_length = 100 , blank=True, null=True)
 
+    def __str__(self):
+        return self.Person.Name
+
     

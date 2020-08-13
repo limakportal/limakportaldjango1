@@ -17,4 +17,7 @@ class Organization(models.Model):
     @property
     def any_children(self):
         return Organization.objects.filter(UpperOrganization = self).exists()
+
+    def __str__(self):
+        return self.Name
     

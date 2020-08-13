@@ -18,3 +18,6 @@ class PersonEducation(models.Model):
     Section = models.CharField(max_length= 100,blank=True, null=True)
     ForeignLanguage = models.CharField(max_length = 200,blank=True, null=True)
     Section = models.BinaryField(blank=True, null=True)
+
+    def __str__(self):
+        return self.Person.Name

@@ -15,5 +15,8 @@ class PersonFamily(models.Model):
     Telephone = models.CharField(max_length = 20 , blank=True, null=True)
     Relation = models.IntegerField(blank=True,null=True)
 
+    def __str__(self):
+        return self.Person.Name
+
 
     

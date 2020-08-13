@@ -4,9 +4,6 @@ from apps.organization.models import Organization
 from apps.status.models import Status
 from apps.person.models import Person
 
-# Create your models here.
-
-
 class Staff(models.Model):
     class Meta:
         db_table = 'Staff'
@@ -15,3 +12,6 @@ class Staff(models.Model):
     Organization = models.ForeignKey(Organization, on_delete = models.CASCADE)
     Status = models.ForeignKey(Status,on_delete=models.CASCADE)
     Person = models.ForeignKey(Person,on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.Person.Name

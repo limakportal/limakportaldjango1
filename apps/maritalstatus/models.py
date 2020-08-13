@@ -6,6 +6,9 @@ class MaritalStatus(models.Model):
 
     Name = models.CharField(max_length=50,blank=True,null=True)
 
+    def __str__(self):
+        return self.Name
+
 
  
 
