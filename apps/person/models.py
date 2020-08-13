@@ -11,7 +11,7 @@ class Person(models.Model):
     Name = models.CharField(max_length=50,blank=True,null=True)
     Surname = models.CharField(max_length=50,blank=True,null=True)
     IdentityID = models.CharField(max_length=50,blank=True,null=True)
-    Nationality = models.ForeignKey(Nationality,on_delete=models.CASCADE)
+    Nationality = models.ForeignKey(Nationality,on_delete=models.CASCADE,related_name='NationalityId')
     Address = models.CharField(max_length=50,blank=True,null=True)
     Telephone = models.CharField(max_length=50,blank=True,null=True)
     # BirthDate = models.DateField(max_length=50,blank=True,null=True)
