@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     'apps.staff',
     'apps.account',
     'apps.personeducation',
+    'apps.personidentity',
 
 ]
 

@@ -1,8 +1,8 @@
 from django.urls import path
-from apps.personelinformation.views import PersonelInformationAPIView , PersonelInformationDetails
+from .views import PersonEducationAPIView , PersonEducationDetails
 
 
 urlpatterns = [ 
-    path('personalinformations/', PersonelInformationAPIView.as_view()),
-    path('personalinformations/<int:id>/', PersonelInformationDetails.as_view()),
+    path('personeducations/', PersonEducationAPIView.as_view()),
+    path('personeducations/<int:id>/', PersonEducationDetails.as_view()),
 ]
