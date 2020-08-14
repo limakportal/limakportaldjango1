@@ -49,7 +49,6 @@ INSTALLED_APPS = [
     'apps.rightstatus',
     'apps.righttype',
     'apps.personhistory',
-    'apps.personelinformation',
     'apps.status',
     'apps.maritalstatus',
     'apps.nationality',
