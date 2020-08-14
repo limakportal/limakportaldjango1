@@ -7,7 +7,7 @@ class PersonHistory(models.Model):
         db_table = 'PersonHistory'
 
     Person = models.ForeignKey(Person,on_delete=models.CASCADE)
-    Staff = models.ForeignKey(Staff,on_delete=models.CASCADE,related_name='Staff')
+    StafId = models.ForeignKey(Staff,on_delete=models.CASCADE,related_name='StafId')
     EntryDate = models.DateField(auto_now_add=True,max_length=50,blank=True,null=True)
     TerminationDate = models.DateField(auto_now_add=True,max_length=50,blank=True,null=True)
 
