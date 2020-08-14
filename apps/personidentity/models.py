@@ -9,7 +9,7 @@ class PersonIdentity(models.Model):
     class Meta:
         db_table = 'PersonIdentity'
     
-    PersonId = models.ForeignKey(Person,on_delete=models.CASCADE)
+    Person = models.ForeignKey(Person,on_delete=models.CASCADE)
     SerialNumber = models.CharField(max_length = 100 , blank=True, null=True)
     FatherName = models.CharField(max_length = 100 , blank=True, null=True)
     MotherName = models.CharField(max_length = 100 , blank=True, null=True)
