@@ -54,8 +54,13 @@ class PersonViewSerializer(serializers.ModelSerializer):
     PersonEducation = serializers.SerializerMethodField()
     PersonFamily = serializers.SerializerMethodField()
     
-    def get_PersonelInformation(self, person):       
-        return PersonelInformationSerializer(PersonelInformation.objects.get(Person=person.id)).data
+    def get_PersonelInformation(self, obj):
+        try:
+            personInformation = PersonelInformation.objects.get(Person=obj.id)
+            serializer = PersonelInformationSerializer(personInformation)
+            return serializer.data
+        except:
+            return None       
 
     def get_PersonIdentity(self,obj):
         try:
