@@ -10,6 +10,11 @@ class Organization(models.Model):
     Status = models.ForeignKey(Status,on_delete=models.CASCADE)
     OrganizationType = models.ForeignKey(OrganizationType, on_delete=models.CASCADE)
     UpperOrganization = models.ForeignKey('self', on_delete = models.CASCADE,null=True)
+    Telephone = models.CharField(blank=True,null=True,max_length=11)
+    Address = models.CharField(blank=True,null=True,max_length=200)
+    IsSaturdayWorkDay = models.BooleanField(default=True)
+    IsSundayWorkDay = models.BooleanField(default=True)
+    CanApproveRight = models.BooleanField(default=True)
 
     def children(self):
         return Organization.objects.filter(UpperOrganization=self)
