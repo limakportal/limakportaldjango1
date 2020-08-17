@@ -7,8 +7,8 @@ class District(models.Model):
         db_table = 'District'
 
     Name = models.CharField(blank=True,max_length=100,null=True)
-    Status = models.ForeignKey(Status,on_delete=models.CASCADE)
-    City = models.ForeignKey(City,on_delete=models.CASCADE)
+    Status = models.ForeignKey(Status,on_delete=models.CASCADE,blank=True, null=True)
+    City = models.ForeignKey(City,on_delete=models.CASCADE,blank=True, null=True)
 
     def __str__(self):
         return self.Name

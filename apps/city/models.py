@@ -6,7 +6,7 @@ class City(models.Model):
         db_table = 'City'
 
     Name = models.CharField(blank=True, max_length=50)
-    Status = models.ForeignKey(Status, on_delete = models.CASCADE)
+    Status = models.ForeignKey(Status, on_delete = models.CASCADE,blank=True, null=True)
 
     def __str__(self):
         return self.Name

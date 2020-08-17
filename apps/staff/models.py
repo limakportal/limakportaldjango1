@@ -9,9 +9,9 @@ class Staff(models.Model):
         db_table = 'Staff'
 
     Title = models.ForeignKey(Title, on_delete=models.CASCADE)
-    Organization = models.ForeignKey(Organization, on_delete = models.CASCADE)
-    Status = models.ForeignKey(Status,on_delete=models.CASCADE)
-    Person = models.ForeignKey(Person,on_delete=models.CASCADE)
+    Organization = models.ForeignKey(Organization, on_delete = models.CASCADE,blank=True, null=True)
+    Status = models.ForeignKey(Status,on_delete=models.CASCADE,blank=True, null=True)
+    Person = models.ForeignKey(Person,on_delete=models.CASCADE,blank=True, null=True)
 
     def __str__(self):
         return self.Person.Name
