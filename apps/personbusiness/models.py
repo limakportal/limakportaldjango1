@@ -8,7 +8,7 @@ class PersonBusiness(models.Model):
     Person = models.ForeignKey(Person,on_delete=models.CASCADE)
     ContractType = models.IntegerField(blank=True,null=True)
     JobStartDate = models.DateField(blank=True, null=True)
-    FirstBudger = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=2)
+    FirstBudger = models.DecimalField(blank=True, null=True, max_digits=9, decimal_places=2)
     JobCode = models.CharField(max_length = 100 , blank=True, null=True)
     RegisterNo = models.CharField(max_length=100,blank=True,null=True)
     SGKRegisterNo = models.CharField(max_length=100,blank=True,null=True)
