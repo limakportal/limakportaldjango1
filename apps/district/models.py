@@ -7,6 +7,7 @@ class District(models.Model):
         db_table = 'District'
 
     Name = models.CharField(blank=True,max_length=100,null=True)
+    Code = models.IntegerField(blank=True,null=True)
     Status = models.ForeignKey(Status,on_delete=models.CASCADE,blank=True, null=True)
     City = models.ForeignKey(City,on_delete=models.CASCADE,blank=True, null=True)
 
