@@ -117,28 +117,28 @@ WSGI_APPLICATION = 'django_project.wsgi.application'
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'hsmdjigr',
+        'USER': 'hsmdjigr',
+        'PASSWORD': 'UORMJNZgxSwr_PsZvxFq3fBFDuJxcXMg',
+        'HOST': 'ruby.db.elephantsql.com',
+        'PORT': '5432',
+    }
+}
+
+
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'weglgprj',
-#         'USER': 'weglgprj',
-#         'PASSWORD': 'M4kYoyFFR7bJPItTxvHr9gEkBuyNzfTa',
+#         'NAME': 'vyxotzwh',
+#         'USER': 'vyxotzwh',
+#         'PASSWORD': 'F1eaGjar2VkTfjDNPU7wLHteb20DF-DE',
 #         'HOST': 'kandula.db.elephantsql.com',
 #         'PORT': '5432',
 #     }
 # }
-
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'vyxotzwh',
-        'USER': 'vyxotzwh',
-        'PASSWORD': 'F1eaGjar2VkTfjDNPU7wLHteb20DF-DE',
-        'HOST': 'kandula.db.elephantsql.com',
-        'PORT': '5432',
-    }
-}
 
 
 # Password validation
