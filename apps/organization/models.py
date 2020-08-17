@@ -9,7 +9,7 @@ class Organization(models.Model):
     Name = models.CharField(blank=True, max_length=50,null=True)
     Status = models.ForeignKey(Status,on_delete=models.CASCADE,blank=True, null=True)
     OrganizationType = models.ForeignKey(OrganizationType, on_delete=models.CASCADE,blank=True, null=True)
-    UpperOrganization = models.ForeignKey('self', on_delete = models.CASCADE,null=True)
+    UpperOrganization = models.ForeignKey('self', on_delete = models.CASCADE,blank=True, null=True)
     Telephone = models.CharField(blank=True,null=True,max_length=11)
     Address = models.CharField(blank=True,null=True,max_length=200)
     IsSaturdayWorkDay = models.BooleanField(default=True)
