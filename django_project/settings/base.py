@@ -48,7 +48,6 @@ INSTALLED_APPS = [
     'apps.righthistory',
     'apps.rightstatus',
     'apps.righttype',
-    'apps.personhistory',
     'apps.status',
     'apps.maritalstatus',
     'apps.nationality',
@@ -66,6 +65,10 @@ INSTALLED_APPS = [
     'apps.personbusiness',
 
 ]
+
+# AUTHENTICATION_BACKENDS = (
+#     ('django.contrib.auth.backends.ModelBackend'),
+# )
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
