@@ -1,5 +1,5 @@
 from .models import City
-from .serializer import CitySerializer
+from .serializer import CitySerializer , CityViewSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -7,8 +7,8 @@ from rest_framework import status
 
 class CityAPIView(APIView):
     def get(self,request):
-        cities = City.objects.all().order_by('id')
-        serializer = CitySerializer(cities,many=True)
+        cities = City.objects.all().order_by('Name')
+        serializer = CityViewSerializer(cities,many=True)
         return Response(serializer.data)
 
     def post(self,request):
@@ -30,7 +30,7 @@ class CityDetails(APIView):
 
     def get(self, request, id):
         city = self.get_object(id)
-        serializer = CitySerializer(city)
+        serializer = CityViewSerializer(city)
         return Response(serializer.data)
 
 
