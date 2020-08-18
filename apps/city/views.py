@@ -3,9 +3,12 @@ from .serializer import CitySerializer , CityViewSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 
 
 class CityAPIView(APIView):
+    @method_decorator(cache_page(60*60*2))
     def get(self,request):
         cities = City.objects.all().order_by('Name')
         serializer = CityViewSerializer(cities,many=True)
@@ -27,7 +30,7 @@ class CityDetails(APIView):
         except City.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-
+    @method_decorator(cache_page(60*60*2))
     def get(self, request, id):
         city = self.get_object(id)
         serializer = CityViewSerializer(city)
