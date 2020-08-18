@@ -10,7 +10,7 @@ class PersonFamily(models.Model):
     Name = models.CharField(max_length = 100 , blank=True, null=True)
     Surname = models.CharField(max_length = 100 , blank=True, null=True)
     IdentityNumber = models.CharField(max_length = 20 , blank=True, null=True)
-    Birtyday = models.DateField(blank=True, null=True)
+    Birtyday = models.DateTimeField(blank=True, null=True)
     Gender = models.ForeignKey(Gender,on_delete=models.CASCADE,blank=True, null=True)
     Telephone = models.CharField(max_length = 20 , blank=True, null=True)
     Relation = models.IntegerField(blank=True,null=True)

@@ -17,12 +17,12 @@ class PersonIdentity(models.Model):
     PlaceOfBirthDistrict = models.ForeignKey(District,on_delete=models.CASCADE,related_name='PlaceOfBirthDistrict',blank=True, null=True)
     RegisteredCity = models.ForeignKey(City,on_delete=models.CASCADE,related_name='RegisteredCity',blank=True, null=True)
     RegisteredDistrict = models.ForeignKey(District,on_delete=models.CASCADE,related_name='RegisteredDistrict',blank=True, null=True)
-    BirthDate = models.DateField(blank=True, null=True)
+    BirthDate = models.DateTimeField(blank=True, null=True)
     Gender = models.ForeignKey(Gender,on_delete=models.CASCADE,blank=True, null=True)
     MaritalStatus = models.ForeignKey(MaritalStatus,on_delete=models.CASCADE,blank=True, null=True)
     BloodType = models.CharField(max_length=50,blank=True,null=True)
     MilitaryStatus = models.IntegerField(blank=True,null=True)
-    MilitaryDischargeData = models.DateField(blank=True, null=True)
+    MilitaryDischargeData = models.DateTimeField(blank=True, null=True)
     PreviousLastname = models.CharField(max_length = 100 , blank=True, null=True)
 
     def __str__(self):
