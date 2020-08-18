@@ -24,19 +24,6 @@ class PersonViewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Person        
         fields = (
-            # 'id',
-            # 'Name',
-            # 'Surname',
-            # 'IdentityID',
-            # 'Address',
-            # 'Telephone',
-            # 'State',
-            # 'IdentitySerialNumber',
-            # 'IdentityVolumeNo',
-            # 'Email',
-            # 'Picture',
-            # 'Nationality',
-            # 'PlaceOfRegistryID',
             'Person',
             'PersonIdentity',
             'PersonBusiness',

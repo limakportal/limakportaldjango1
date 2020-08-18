@@ -72,21 +72,21 @@ class PersonWithPersonInformationAPIView(APIView):
 
         transactionSaveId = transaction.savepoint()
 
-        personSerializer = PersonSerializer(data = request.data['person'] )
+        personSerializer = PersonSerializer(data = request.data['Person'] )
         if personSerializer.is_valid():
             person = personSerializer.save()
 
-            personIdentitySerializer = PersonIdentitySerializer(data = request.data['personIdentity'])   
-            if len(request.data['personIdentity']) > 0 :
+            personIdentitySerializer = PersonIdentitySerializer(data = request.data['PersonIdentity'])   
+            if len(request.data['PersonIdentity']) > 0 :
                 personIdentitySerializer.initial_data['Person'] = person.id               
                 if personIdentitySerializer.is_valid():
                     personIdentitySerializer.save()
                 else:
                     transaction.savepoint_rollback(transactionSaveId)
 
-            personbusinessSerializer = PersonBusinessSerializer(data = request.data['personbusiness'])
+            personbusinessSerializer = PersonBusinessSerializer(data = request.data['PersonBusiness'])
            
-            if len(request.data['personbusiness']) > 0:
+            if len(request.data['PersonBusiness']) > 0:
                 personbusinessSerializer.initial_data['Person'] = person.id 
                 if personbusinessSerializer.is_valid():
                     personbusinessSerializer.save()
@@ -94,8 +94,8 @@ class PersonWithPersonInformationAPIView(APIView):
                     transaction.savepoint_rollback(transactionSaveId)
 
 
-            if len(request.data['personeducation']) > 0:
-                for personEducation in request.data['personeducation']:
+            if len(request.data['PersonEducation']) > 0:
+                for personEducation in request.data['PersonEducation']:
                     personEducationSerializer = PersonEducationSerializer(data=personEducation)
                     personEducationSerializer.initial_data['Person'] = person.id
                     if personEducationSerializer.is_valid():
@@ -103,8 +103,8 @@ class PersonWithPersonInformationAPIView(APIView):
                     else:
                         transaction.savepoint_rollback(transactionSaveId)
 
-            if len(request.data['personfamily']) > 0:
-                for personFamily in request.data['personfamily']:
+            if len(request.data['PersonFamily']) > 0:
+                for personFamily in request.data['PersonFamily']:
                     personFamilySerializer = PersonFamilySerializer(data=personFamily)
                     personFamilySerializer.initial_data['Person'] = person.id
                     if personFamilySerializer.is_valid():
@@ -133,3 +133,75 @@ class PersonWithPersonInformationDetails(APIView):
         person = self.get_object(id)
         serializer = PersonViewSerializer(person)
         return Response(serializer.data)
+
+    @transaction.atomic
+    def put(self, request,id):
+        print('emrah')
+
+        transactionSaveId = transaction.savepoint()
+
+        person = self.get_object(id)
+        serializer = PersonSerializer(person, data=request.data['Person'])
+        if serializer.is_valid():
+            serializer.save()
+            
+            if len(request.data['PersonIdentity']) > 0:
+                try:
+                    personIdentity = PersonIdentity.objects.get(id = request.data['PersonIdentity']['id'])
+                    personIdentitySerializer = PersonIdentitySerializer(personIdentity , data = request.data['PersonIdentity'])
+                    if personIdentitySerializer.is_valid():
+                        personIdentitySerializer.save()
+                    else:
+                        transaction.savepoint_rollback(transactionSaveId)
+                        return Response(personIdentitySerializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                except PersonIdentity.DoesNotExist:
+                    return Response(status=status.HTTP_404_NOT_FOUND)
+
+            if len(request.data['PersonBusiness']) > 0:
+                try:
+                    personBusiness = PersonBusiness.objects.get(id = request.data['PersonBusiness']['id'])
+                    personBusinessSerializer = PersonBusinessSerializer(personBusiness , data = request.data['PersonBusiness'])
+                    if personBusinessSerializer.is_valid():
+                        personBusinessSerializer.save()
+                    else:
+                        transaction.savepoint_rollback(transaction)
+                        return Response(personBusinessSerializer.errors , status = status.HTTP_400_BAD_REQUEST)
+                except PersonIdentity.DoesNotExist:
+                    return Response(status = status.HTTP_404_NOT_FOUND)
+
+            if len(request.data['PersonEducation']) > 0:
+                for peronEducationData in request.data['PersonEducation']:
+                    try:
+                        personEducation = PersonEducation.objects.get(id = peronEducationData['id'])
+                        personEducationSerializer = PersonEducationSerializer(personEducation , data = peronEducationData)
+                        if personEducationSerializer.is_valid():
+                            personEducationSerializer.save()
+                        else:
+                            transaction.savepoint_rollback(transaction)
+                            return Response(personEducationSerializer.errors , status = status.HTTP_400_BAD_REQUEST)
+                    except PersonEducation.DoesNotExist:
+                        return Response(status = status.HTTP_404_NOT_FOUND)
+
+            if len(request.data['PersonFamily']) > 0:
+                for personFamilyData in request.data['PersonFamily']:
+                    try:
+                        personFamily = PersonFamily.objects.get(id = personFamilyData['id'])
+                        personFamilySerializer = PersonEducationSerializer(personFamily , data = personFamilyData)
+                        if personFamilySerializer.is_valid():
+                            personFamilySerializer.save()
+                        else:
+                            transaction.savepoint_rollback(transaction)
+                            return Response(personFamilySerializer.errors , status = status.HTTP_400_BAD_REQUEST)
+                    except expression as identifier:
+                        return Response(status = status.HTTP_404_NOT_FOUND)
+
+            try:
+                newPerson = Person.objects.get(id=id)
+                serializer = PersonViewSerializer(newPerson)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            except:
+                return Response(status=status.HTTP_404_NOT_FOUND) 
+
+        else:                
+            transaction.savepoint_rollback(transactionSaveId)
+            
