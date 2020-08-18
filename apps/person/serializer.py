@@ -24,19 +24,20 @@ class PersonViewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Person        
         fields = (
-            'id',
-            'Name',
-            'Surname',
-            'IdentityID',
-            'Address',
-            'Telephone',
-            'State',
-            'IdentitySerialNumber',
-            'IdentityVolumeNo',
-            'Email',
-            'Picture',
-            'Nationality',
-            'PlaceOfRegistryID',
+            # 'id',
+            # 'Name',
+            # 'Surname',
+            # 'IdentityID',
+            # 'Address',
+            # 'Telephone',
+            # 'State',
+            # 'IdentitySerialNumber',
+            # 'IdentityVolumeNo',
+            # 'Email',
+            # 'Picture',
+            # 'Nationality',
+            # 'PlaceOfRegistryID',
+            'Person',
             'PersonIdentity',
             'PersonBusiness',
             'PersonEducation',
@@ -46,10 +47,21 @@ class PersonViewSerializer(serializers.ModelSerializer):
     # Id = serializers.CharField(source='id')
     # NationalityId = serializers.CharField(source='Nationality')
 
+    Person = serializers.SerializerMethodField()
     PersonIdentity = serializers.SerializerMethodField()
     PersonBusiness = serializers.SerializerMethodField()
     PersonEducation = serializers.SerializerMethodField()
     PersonFamily = serializers.SerializerMethodField()
+
+    def get_Person(self,obj):
+        try:
+            print(obj.id)
+            person = Person.objects.get(id=obj.id)
+            print(person)
+            serializer = PersonSerializer(person)
+            return serializer.data
+        except expression as identifier:
+            return None
     
     def get_PersonIdentity(self,obj):
         try:
