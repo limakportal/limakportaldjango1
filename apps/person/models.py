@@ -2,7 +2,6 @@ from django.db import models
 
 from apps.gender.models import Gender
 from apps.maritalstatus.models import MaritalStatus
-from apps.city.models import City
 from apps.nationality.models import Nationality
 
 class Person(models.Model):
@@ -16,9 +15,6 @@ class Person(models.Model):
     Address = models.CharField(max_length=50,blank=True,null=True)
     Telephone = models.CharField(max_length=50,blank=True,null=True)
     State = models.IntegerField(blank=True,null=True)
-    PlaceOfRegistryID = models.ForeignKey(City,on_delete=models.CASCADE,related_name='PlaceOfRegistryID',blank=True, null=True)
-    # IdentitySerialNumber = models.CharField(max_length=50,blank=True,null=True)
-    # IdentityVolumeNo = models.CharField(max_length=50,blank=True,null=True)
     Email = models.CharField(max_length=50,blank=True,null=True)
     Picture = models.BinaryField(max_length=(1<<24)-1,blank=True,null=True)
 
