@@ -39,4 +39,5 @@ urlpatterns = [
     path('',include('apps.personidentity.urls')),
     path('',include('apps.personfamily.urls')),
     path('',include('apps.personbusiness.urls')),
+    path('',include('apps.navigationbar.urls')),
 ]

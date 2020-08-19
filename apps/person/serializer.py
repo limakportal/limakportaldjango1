@@ -42,9 +42,7 @@ class PersonViewSerializer(serializers.ModelSerializer):
 
     def get_Person(self,obj):
         try:
-            print(obj.id)
             person = Person.objects.get(id=obj.id)
-            print(person)
             serializer = PersonSerializer(person)
             return serializer.data
         except expression as identifier:
