@@ -55,7 +55,7 @@ class RightWithApproverSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'EndDate',
-            'StatDate'
+            'StartDate'
             'DateOfReturn',
             'Address',
             'Telephone',
