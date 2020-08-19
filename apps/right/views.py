@@ -3,6 +3,9 @@ from .serializer import RightSerializer , RightWithApproverSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.decorators import api_view
+from wsgiref.util import FileWrapper
+from django.http import HttpResponse
 
 class RightAPIView(APIView):
     def get(self,request):
@@ -52,3 +55,10 @@ class RightWithApproverAPIView(APIView):
         rights = Right.objects.all().order_by('id')
         serializer = RightWithApproverSerializer(rights,many=True)
         return Response(serializer.data)
+
+@api_view(['GET'])
+def RightDownload(request):
+    zip_file = open('Yillik_izin_Formu.pdf', 'rb')
+    response = HttpResponse(FileWrapper(zip_file), content_type='application/pdf')
+    response['Content-Disposition'] = 'filename="izin.pdf"'
+    return response
