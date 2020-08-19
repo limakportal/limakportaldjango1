@@ -16,10 +16,8 @@ class RightWithApproverSerializer(serializers.ModelSerializer):
     RightType = RightTypeSerializer()
 
     Approver1FullName = serializers.SerializerMethodField('apporover1_full_name')
-    Approver2FullName = serializers.SerializerMethodField('apporover2_full_name')
     PersonFullName = serializers.SerializerMethodField('person_full_name')
     PersonApprover1 = serializers.SerializerMethodField()
-    PersonApprover2 = serializers.SerializerMethodField()
 
     def apporover1_full_name(self,obj):
         if obj.Approver1 != None:
@@ -28,12 +26,12 @@ class RightWithApproverSerializer(serializers.ModelSerializer):
             return serializer['Name'] + ' ' + serializer['Surname']
         return None
 
-    def apporover2_full_name(self,obj):
-        if obj.Approver1 != None:
-            personel = Person.objects.get(id=obj.Approver2)
-            serializer = PersonSerializer(personel).data
-            return serializer['Name'] + ' ' + serializer['Surname']
-        return None
+    # def apporover2_full_name(self,obj):
+    #     if obj.Approver1 != None:
+    #         personel = Person.objects.get(id=obj.Approver2)
+    #         serializer = PersonSerializer(personel).data
+    #         return serializer['Name'] + ' ' + serializer['Surname']
+    #     return None
 
     def person_full_name(self,obj):
         person = Person.objects.get(id=obj.Person.id)
@@ -46,30 +44,28 @@ class RightWithApproverSerializer(serializers.ModelSerializer):
             serializer = PersonSerializer(person).data
             return serializer
 
-    def get_PersonApprover2(self,obj):
-        if obj.Approver1 != None:
-            person = Person.objects.get(id = obj.Approver2)
-            serializer = PersonSerializer(person).data
-            return serializer
+    # def get_PersonApprover2(self,obj):
+    #     if obj.Approver1 != None:
+    #         person = Person.objects.get(id = obj.Approver2)
+    #         serializer = PersonSerializer(person).data
+    #         return serializer
 
     class Meta:
         model = Right
         fields = (
             'id',
             'EndDate',
+            'StatDate'
             'DateOfReturn',
             'Address',
             'Telephone',
             'Approver1',
-            'Approver2',
             'RightNumber',
             'DenyExplanation',
             'Person',
             'RightType',
             'RightStatus',
             'Approver1FullName',
-            'Approver2FullName',
             'PersonFullName',
-            'PersonApprover1',
-            'PersonApprover2'
+            'PersonApprover1'
         )
