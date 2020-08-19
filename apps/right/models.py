@@ -10,12 +10,12 @@ class Right(models.Model):
         db_table = 'Right'
 
     Person = models.ForeignKey(Person,on_delete = models.CASCADE)
-    EndDate = models.DateField(auto_now_add=True,max_length=50,blank=True,null=True)
-    DateOfReturn = models.DateField(auto_now_add=True,max_length=50,blank=True,null=True)
+    EndDate = models.DateTimeField(blank=True, null=True)
+    StartDate = models.DateTimeField(blank=True, null=True)
+    DateOfReturn = models.DateTimeField(blank=True, null=True)
     Address = models.CharField(max_length=50,blank=True,null=True)
     Telephone = models.CharField(max_length=50,blank=True,null=True)
     Approver1 = models.IntegerField(blank=True,null=True)
-    Approver2 = models.IntegerField(blank=True,null=True)
     RightType = models.ForeignKey(RightType,on_delete = models.CASCADE,blank=True, null=True)
     RightStatus = models.ForeignKey(RightStatus, on_delete = models.CASCADE,blank=True, null=True)
     RightNumber = models.IntegerField(blank=True,null=True)
