@@ -40,4 +40,7 @@ urlpatterns = [
     path('',include('apps.personfamily.urls')),
     path('',include('apps.personbusiness.urls')),
     path('',include('apps.navigationbar.urls')),
+    path('',include('apps.role.urls')),
+    path('',include('apps.permission.urls')),
+    path('',include('apps.authority.urls')),
 ]
