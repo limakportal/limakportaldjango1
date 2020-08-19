@@ -2,12 +2,12 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .models import NavigationBar
-from .serializer import NavigationBarSerializer
+from .serializer import NavigationBarSerializer , NavigationBarItemsSerializer
 
 class NavigationBarAPIView(APIView):
     def get(self,request):
         navigationBar = NavigationBar.objects.all().order_by('id')
-        serializer = NavigationBarSerializer(navigationBar , many = True)
+        serializer = NavigationBarItemsSerializer(navigationBar , many = True)
         return Response(serializer.data)
 
     def post(self,request):

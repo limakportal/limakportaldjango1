@@ -65,6 +65,9 @@ INSTALLED_APPS = [
     'apps.personfamily',
     'apps.personbusiness',
     'apps.navigationbar',
+    'apps.role',
+    'apps.permission',
+    'apps.authority',
 
 ]
 

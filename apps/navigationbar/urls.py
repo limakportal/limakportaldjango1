@@ -3,6 +3,6 @@ from .views import NavigationBarAPIView , NavigationBarDetails
 
 
 urlpatterns = [ 
-    path('navigationbar/', NavigationBarAPIView.as_view()),
-    path('navigationbar/<int:id>/', NavigationBarDetails.as_view()),
+    path('navigationbars/', NavigationBarAPIView.as_view()),
+    path('navigationbars/<int:id>/', NavigationBarDetails.as_view()),
 ]
