@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.db import transaction
 
 from .models import Person
-from .serializer import PersonSerializer , PersonViewSerializer
+from .serializer import PersonSerializer , PersonViewSerializer , PersonViewDetailSerializer
 from apps.personidentity.models import PersonIdentity
 from apps.personidentity.serializer import PersonIdentitySerializer
 from apps.personbusiness.models import PersonBusiness
@@ -131,7 +131,7 @@ class PersonWithPersonInformationDetails(APIView):
 
     def get(self, request, id):
         person = self.get_object(id)
-        serializer = PersonViewSerializer(person)
+        serializer = PersonViewDetailSerializer(person)
         return Response(serializer.data)
 
     @transaction.atomic
