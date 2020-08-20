@@ -45,4 +45,5 @@ urlpatterns = [
     path('',include('apps.authority.urls')),
     path('',include('apps.rightmaintype.urls')),
     path('',include('apps.vocationdays.urls')),
+    path('',include('apps.rightleave.urls')),
 ]

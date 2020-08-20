@@ -69,7 +69,8 @@ INSTALLED_APPS = [
     'apps.permission',
     'apps.authority',
     'apps.rightmaintype',
-    'apps.vocationdays'
+    'apps.vocationdays',
+    'apps.rightleave'
 
 ]
 
