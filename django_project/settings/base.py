@@ -68,6 +68,7 @@ INSTALLED_APPS = [
     'apps.role',
     'apps.permission',
     'apps.authority',
+    'apps.rightmaintype',
 
 ]
 

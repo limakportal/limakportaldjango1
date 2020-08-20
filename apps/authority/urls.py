@@ -3,6 +3,6 @@ from .views import AuthorityAPIView , AuthorityDetails
 
 
 urlpatterns = [ 
-    path('authorities/', AuthorityAPIView.as_view()),
+    path('authorities', AuthorityAPIView.as_view()),
     path('authorities/<int:id>/', AuthorityDetails.as_view()),
 ]

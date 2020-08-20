@@ -43,4 +43,5 @@ urlpatterns = [
     path('',include('apps.role.urls')),
     path('',include('apps.permission.urls')),
     path('',include('apps.authority.urls')),
+    path('',include('apps.rightmaintype.urls')),
 ]
