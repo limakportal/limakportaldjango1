@@ -43,6 +43,7 @@ urlpatterns = [
     path('',include('apps.role.urls')),
     path('',include('apps.permission.urls')),
     path('',include('apps.authority.urls')),
+    path('',include('apps.login.urls')),
     path('',include('apps.rightmaintype.urls')),
     path('',include('apps.vocationdays.urls')),
     path('',include('apps.rightleave.urls')),

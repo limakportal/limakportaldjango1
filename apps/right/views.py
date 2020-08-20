@@ -1,5 +1,6 @@
 from .models import Right
 from .serializer import RightSerializer , RightWithApproverSerializer
+from ..righttype.models import RightType
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -56,9 +57,21 @@ class RightWithApproverAPIView(APIView):
         serializer = RightWithApproverSerializer(rights,many=True)
         return Response(serializer.data)
 
-@api_view(['GET'])
-def RightDownload(request):
-    zip_file = open('Yillik_izin_Formu.pdf', 'rb')
-    response = HttpResponse(FileWrapper(zip_file), content_type='application/pdf')
-    response['Content-Disposition'] = 'filename="izin.pdf"'
-    return response
+class RightDownloadApiView(APIView):
+    def get(self,request,id):    
+        try:
+            right = Right.objects.get(id=id)
+            righttype = RightType.objects.get(id=right.RightType.id)
+            if  righttype.RightMainType.id == 1:
+                zip_file = open('Yillik_izin_Formu.pdf', 'rb')
+            if  righttype.RightMainType.id == 2:
+                zip_file = open('Mazeret_izin_Formu.pdf', 'rb')
+            if  righttype.RightMainType.id == 3:
+                zip_file = open('Ucretsiz_izin_Formu.pdf', 'rb')
+            response = HttpResponse(FileWrapper(zip_file), content_type='application/pdf')
+            response['Content-Disposition'] = 'filename="izin.pdf"'
+            return response
+        except Right.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+    
