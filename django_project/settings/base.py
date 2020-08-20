@@ -68,14 +68,26 @@ INSTALLED_APPS = [
     'apps.role',
     'apps.permission',
     'apps.authority',
+<<<<<<< HEAD
+    'apps.login',
+=======
     'apps.rightmaintype',
-    'apps.vocationdays'
+    'apps.vocationdays',
+    'apps.rightleave'
+>>>>>>> 44f901ea925a975cb722c584a4a3ee5bc462ea4a
 
 ]
 
 # AUTHENTICATION_BACKENDS = (
 #     ('django.contrib.auth.backends.ModelBackend'),
 # )
+
+# REST_FRAMEWORK = {
+#     'DEFAULT_AUTHENTICATION_CLASSES': [
+#         'rest_framework_simplejwt.authentication.JWTAuthentication',
+#     ],
+# }
+# AUTH_USER_MODEL = 'account.Account'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -87,6 +99,7 @@ REST_FRAMEWORK = {
 }
 
 AUTH_USER_MODEL = 'account.Account'
+
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
