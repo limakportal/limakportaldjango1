@@ -5,3 +5,11 @@ class PersonBusinessSerializer(serializers.ModelSerializer):
     class Meta:
         model = PersonBusiness
         fields =('__all__')
+
+class PersonBusinessForPersonListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PersonBusiness
+        fields =(
+            'id',
+            'JobStartDate'
+        )

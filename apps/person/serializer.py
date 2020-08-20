@@ -8,19 +8,72 @@ from apps.maritalstatus.serializer import MaritalStatusSerializer
 from apps.personidentity.models import PersonIdentity
 from apps.personidentity.serializer import PersonIdentitySerializer
 from apps.personbusiness.models import PersonBusiness
-from apps.personbusiness.serializer import PersonBusinessSerializer
+from apps.personbusiness.serializer import PersonBusinessSerializer ,PersonBusinessForPersonListSerializer
 from apps.personeducation.models import PersonEducation
 from apps.personeducation.serializer import PersonEducationSerializer
 from apps.personfamily.models import PersonFamily
 from apps.personfamily.serializer import PersonFamilySerializer
+from apps.staff.models import Staff
+from apps.staff.serializer import StafForPersonSerializer
 
 class PersonSerializer(serializers.ModelSerializer):
     class Meta:
         model = Person       
         fields = ('__all__')
 
+class PersonForListViewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Person
+        fields = (
+            'id',
+            'Name',
+            'Surname',
+            'IdentityID',
+            'Telephone',
+            'Email'
+        )
+
 
 class PersonViewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Person
+        fields = (
+            'Person',
+            'PersonBusiness',
+            'Staff'
+        )
+    
+    Person = serializers.SerializerMethodField()
+    PersonBusiness = serializers.SerializerMethodField()
+    Staff = serializers.SerializerMethodField()
+
+    def get_Person(self,obj):
+        try:
+            person = Person.objects.get(id=obj.id)
+            serializer = PersonForListViewSerializer(person)
+            return serializer.data
+        except expression as identifier:
+            return None
+
+    def get_PersonBusiness(self,obj):
+        try:
+            personBusiness = PersonBusiness.objects.get(Person = obj.id)
+            serializer = PersonBusinessForPersonListSerializer(personBusiness)
+            return serializer.data
+        except:
+            return None
+
+    def get_Staff(self,obj):
+        try:
+            staff = Staff.objects.get(Person = obj.id)
+            serializers = StafForPersonSerializer(staff)
+            return serializers.data
+        except:
+            return None
+
+
+
+class PersonViewDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Person        
         fields = (

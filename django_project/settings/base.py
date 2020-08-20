@@ -68,7 +68,13 @@ INSTALLED_APPS = [
     'apps.role',
     'apps.permission',
     'apps.authority',
+<<<<<<< HEAD
     'apps.login',
+=======
+    'apps.rightmaintype',
+    'apps.vocationdays',
+    'apps.rightleave'
+>>>>>>> 44f901ea925a975cb722c584a4a3ee5bc462ea4a
 
 ]
 

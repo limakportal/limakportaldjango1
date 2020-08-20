@@ -2,6 +2,8 @@ from django.db import models
 from apps.status.models import Status
 from apps.organizationtype.models import OrganizationType
 
+from apps.title.models import Title
+
 class Organization(models.Model):
     class Meta:
         db_table = 'Organization'
@@ -15,6 +17,9 @@ class Organization(models.Model):
     IsSaturdayWorkDay = models.BooleanField(default=True)
     IsSundayWorkDay = models.BooleanField(default=True)
     CanApproveRight = models.BooleanField(default=True)
+    ManagerTitle = models.ForeignKey(Title, on_delete = models.CASCADE,blank=True, null=True)
+    WorkStartTime = models.DateTimeField(blank=True, null=True)
+    WorkEndTime = models.DateTimeField(blank=True, null=True)
 
     def children(self):
         return Organization.objects.filter(UpperOrganization=self)
