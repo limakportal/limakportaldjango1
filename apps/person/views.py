@@ -159,13 +159,15 @@ class PersonWithPersonInformationDetails(APIView):
                         transaction.savepoint_rollback(transactionSaveId)
                         return Response(personIdentitySerializer.errors, status=status.HTTP_400_BAD_REQUEST)
                 else:
-                    personIdentityAddSerializer = PersonIdentitySerializer(data = getPersonIdentityData)
-                    personIdentityAddSerializer.initial_data['Person'] = id
-                    if personIdentityAddSerializer.is_valid():
-                        personIdentityAddSerializer.save()
-                    else:
-                        transaction.savepoint_rollback(transactionSaveId)
-                        return Response(personIdentityAddSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                    personIdentity = PersonIdentity.objects.filter(Person = id)
+                    if len(personIdentity) == 0:
+                        personIdentityAddSerializer = PersonIdentitySerializer(data = getPersonIdentityData)
+                        personIdentityAddSerializer.initial_data['Person'] = id
+                        if personIdentityAddSerializer.is_valid():
+                            personIdentityAddSerializer.save()
+                        else:
+                            transaction.savepoint_rollback(transactionSaveId)
+                            return Response(personIdentityAddSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
             getPersonBusinessData = {}
             getPersonBusinessData = request.data['PersonBusiness']
@@ -179,13 +181,15 @@ class PersonWithPersonInformationDetails(APIView):
                         transaction.savepoint_rollback(transactionSaveId)
                         return Response(personBussinessEddSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
                 else:
-                    personBusinessAddSerializer = PersonBusinessSerializer(data = getPersonBusinessData)
-                    personBusinessAddSerializer.initial_data['Person'] = id
-                    if personBusinessAddSerializer.is_valid():
-                        personBusinessAddSerializer.save()
-                    else:
-                        transaction.savepoint_rollback(transactionSaveId)
-                        return Response(personBusinessAddSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                    personBusiness = PersonBusiness.objects.filter(Person = id)
+                    if len(personBusiness) == 0:
+                        personBusinessAddSerializer = PersonBusinessSerializer(data = getPersonBusinessData)
+                        personBusinessAddSerializer.initial_data['Person'] = id
+                        if personBusinessAddSerializer.is_valid():
+                            personBusinessAddSerializer.save()
+                        else:
+                            transaction.savepoint_rollback(transactionSaveId)
+                            return Response(personBusinessAddSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
             getPersonEducationData = {}
             getPersonEducationData = request.data['PersonEducation']
