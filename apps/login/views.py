@@ -3,7 +3,6 @@ from django.contrib.auth.hashers import make_password
 from rest_framework.utils import json
 from rest_framework.views import APIView
 from rest_framework.response import Response
-import requests
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import User
 from apps.account.models import Account
