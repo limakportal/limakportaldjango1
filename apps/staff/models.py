@@ -16,4 +16,4 @@ class Staff(models.Model):
     Person = models.ForeignKey(Person,on_delete=models.CASCADE,blank=True, null=True)
 
     def __str__(self):
-        return self.Person.Name
+        return self.Title
