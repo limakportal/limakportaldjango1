@@ -7,8 +7,8 @@ from rest_framework import status
 
 class RightMainTypeAPIView(APIView):
     def get(self,request):
-        rightmaintypes = Title.objects.all().order_by('id')
-        serializer = TitleSerializer(rightmaintypes,many=True)
+        rightmaintypes = RightMainType.objects.all().order_by('id')
+        serializer = RightMainTypeSerializer(rightmaintypes,many=True)
         return Response(serializer.data)
 
     def post(self,request):
