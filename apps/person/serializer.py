@@ -14,7 +14,7 @@ from apps.personeducation.serializer import PersonEducationSerializer
 from apps.personfamily.models import PersonFamily
 from apps.personfamily.serializer import PersonFamilySerializer
 from apps.staff.models import Staff
-from apps.staff.serializer import StaffSerializer
+from apps.staff.serializer import StafForPersonSerializer
 
 class PersonSerializer(serializers.ModelSerializer):
     class Meta:
@@ -66,7 +66,7 @@ class PersonViewSerializer(serializers.ModelSerializer):
     def get_Staff(self,obj):
         try:
             staff = Staff.objects.get(Person = obj.id)
-            serializers = StaffSerializer(staff)
+            serializers = StafForPersonSerializer(staff)
             return serializers.data
         except:
             return None
