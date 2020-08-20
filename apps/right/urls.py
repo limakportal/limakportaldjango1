@@ -3,7 +3,7 @@ from .views import RightAPIView , RightDetails , RightWithApproverAPIView,RightD
 
 
 urlpatterns = [ 
-    path('rights/', RightAPIView.as_view()),
+    path('rights', RightAPIView.as_view()),
     path('rights/<int:id>/', RightDetails.as_view()),
     path('rightsDesc', RightWithApproverAPIView.as_view()),
     path('rightsDownload', RightDownload)
