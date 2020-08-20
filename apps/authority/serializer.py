@@ -1,18 +1,16 @@
 from rest_framework import serializers
-from .models import Permission
-from .models import Role
 from .models import Authority
 
 from apps.permission.serializer import PermissionSerializer
 from apps.role.serializer import RoleSerializer
-from apps.permission.serializer import PermissionSerializer
+
 
 
 class AuthoritySerializer(serializers.ModelSerializer):
+    Role = RoleSerializer()
+    Permission = PermissionSerializer()
     class Meta:
-        model = Authority
-        Role = RoleSerializer()
-        Permission = PermissionSerializer()  
+        model = Authority  
         fields = ('__all__')
 
 
