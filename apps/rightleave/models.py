@@ -11,4 +11,4 @@ class RightLeave(models.Model):
     Optime = models.DateTimeField(blank=True,null=True)
 
     def __str__(self):
-        return self.Name
+        return self.Person.Name
