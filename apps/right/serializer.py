@@ -21,9 +21,12 @@ class RightWithApproverSerializer(serializers.ModelSerializer):
 
     def apporover1_full_name(self,obj):
         if obj.Approver1 != None:
-            personel = Person.objects.get(id=obj.Approver1)
-            serializer = PersonSerializer(personel).data
-            return serializer['Name'] + ' ' + serializer['Surname']
+            try:
+                personel = Person.objects.get(id=obj.Approver1)
+                serializer = PersonSerializer(personel).data
+                return serializer['Name'] + ' ' + serializer['Surname']
+            except:
+                return None
         return None
 
     # def apporover2_full_name(self,obj):
@@ -34,15 +37,22 @@ class RightWithApproverSerializer(serializers.ModelSerializer):
     #     return None
 
     def person_full_name(self,obj):
-        person = Person.objects.get(id=obj.Person.id)
-        serializer = PersonSerializer(person).data
-        return serializer['Name'] + ' ' +serializer['Surname']
+        try:
+            person = Person.objects.get(id=obj.Person.id)
+            serializer = PersonSerializer(person).data
+            return serializer['Name'] + ' ' +serializer['Surname']
+        except:
+            return None
 
     def get_PersonApprover1(self,obj):
         if obj.Approver1 != None:
-            person = Person.objects.get(id = obj.Approver1)
-            serializer = PersonSerializer(person).data
-            return serializer
+            try:
+                person = Person.objects.get(id = obj.Approver1)
+                serializer = PersonSerializer(person).data
+                return serializer
+            except:
+                return None
+
 
     # def get_PersonApprover2(self,obj):
     #     if obj.Approver1 != None:
