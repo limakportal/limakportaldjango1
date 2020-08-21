@@ -10,7 +10,7 @@ from django.views.decorators.cache import cache_page
 class VocationAPIView(APIView):
     @method_decorator(cache_page(60*60*2))
     def get(self,request):
-        days = VocationDays.objects.all().order_by('Date')
+        days = VocationDays.objects.all().order_by('DateDay')
         serializer = VocationDaysSerializer(days,many=True)
         return Response(serializer.data)
 
