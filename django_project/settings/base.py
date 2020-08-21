@@ -71,9 +71,10 @@ INSTALLED_APPS = [
     'apps.login',
     'apps.rightmaintype',
     'apps.vocationdays',
-    'apps.rightleave'
+    'apps.rightleave',
+    'apps.userrole'
 ]
-
+#google token
 # AUTHENTICATION_BACKENDS = (
 #     ('django.contrib.auth.backends.ModelBackend'),
 # )
@@ -151,10 +152,10 @@ DATABASES = {
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'vyxotzwh',
-#         'USER': 'vyxotzwh',
-#         'PASSWORD': 'F1eaGjar2VkTfjDNPU7wLHteb20DF-DE',
-#         'HOST': 'kandula.db.elephantsql.com',
+#         'NAME': 'postgres',
+#         'USER': 'postgres',
+#         'PASSWORD': 'm6df1o',
+#         'HOST': '192.168.100.76',
 #         'PORT': '5432',
 #     }
 # }

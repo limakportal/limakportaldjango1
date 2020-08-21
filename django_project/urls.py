@@ -47,4 +47,5 @@ urlpatterns = [
     path('',include('apps.rightmaintype.urls')),
     path('',include('apps.vocationdays.urls')),
     path('',include('apps.rightleave.urls')),
+    path('',include('apps.userrole.urls')),
 ]
