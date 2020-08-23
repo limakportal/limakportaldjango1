@@ -138,12 +138,13 @@ class PersonWithPersonInformationDetails(APIView):
 
     @transaction.atomic
     def put(self, request,id):
-        print('emrah')
 
         transactionSaveId = transaction.savepoint()
 
         person = self.get_object(id)
-        serializer = PersonSerializer(person, data=request.data['Person'])
+        getPersonData = {}
+        getPersonData = request.data['Person']
+        serializer = PersonSerializer(person, data = getPersonData)
         if serializer.is_valid():
             serializer.save()
 
@@ -157,7 +158,7 @@ class PersonWithPersonInformationDetails(APIView):
                         personIdentityEditSerializer.save()
                     else:
                         transaction.savepoint_rollback(transactionSaveId)
-                        return Response(personIdentitySerializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                        return Response(personIdentityEditSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
                 else:
                     personIdentity = PersonIdentity.objects.filter(Person = id)
                     if len(personIdentity) == 0:
@@ -173,7 +174,7 @@ class PersonWithPersonInformationDetails(APIView):
             getPersonBusinessData = request.data['PersonBusiness']
             if len(getPersonBusinessData) > 0:
                 if 'id' in json.loads(json.dumps(getPersonBusinessData)):
-                    personBusinessObj = PersonIdentity.objects.get(id = getPersonBusinessData['id'])
+                    personBusinessObj = PersonBusiness.objects.get(id = getPersonBusinessData['id'])
                     personBussinessEddSerializer = PersonBusinessSerializer(personBusinessObj , data = getPersonBusinessData)
                     if personBussinessEddSerializer.is_valid():
                         personBussinessEddSerializer.save()

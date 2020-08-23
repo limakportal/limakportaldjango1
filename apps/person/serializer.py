@@ -52,7 +52,7 @@ class PersonViewSerializer(serializers.ModelSerializer):
             person = Person.objects.get(id=obj.id)
             serializer = PersonForListViewSerializer(person)
             return serializer.data
-        except expression as identifier:
+        except:
             return None
 
     def get_PersonBusiness(self,obj):
@@ -98,7 +98,7 @@ class PersonViewDetailSerializer(serializers.ModelSerializer):
             person = Person.objects.get(id=obj.id)
             serializer = PersonSerializer(person)
             return serializer.data
-        except expression as identifier:
+        except :
             return None
     
     def get_PersonIdentity(self,obj):
