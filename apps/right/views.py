@@ -1,12 +1,14 @@
 from .models import Right
 from .serializer import RightSerializer , RightWithApproverSerializer
 from ..righttype.models import RightType
+from ..rightleave.models import RightLeave
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view
 from wsgiref.util import FileWrapper
 from django.http import HttpResponse
+from django.db.models import Sum
 
 class RightAPIView(APIView):
     def get(self,request):
@@ -74,4 +76,19 @@ class RightDownloadApiView(APIView):
         except Right.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-    
+@api_view(['GET'])
+def RightBalance(request,id):
+    try:
+        rightleave =  RightLeave.objects.filter(Person=id)
+        if rightleave:
+            leave =  rightleave.aggregate(total=Sum('Earning'))
+            right  = Right.objects.filter(Person=id,RightStatus=1)
+            number = 0
+            if  right:
+                number =  right.aggregate(total=Sum('RightNumber'))['total']
+            total = leave['total'] - number
+        else:
+           return Response('Kişiye ait izin hakedişi bulunmamaktadır.',status=status.HTTP_404_NOT_FOUND)
+        return Response({'total' : total})
+    except RightLeave.DoesNotExist:
+        return Response('Kişiye ait izin hakedişi bulunmamaktadır.',status=status.HTTP_404_NOT_FOUND)
