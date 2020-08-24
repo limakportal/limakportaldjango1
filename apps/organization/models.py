@@ -3,6 +3,7 @@ from apps.status.models import Status
 from apps.organizationtype.models import OrganizationType
 
 from apps.title.models import Title
+from ..shift.models import Shift
 
 class Organization(models.Model):
     class Meta:
@@ -20,6 +21,9 @@ class Organization(models.Model):
     ManagerTitle = models.ForeignKey(Title, on_delete = models.CASCADE,blank=True, null=True)
     WorkStartTime = models.DateTimeField(blank=True, null=True)
     WorkEndTime = models.DateTimeField(blank=True, null=True)
+    Shift = models.ForeignKey(Shift, on_delete = models.CASCADE,blank=True, null=True)
+
+
 
     def children(self):
         return Organization.objects.filter(UpperOrganization=self)

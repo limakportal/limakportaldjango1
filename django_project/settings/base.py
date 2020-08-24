@@ -72,7 +72,9 @@ INSTALLED_APPS = [
     'apps.rightmaintype',
     'apps.vocationdays',
     'apps.rightleave',
-    'apps.userrole'
+    'apps.userrole',
+    'apps.shift',
+    # 'apps.businessrules',
 ]
 #google token
 # AUTHENTICATION_BACKENDS = (
