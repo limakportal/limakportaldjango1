@@ -21,7 +21,7 @@ class Organization(models.Model):
     ManagerTitle = models.ForeignKey(Title, on_delete = models.CASCADE,blank=True, null=True)
     WorkStartTime = models.DateTimeField(blank=True, null=True)
     WorkEndTime = models.DateTimeField(blank=True, null=True)
-    Shift = models.ForeignKey(Shift, on_delete = models.CASCADE,blank=True, null=True)
+    # Shift = models.ForeignKey(Shift, on_delete = models.CASCADE,blank=True, null=True)
 
 
 
