@@ -20,6 +20,7 @@ class PersonApproverDetails(APIView):
                 personel = Person.objects.get(id=id)
                 serializer = PersonSerializer(personel)
                 data = {}
+                data['id'] = serializer.data['id']
                 data['FullName'] = serializer.data['Name'] + ' ' + serializer.data['Surname']
                 return Response(data)
             else:
@@ -27,6 +28,7 @@ class PersonApproverDetails(APIView):
                 personel = Person.objects.get(id=staffs.Person.id)
                 serializer = PersonSerializer(personel)
                 data = {}
+                data['id'] = serializer.data['id']
                 data['FullName'] = serializer.data['Name'] + ' ' + serializer.data['Surname']
                 return Response(data)
 
