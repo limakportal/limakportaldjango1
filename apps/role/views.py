@@ -39,7 +39,7 @@ class RoleDetails(APIView):
 
     def put(self, request,id):
         role = self.get_object(id)
-        serializer = RoleSerializer(gender, data=request.data)
+        serializer = RoleSerializer(role, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
