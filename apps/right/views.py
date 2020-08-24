@@ -10,6 +10,9 @@ from wsgiref.util import FileWrapper
 from django.http import HttpResponse
 from django.db.models import Sum
 from ..utils.enums import EnumRightTypes,EnumRightStatus
+from ..organization.models import Organization
+from ..staff.models import Staff
+import datetime
 
 class RightAPIView(APIView):
     def get(self,request):
@@ -96,3 +99,31 @@ def RightBalance(request,id):
     except RightLeave.DoesNotExist:
         return Response('Kişiye ait izin hakedişi bulunmamaktadır.',status=status.HTTP_404_NOT_FOUND)
 
+@api_view(['POST'])
+def RightDaysNumber(request,id):
+        stardate = datetime.datetime.strptime(request.data['StartDate'],'%Y-%m-%d')
+        enddate = datetime.datetime.strptime(request.data['EndDate'],'%Y-%m-%d')
+        startime = request.data['StartTime']
+        endtime = request.data['EndTime']
+        delta = datetime.timedelta(days=1)
+        number = 0
+        staff = Staff.objects.filter(Person=id)
+        if staff:
+            organization = Organization.objects.get(id=20)
+            if  organization:
+                while stardate < enddate:
+                      if stardate.weekday() == 5:
+                         if organization.IsSaturdayWorkDay:
+                            number +=1
+                      elif stardate.weekday() == 6:
+                              if organization.IsSundayWorkDay:
+                                  number += 1
+                      else:
+                           number += 1
+                      stardate += delta
+            else:
+                return Response('Şirket tanımı yapılmamıştır.',status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response('Kadro tanımı yapılmamıştır.',status=status.HTTP_404_NOT_FOUND)
+        
+        return   Response({'daynumber' : number})
