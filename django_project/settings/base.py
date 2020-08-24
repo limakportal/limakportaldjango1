@@ -139,13 +139,24 @@ WSGI_APPLICATION = 'django_project.wsgi.application'
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'hsmdjigr',
+#         'USER': 'hsmdjigr',
+#         'PASSWORD': 'UORMJNZgxSwr_PsZvxFq3fBFDuJxcXMg',
+#         'HOST': 'ruby.db.elephantsql.com',
+#         'PORT': '5432',
+#     }
+# }
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'hsmdjigr',
-        'USER': 'hsmdjigr',
-        'PASSWORD': 'UORMJNZgxSwr_PsZvxFq3fBFDuJxcXMg',
-        'HOST': 'ruby.db.elephantsql.com',
+        'NAME': 'd6mbftu1ace6cv',
+        'USER': 'zecudiiudbjrhz',
+        'PASSWORD': 'a99854179a6904be1858403b510aa6ca35e55d67e68e0a5934d7dfc65d072cb8',
+        'HOST': 'ec2-54-246-87-132.eu-west-1.compute.amazonaws.com',
         'PORT': '5432',
     }
 }
