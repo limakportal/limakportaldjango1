@@ -9,7 +9,7 @@ from rest_framework.decorators import api_view
 from wsgiref.util import FileWrapper
 from django.http import HttpResponse
 from django.db.models import Sum
-from ..utils.enums import EnumRightTypes
+from ..utils.enums import EnumRightTypes,EnumRightStatus
 
 class RightAPIView(APIView):
     def get(self,request):
@@ -45,6 +45,8 @@ class RightDetails(APIView):
         serializer = RightSerializer(right, data=request.data)
         if serializer.is_valid():
             serializer.save()
+            # if  serializer.data['RightStatus'] = EnumRightStatus.Onaylandi:
+            #     MailGonder()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -83,7 +85,7 @@ def RightBalance(request,id):
         rightleave =  RightLeave.objects.filter(Person=id)
         if rightleave:
             leave =  rightleave.aggregate(total=Sum('Earning'))
-            right  = Right.objects.filter(Person=id,RightStatus=1)
+            right  = Right.objects.filter(Person=id,RightStatus=EnumRightStatus.OnayBekliyor)
             number = 0
             if  right:
                 number =  right.aggregate(total=Sum('RightNumber'))['total']
@@ -93,3 +95,4 @@ def RightBalance(request,id):
         return Response({'total' : total})
     except RightLeave.DoesNotExist:
         return Response('Kişiye ait izin hakedişi bulunmamaktadır.',status=status.HTTP_404_NOT_FOUND)
+
