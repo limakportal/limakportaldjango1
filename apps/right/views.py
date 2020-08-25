@@ -13,6 +13,7 @@ from ..utils.enums import EnumRightTypes,EnumRightStatus
 from ..organization.models import Organization
 from ..staff.models import Staff
 import datetime
+import os
 
 class RightAPIView(APIView):
     def get(self,request):
@@ -71,13 +72,21 @@ class RightDownloadApiView(APIView):
             right = Right.objects.get(id=id)
             righttype = RightType.objects.get(id=right.RightType.id)
             if  righttype.RightMainType.id == EnumRightTypes.Yillik:
-                zip_file = open('Yillik_izin_Formu.pdf', 'rb')
+                filename = 'Yillik_izin_Formu.pdf'
             if  righttype.RightMainType.id == EnumRightTypes.Mazeret:
-                zip_file = open('Mazeret_izin_Formu.pdf', 'rb')
+                filename = 'Mazeret_izin_Formu.pdf'
             if  righttype.RightMainType.id == EnumRightTypes.Ucretsiz:
-                zip_file = open('Ucretsiz_izin_Formu.pdf', 'rb')
-            response = HttpResponse(FileWrapper(zip_file), content_type='application/pdf')
-            response['Content-Disposition'] = 'filename="izin.pdf"'
+                filename = 'Ucretsiz_izin_Formu.pdf'
+
+            with open(filename,'r',encoding='utf-8') as inputfile:
+                 filedata = inputfile.read()
+            filedata = filedata.replace('StartDate','deneme')
+            with open('result.pdf','w',encoding='utf-8') as outputfile:
+                 outputfile.write(filedata)
+
+            newfile = open('result.pdf','rb')
+            response = HttpResponse(FileWrapper(newfile), content_type='application/pdf')
+            response['Content-Disposition'] = 'filename="result.pdf"'
             return response
         except Right.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
@@ -88,7 +97,7 @@ def RightBalance(request,id):
         rightleave =  RightLeave.objects.filter(Person=id)
         if rightleave:
             leave =  rightleave.aggregate(total=Sum('Earning'))
-            right  = Right.objects.filter(Person=id,RightStatus=EnumRightStatus.OnayBekliyor)
+            right  = Right.objects.filter(Person=id,RightStatus=EnumRightStatus.Onaylandi)
             number = 0
             if  right:
                 number =  right.aggregate(total=Sum('RightNumber'))['total']
