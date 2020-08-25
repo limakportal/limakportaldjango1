@@ -19,6 +19,7 @@ from ..person.models import Person
 from .serializer import PersonSerializer
 from ..businessrules.views import mail_yolla
 from ..person.businesrules import GetPersonApprover
+from ..personbusiness.models import PersonBusiness
 
 class RightAPIView(APIView):
     def get(self,request):
@@ -170,3 +171,35 @@ def RightDaysNumber(request):
             return Response('Kadro tanımı yapılmamıştır.',status=status.HTTP_404_NOT_FOUND)
         
         return   Response({'daynumber' : number})
+
+@api_view(['GET'])
+def PersonRightInfo(request,id):
+        totalleave = totalright = remainingleave = nextyear = nextleave = approvelwaiting = 0
+
+        rightleave =  RightLeave.objects.filter(Person=id) 
+        if rightleave:
+            totalleave = rightleave.aggregate(total=Sum('Earning'))['total']
+        
+        right = Right.objects.filter(Person=id,RightStatus=EnumRightStatus.Onaylandi)
+        if right:
+            totalright =  right.aggregate(total=Sum('RightNumber'))['total']
+
+        right = Right.objects.filter(Person=id,RightStatus=EnumRightStatus.OnayBekliyor)
+        if right:
+            approvelwaiting = right.aggregate(total=Sum('RightNumber'))['total']
+
+        remainingleave = totalleave - totalright
+
+        personbusiness = PersonBusiness.objects.get(Person=id)
+        if personbusiness:
+            businessyear = personbusiness.JobStartDate
+            if datetime.date.today().year - businessyear.year >= 5:
+                nextleave = 20
+            else:
+                nextleave = 14
+        
+        nextyear = datetime.date.today().year + 1
+        
+        content = {'totalleave' : totalleave, 'totalright': totalright, 'remainingleave' : remainingleave,
+                'nextyear' : nextyear, 'nextleave': nextleave, 'approvelwaiting' : approvelwaiting}
+        return Response(content)
