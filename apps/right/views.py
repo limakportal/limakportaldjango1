@@ -96,7 +96,7 @@ class RightDownloadApiView(APIView):
                 filename = 'Mazeret_izin_Formu.docx'
                 outputfile = "MazeretResult.docx"
             if  righttype.RightMainType.id == EnumRightTypes.Ucretsiz:
-                filename = 'Ucretsiz_izin_Formu.docx'
+                filename = 'Ucretsiz_izin_formu.docx'
                 outputfile = "UcretsizResult.docx"
 
             doc = DocxTemplate(filename)
