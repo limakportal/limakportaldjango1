@@ -13,7 +13,7 @@ class Right(models.Model):
     EndDate = models.DateTimeField(blank=True, null=True)
     StartDate = models.DateTimeField(blank=True, null=True)
     DateOfReturn = models.DateTimeField(blank=True, null=True)
-    Address = models.CharField(max_length=50,blank=True,null=True)
+    # Address = models.CharField(max_length=50,blank=True,null=True)
     Telephone = models.CharField(max_length=50,blank=True,null=True)
     Approver1 = models.IntegerField(blank=True,null=True)
     RightType = models.ForeignKey(RightType,on_delete = models.CASCADE,blank=True, null=True)
@@ -21,6 +21,7 @@ class Right(models.Model):
     RightNumber = models.IntegerField(blank=True,null=True)
     DenyExplanation = models.CharField(max_length=50,blank=True, null=True)
     HrHasField = models.BooleanField(blank=True,default=False)
+    KvkkIsChecked = models.BooleanField(blank=True, null=True)
 
     def __str__(self):
         return self.Person.Name
