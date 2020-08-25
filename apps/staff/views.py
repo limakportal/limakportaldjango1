@@ -1,5 +1,5 @@
 from .models import Staff
-from .serializer import StaffSerializer
+from .serializer import StaffSerializer , StaffJoinSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -8,7 +8,7 @@ from rest_framework import status
 class StaffAPIView(APIView):
     def get(self,request):
         staff = Staff.objects.all().order_by('id')
-        serializer = StaffSerializer(staff,many=True)
+        serializer = StaffJoinSerializer(staff,many=True)
         return Response(serializer.data)
 
     def post(self,request):
