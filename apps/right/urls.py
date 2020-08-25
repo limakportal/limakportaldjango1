@@ -8,5 +8,5 @@ urlpatterns = [
     path('rightsDesc', RightWithApproverAPIView.as_view()),
     path('rightsDownload/<int:id>', RightDownloadApiView.as_view()),
     path('rightsBalance/<int:id>', RightBalance),
-    path('righsDayNumber/<int:id>', RightDaysNumber)
+    path('righsDayNumber', RightDaysNumber)
 ]
