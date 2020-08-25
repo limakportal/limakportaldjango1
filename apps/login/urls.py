@@ -4,5 +4,5 @@ from django.urls import path
 from .views import GoogleView 
 
 urlpatterns = [
-    path('logintest', GoogleView.as_view(),name="logintest"),
+    path('googleLogin', GoogleView.as_view(),name="googleLogin"),
 ]

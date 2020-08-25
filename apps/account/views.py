@@ -17,6 +17,10 @@ from rest_framework.views import APIView
 
 from ..person.models import Person
 from ..person.serializer import PersonSerializer
+from ..userrole.models import UserRole
+from ..authority.models import Authority
+from ..permission.models import Permission
+from ..permission.serializer import PermissionSerializer
 
 @api_view(['POST', ])
 def registration_view(request):
@@ -96,5 +100,27 @@ class ObtainAuthToken(APIView):
         except :
             response['Person'] = None
 
+
+        requestPermission = {} 
+        userRoles = UserRole.objects.filter(Account_id = user.id)
+        for userRole in userRoles:
+            authorityes = Authority.objects.filter(Role_id = userRole.Role_id , Active = True)
+            for authority in authorityes:
+                permissions = Permission.objects.filter(id = authority.Permission_id)
+                for permission in permissions:
+                    permissionSerializer = PersonSerializer(permission)
+                    requestPermission[permissionSerializer.data['id']] = permissionSerializer.data['Name']
+
+                # try:
+                #     permission = Permission.objects.filter(id = 4)
+                #     serializer = PersonSerializer(permission , many =True)
+                #     requestPermission = {}
+                #     # requestPermission = serializer.data
+                #     # requestPermission['permission'] = serializer.data
+                #     response['Permissions'] = serializer.data
+                # except :
+                #     pass
+
+        requestPermission['permission'] = requestPermission
         # return Response({'token': token.key})
         return Response(response)

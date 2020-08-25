@@ -14,7 +14,10 @@ from apps.staff.serializer import StaffSerializer
 from apps.authority.models import Authority
 from apps.authority.serializer import AuthoritySerializer
 from rest_framework import status
+import requests
 
+from ..organization.models import Organization
+from ..organization.serializer import OrganizationTreeSerializer
 
 
 
@@ -47,6 +50,16 @@ class GoogleView(APIView):
             response['Authority'] = authoritySerializer.data
             response['access_token'] = str(token.access_token)
             # response['refresh_token'] = str(token)
+
+            #kişiye göre organizasyon çekme
+
+            # try:
+            #     organizationObj = Organization.objects.get(id == staff.Organization)
+            #     serializer = OrganizationTreeSerializer(organizationObj)
+            #     response['Menu'] = serializer.data
+            # except :
+            #     response['Menu'] = None
+            
             return Response(response,status=status.HTTP_200_OK)
         except Account.DoesNotExist:
             content = {'message': 'Kayıtlı kullanıcı bulunamadı'}
