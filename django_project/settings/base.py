@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+from datetime import timedelta
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -99,6 +100,10 @@ AUTH_USER_MODEL = 'account.Account'
 
 # AUTH_USER_MODEL = 'account.Account'
 
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME' : timedelta(minutes=1)
+}
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
