@@ -57,11 +57,11 @@ class GoogleView(APIView):
             response['access_token'] = str(token.access_token)
             responseUser = {}
             responseUser['id'] = userSerializer.data['id']
-            responseUser['Email'] = userSerializer.data['Email']
+            responseUser['Email'] = data['email']
             response['User'] = responseUser
 
             try:
-                person = Person.objects.get(Email = userSerializer.data['Email'])
+                person = Person.objects.get(Email = data['email'])
                 responsePerson = {}
                 responsePerson['id'] = person.id
                 responsePerson['Name'] = person.Name
