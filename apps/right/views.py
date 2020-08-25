@@ -15,7 +15,9 @@ from ..staff.models import Staff
 from ..person.models import Person
 import datetime
 from docxtpl import DocxTemplate
-
+from ..person.models import Person
+from .serializer import PersonSerializer
+from ..businessrules.views import mail_yolla
 
 class RightAPIView(APIView):
     def get(self,request):
@@ -51,8 +53,18 @@ class RightDetails(APIView):
         serializer = RightSerializer(right, data=request.data)
         if serializer.is_valid():
             serializer.save()
-            # if  serializer.data['RightStatus'] = EnumRightStatus.Onaylandi:
-            #     MailGonder()
+            if  serializer.data['RightStatus'] == EnumRightStatus.Onaylandi:
+                person = Person.objects.get(id = serializer.data['Person'])
+                personSerializer = PersonSerializer(person)
+                baslik = 'İzin Kullanım Hakkında'
+                icerik = 'İzin talebiniz onaylanmıştır. Bakiyenizden ' + str(request.data['RightNumber']) + ' gün düşülmüştür.'
+                mail_yolla(baslik,icerik,personSerializer.data['Email'],[personSerializer.data['Email']])
+            else if  serializer.data['RightStatus'] == EnumRightStatus.Iptal:
+                person = Person.objects.get(id = serializer.data['Person'])
+                personSerializer = PersonSerializer(person)
+                baslik = 'İzin Kullanım Hakkında'
+                icerik = 'İzin talebiniz reddedilmiştir.'
+                mail_yolla(baslik,icerik,personSerializer.data['Email'],[personSerializer.data['Email']])
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
