@@ -3,13 +3,20 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.db import transaction
 import json
-# from rest_framework.decorators import api_view, permission_classes
 
-from ..role.serializer import RoleSerializer
+
+from ..role.models import Role
+
+from ..role.serializer import RoleSerializer , RoleViewSerializer
 from ..authority.serializer import AuthoritySerializer
 from ..userrole.serializer import UserRoleSerializer
 
 class RoleWithPermissionAPIView(APIView):
+    def get(self,request):
+        roles = Role.objects.all()
+        serializer = RoleViewSerializer(roles ,many = True)
+        return Response(serializer.data)
+
     @transaction.atomic
     def post(self,request): 
         transactionSaveId = transaction.savepoint()
@@ -49,8 +56,5 @@ class RoleWithPermissionAPIView(APIView):
         else:
             transaction.savepoint_rollback(transaction)
             return Response(roleSerializer.error_messages , status = status.HTTP_400_BAD_REQUEST)
-
-
-
 
 
