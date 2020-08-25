@@ -8,7 +8,11 @@ from ..staff.models import Staff
 from ..organization.models import Organization
 from .models import Person
 from .serializer import PersonSerializer
+from .serializer import PersonViewSerializer
+from ..personidentity.models import PersonIdentity
+from .serializer import PersonIdentitySerializer
 from rest_framework.decorators import api_view
+from datetime import datetime
 
 @api_view(['GET'])
 def PersonApprover(request, id):
@@ -81,3 +85,41 @@ def GetPersonApprover(id):
             serializer = PersonSerializer(personel)
         
         return serializer
+
+@api_view(['GET'])
+def bornTodayPerson(request):
+    try:
+        today = datetime.now()
+        day = today.day
+        month = today.month    
+        
+        personidentities = PersonIdentity.objects.filter(BirthDate__day = day, BirthDate__month = month)
+        persons = []
+        for personIdenty in personidentities:
+            person = Person.objects.get(id = personIdenty.Person_id)
+            staff = Staff.objects.get(id = personIdenty.Person_id)
+            persons.append(person)
+            persons.append(staff)
+        serializer = PersonViewSerializer(persons,many=True)
+        return Response(serializer.data)
+    except:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
+def bornMonthPerson(request):
+    try:
+        today = datetime.now()
+        month = today.month    
+        
+        personidentities = PersonIdentity.objects.filter(BirthDate__month = month)
+        persons = []
+        for personIdenty in personidentities:
+            person = Person.objects.get(id = personIdenty.Person_id)
+            staff = Staff.objects.get(id = personIdenty.Person_id)
+            persons.append(person)
+            persons.append(staff)
+        serializer = PersonViewSerializer(persons,many=True)
+        return Response(serializer.data)
+    except:
+        return Response(status=status.HTTP_404_NOT_FOUND)

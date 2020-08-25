@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import PersonAPIView , PersonDetails , PersonWithPersonInformationAPIView , PersonWithPersonInformationDetails 
-from .businesrules import PersonApprover
+from .businesrules import PersonApprover, bornTodayPerson, bornMonthPerson
 
 
 urlpatterns = [ 
@@ -9,4 +9,6 @@ urlpatterns = [
     path('personsDesc', PersonWithPersonInformationAPIView.as_view()),
     path('personsDesc/<int:id>', PersonWithPersonInformationDetails.as_view()),
     path('personapprover/<int:id>', PersonApprover),
+    path('borntodayperson', bornTodayPerson),
+    path('bornmonthperson', bornMonthPerson),
 ]
