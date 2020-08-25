@@ -19,6 +19,9 @@ import requests
 from ..organization.models import Organization
 from ..organization.serializer import OrganizationTreeSerializer
 from ..person.models import Person
+from ..permission.models import Permission
+from ..permission.views import PermissionSerializer
+from ..userrole.models import UserRole
 
 
 
@@ -40,11 +43,11 @@ class GoogleView(APIView):
 
         try:
             accounts = Account.objects.get(email=data['email'])
-            person =Person.objects.get(Email=data['email'])
-            staff = Staff.objects.get(Person=person.id)
-            authority=Authority.objects.filter(Role=staff.Role)          
+            # person =Person.objects.get(Email=data['email'])
+            # staff = Staff.objects.get(Person=person.id)
+            # authority=Authority.objects.filter(Role=staff.Role)          
             userSerializer = AccountSerializer(accounts)
-            authoritySerializer=AuthoritySerializer(authority,many=True)
+            # authoritySerializer=AuthoritySerializer(authority,many=True)
             token = RefreshToken.for_user(accounts) 
             response = {}
             # response['User'] = userSerializer.data
@@ -69,6 +72,19 @@ class GoogleView(APIView):
                 response['Person'] = responsePerson
             except :
                 response['Person'] = None
+
+
+            allPermissions = []
+            userRoles = UserRole.objects.filter(Account_id = userSerializer.data['id'])
+            for userRole in userRoles:
+                authorityes = Authority.objects.filter(Role_id = userRole.Role_id , Active = True)
+                for authority in authorityes:
+                    permissions = Permission.objects.filter(id = authority.Permission_id)
+                    for permission in permissions:
+
+                        allPermissions.append(permission);    
+
+            response['permissions'] = PermissionSerializer(allPermissions, many=True).data
 
             
             return Response(response,status=status.HTTP_200_OK)
