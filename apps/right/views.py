@@ -99,10 +99,11 @@ class RightDownloadApiView(APIView):
                 filename = 'Ucretsiz_izin_formu.docx'
                 outputfile = "UcretsizResult.docx"
 
+
             doc = DocxTemplate(filename)
             context = { 'Name' : person.Name , 'Surname' : person.Surname , 'No' : right.RightNumber , 'GetDate' : datetime.date.today(),
                          'StartDate' : right.StartDate.date() , 'EndDate' : right.EndDate.date(),
-                         'ApproveName' : serializer.data['Name'], 'ApproveSurname' : serializer.data['Surname']}
+                         'AppName' : serializer.data['Name'], 'AppSurname' : serializer.data['Surname']}
             doc.render(context)
             doc.save(outputfile)
 
