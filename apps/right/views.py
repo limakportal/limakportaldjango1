@@ -58,8 +58,10 @@ class RightDetails(APIView):
                 person = Person.objects.get(id = serializer.data['Person'])
                 personSerializer = PersonSerializer(person)
                 baslik = 'İzin Kullanım Hakkında'
-                icerik = 'İzin talebiniz onaylanmıştır. Bakiyenizden ' + str(request.data['RightNumber']) + ' gün düşülmüştür.'
+                icerik = 'İzin talebiniz onaylanmıştır. Bakiyenizden ' + str(request.data['RightNumber']) + ' gün düşülmüştür. ' + 
+                'İzin sürecinizin tamamlanması için imzalı izin formunuzu izne ayrılmadan önce İnsan Kaynakları Direktörlüğüne iletiniz.'
                 mail_yolla(baslik,icerik,personSerializer.data['Email'],[personSerializer.data['Email']])
+                
             elif  serializer.data['RightStatus'] == EnumRightStatus.Reddedildi:
                 person = Person.objects.get(id = serializer.data['Person'])
                 personSerializer = PersonSerializer(person)
@@ -105,7 +107,7 @@ class RightDownloadApiView(APIView):
             context = { 'Name' : person.Name , 'Surname' : person.Surname , 'No' : right.RightNumber , 'GetDate' : datetime.date.today(),
                          'SD' : right.StartDate.date() , 'EndDate' : right.EndDate.date(),
                          'AppName' : serializer.data['Name'], 'AppSurname' : serializer.data['Surname'],
-                         'RD' : right.DateOfReturn.date(), 'Adress' : right.Address , 'Tel' : right.Telephone ,
+                         'RD' : right.DateOfReturn.date(), 'Tel' : right.Telephone ,
                          'Bak' : total , 'Kal' : total - right.RightNumber }
             doc.render(context)
             doc.save(outputfile)
