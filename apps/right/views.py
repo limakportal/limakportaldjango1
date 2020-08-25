@@ -131,15 +131,15 @@ def RightBalance(request,id):
     except RightLeave.DoesNotExist:
         return Response('Kişiye ait izin hakedişi bulunmamaktadır.',status=status.HTTP_404_NOT_FOUND)
 
-@api_view(['PUT'])
-def RightDaysNumber(request,id):
+@api_view(['POST'])
+def RightDaysNumber(request):
         stardate = datetime.datetime.strptime(request.data['StartDate'],'%Y-%m-%d')
         enddate = datetime.datetime.strptime(request.data['EndDate'],'%Y-%m-%d')
         startime = request.data['StartTime']
         endtime = request.data['EndTime']
         delta = datetime.timedelta(days=1)
         number = 0
-        staff = Staff.objects.get(Person=id)
+        staff = Staff.objects.get(Person=int(request.data['Person']))
         if staff:
             organization = Organization.objects.get(id=staff.Organization.id)
             if  organization:
