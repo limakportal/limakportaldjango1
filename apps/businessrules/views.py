@@ -38,7 +38,7 @@ class OrganizationWithPersonTree(serializers.ModelSerializer):
             return OrganizationWithPersonTree(obj.children(), many=True).data
 
 
-def mail_yolla():
-    baslik = 'İzin Kullanım Hakkında'
-    icerik = 'Ayça Bilmez’in ... tarihine kadar ... gün iznini kullanması gerekmektedir. Lütfen çalışanınızı mevcut iznini kullanmaya yönlendiriniz.'
-    send_mail(baslik, icerik, 'basarersoy@gmail.com',['eince@limak.com.tr'], fail_silently=False)
+def mail_yolla(baslik,icerik,to,send):
+    # baslik = 'İzin Kullanım Hakkında'
+    # icerik = 'Ayça Bilmez’in ... tarihine kadar ... gün iznini kullanması gerekmektedir. Lütfen çalışanınızı mevcut iznini kullanmaya yönlendiriniz.'
+    send_mail(baslik, icerik, to, send, fail_silently=False)
