@@ -11,5 +11,6 @@ whitenoise==5.1.0
 djangorestframework-simplejwt==4.4.0
 requests==2.24.0
 urllib3==1.25.10
+docxtpl==0.10.0
 
 

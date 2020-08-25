@@ -12,8 +12,10 @@ from django.db.models import Sum
 from ..utils.enums import EnumRightTypes,EnumRightStatus
 from ..organization.models import Organization
 from ..staff.models import Staff
+from ..person.models import Person
 import datetime
-import os
+from docxtpl import DocxTemplate
+
 
 class RightAPIView(APIView):
     def get(self,request):
@@ -71,22 +73,26 @@ class RightDownloadApiView(APIView):
         try:
             right = Right.objects.get(id=id)
             righttype = RightType.objects.get(id=right.RightType.id)
+            person = Person.objects.get(id=right.Person.id)
             if  righttype.RightMainType.id == EnumRightTypes.Yillik:
-                filename = 'Yillik_izin_Formu.pdf'
+                filename = 'Yillik_izin_Formu.docx'
+                outputfile = "YillikResult.docx"
             if  righttype.RightMainType.id == EnumRightTypes.Mazeret:
-                filename = 'Mazeret_izin_Formu.pdf'
+                filename = 'Mazeret_izin_Formu.docx'
+                outputfile = "MazeretResult.docx"
             if  righttype.RightMainType.id == EnumRightTypes.Ucretsiz:
-                filename = 'Ucretsiz_izin_Formu.pdf'
+                filename = 'Ucretsiz_izin_Formu.docx'
+                outputfile = "UcretsizResult.docx"
 
-            with open(filename,'r',encoding='utf-8') as inputfile:
-                 filedata = inputfile.read()
-            filedata = filedata.replace('StartDate','deneme')
-            with open('result.pdf','w',encoding='utf-8') as outputfile:
-                 outputfile.write(filedata)
+            doc = DocxTemplate(filename)
+            context = { 'Name' : person.Name , 'Surname' : person.Surname , 'No' : right.RightNumber , 'GetDate' : datetime.date.today(),
+                         'StartDate' : right.StartDate.date() , 'EndDate' : right.EndDate.date()}
+            doc.render(context)
+            doc.save(outputfile)
 
-            newfile = open('result.pdf','rb')
-            response = HttpResponse(FileWrapper(newfile), content_type='application/pdf')
-            response['Content-Disposition'] = 'filename="result.pdf"'
+            newfile = open(outputfile,'rb')
+            response = HttpResponse(FileWrapper(newfile), content_type='application/docx')
+            response['Content-Disposition'] = 'filename="result.docx"'
             return response
         except Right.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
