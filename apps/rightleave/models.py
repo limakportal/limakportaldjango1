@@ -6,7 +6,7 @@ class RightLeave(models.Model):
         db_table = 'RightLeave'
 
     Earning = models.IntegerField(blank=True, null=True)
-    Year = models.DateField(blank=True, null=True)
+    Year = models.IntegerField(blank=True, null=True)
     Person = models.ForeignKey(Person,on_delete = models.CASCADE)
     Optime = models.DateTimeField(blank=True,null=True)
 
