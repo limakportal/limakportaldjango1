@@ -7,7 +7,7 @@ class VocationDays(models.Model):
 
     Name = models.CharField(blank=True, max_length=50)
     DateDay = models.DateTimeField(blank=True,null=True)
-    DayType = models.IntegerField(blank=True,null=True)
+    DayType = models.BooleanField(blank=True,null=True)
 
     def __str__(self):
         return self.Name

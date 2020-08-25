@@ -7,8 +7,8 @@ from apps.role.serializer import RoleSerializer
 
 
 class AuthoritySerializer(serializers.ModelSerializer):
-    Role = RoleSerializer()
-    Permission = PermissionSerializer()
+    # Role = RoleSerializer()
+    # Permission = PermissionSerializer()
     class Meta:
         model = Authority  
         fields = ('__all__')
