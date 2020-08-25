@@ -155,7 +155,7 @@ def RightDaysNumber(request):
         if staff:
             organization = Organization.objects.get(id=staff.Organization.id)
             if  organization:
-                while stardate < enddate:
+                while stardate == enddate:
                       if stardate.weekday() == 5:
                          if organization.IsSaturdayWorkDay:
                             number +=1

@@ -11,5 +11,6 @@ class PersonBusinessForPersonListSerializer(serializers.ModelSerializer):
         model = PersonBusiness
         fields =(
             'id',
-            'JobStartDate'
+            'JobStartDate',
+            'LeaveDate'
         )
