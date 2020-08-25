@@ -203,3 +203,16 @@ def PersonRightInfo(request,id):
         content = {'totalleave' : totalleave, 'totalright': totalright, 'remainingleave' : remainingleave,
                 'nextyear' : nextyear, 'nextleave': nextleave, 'approvelwaiting' : approvelwaiting}
         return Response(content)
+
+@api_view(['GET'])
+def GetRightStatus(request,status_id):
+        try:
+            rights = Right.objects.filter(RightStatus = status_id)
+            if rights:
+                serializer = RightWithApproverSerializer(rights,many=True)
+                return Response(serializer.data)
+            else:
+                return Response('İzin bulunamadı',status=status.HTTP_404_NOT_FOUND)
+
+        except:
+           return Response(status=status.HTTP_404_NOT_FOUND)
