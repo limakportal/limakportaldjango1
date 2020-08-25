@@ -12,6 +12,7 @@ class RightType(models.Model):
     Name = models.CharField(blank=True, max_length=50)
     Status = models.ForeignKey(Status, on_delete = models.CASCADE,blank=True, null=True)
     RightMainType = models.ForeignKey(RightMainType, on_delete = models.CASCADE, blank=True, null=True)
+    MaxDayOff = models.IntegerField(blank=True,null=True)
 
 
     def __str__(self):
