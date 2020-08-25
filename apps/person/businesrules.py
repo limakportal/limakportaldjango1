@@ -8,11 +8,10 @@ from ..staff.models import Staff
 from ..organization.models import Organization
 from .models import Person
 from .serializer import PersonSerializer
+from rest_framework.decorators import api_view
 
-
-class PersonApproverDetails(APIView):
-
-    def get(self, request, id):
+@api_view(['GET'])
+def PersonApprover(request, id):
         try:
             staff = Staff.objects.get(Person = id)
             organization = Organization.objects.get(id = staff.Organization.id)
@@ -46,3 +45,16 @@ class PersonApproverDetails(APIView):
 
         except:
             return Response(status=status.HTTP_404_NOT_FOUND)
+
+def GetPersonApprover(id):
+        staff = Staff.objects.get(Person = id)
+        organization = Organization.objects.get(id = staff.Organization.id)
+        if organization.CanApproveRight:
+            personel = Person.objects.get(id=id)
+            serializer = PersonSerializer(personel)
+        else:
+            staffs = Staff.objects.get(Organization = organization.UpperOrganization.id)
+            personel = Person.objects.get(id=staffs.Person.id)
+            serializer = PersonSerializer(personel)
+        
+        return serializer
