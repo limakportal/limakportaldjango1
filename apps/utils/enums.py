@@ -8,7 +8,8 @@ class EnumRightTypes(IntEnum):
 class EnumRightStatus(IntEnum):
       OnayBekliyor=1
       Onaylandi=2
-      Iptal=3
+      Reddedildi=3
+      Iptal=4
 
 class EnumStatus(IntEnum):
       Passive=0

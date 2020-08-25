@@ -60,7 +60,7 @@ class RightDetails(APIView):
                 baslik = 'İzin Kullanım Hakkında'
                 icerik = 'İzin talebiniz onaylanmıştır. Bakiyenizden ' + str(request.data['RightNumber']) + ' gün düşülmüştür.'
                 mail_yolla(baslik,icerik,personSerializer.data['Email'],[personSerializer.data['Email']])
-            elif  serializer.data['RightStatus'] == EnumRightStatus.Iptal:
+            elif  serializer.data['RightStatus'] == EnumRightStatus.Reddedildi:
                 person = Person.objects.get(id = serializer.data['Person'])
                 personSerializer = PersonSerializer(person)
                 baslik = 'İzin Kullanım Hakkında'
@@ -99,10 +99,11 @@ class RightDownloadApiView(APIView):
                 filename = 'Ucretsiz_izin_formu.docx'
                 outputfile = "UcretsizResult.docx"
 
+
             doc = DocxTemplate(filename)
             context = { 'Name' : person.Name , 'Surname' : person.Surname , 'No' : right.RightNumber , 'GetDate' : datetime.date.today(),
                          'StartDate' : right.StartDate.date() , 'EndDate' : right.EndDate.date(),
-                         'ApproveName' : serializer.data['Name'], 'ApproveSurname' : serializer.data['Surname']}
+                         'AppName' : serializer.data['Name'], 'AppSurname' : serializer.data['Surname']}
             doc.render(context)
             doc.save(outputfile)
 
@@ -130,7 +131,7 @@ def RightBalance(request,id):
     except RightLeave.DoesNotExist:
         return Response('Kişiye ait izin hakedişi bulunmamaktadır.',status=status.HTTP_404_NOT_FOUND)
 
-@api_view(['POST'])
+@api_view(['PUT'])
 def RightDaysNumber(request,id):
         stardate = datetime.datetime.strptime(request.data['StartDate'],'%Y-%m-%d')
         enddate = datetime.datetime.strptime(request.data['EndDate'],'%Y-%m-%d')
