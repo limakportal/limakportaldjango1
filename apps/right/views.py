@@ -18,6 +18,7 @@ from docxtpl import DocxTemplate
 from ..person.models import Person
 from .serializer import PersonSerializer
 from ..businessrules.views import mail_yolla
+from ..person.businesrules import GetPersonApprover
 
 class RightAPIView(APIView):
     def get(self,request):
@@ -86,6 +87,8 @@ class RightDownloadApiView(APIView):
             right = Right.objects.get(id=id)
             righttype = RightType.objects.get(id=right.RightType.id)
             person = Person.objects.get(id=right.Person.id)
+            serializer = GetPersonApprover(person.id)
+
             if  righttype.RightMainType.id == EnumRightTypes.Yillik:
                 filename = 'Yillik_izin_Formu.docx'
                 outputfile = "YillikResult.docx"
@@ -98,7 +101,8 @@ class RightDownloadApiView(APIView):
 
             doc = DocxTemplate(filename)
             context = { 'Name' : person.Name , 'Surname' : person.Surname , 'No' : right.RightNumber , 'GetDate' : datetime.date.today(),
-                         'StartDate' : right.StartDate.date() , 'EndDate' : right.EndDate.date()}
+                         'StartDate' : right.StartDate.date() , 'EndDate' : right.EndDate.date(),
+                         'ApproveName' : serializer.data['Name'], 'ApproveSurname' : serializer.data['Surname']}
             doc.render(context)
             doc.save(outputfile)
 
@@ -136,7 +140,7 @@ def RightDaysNumber(request,id):
         number = 0
         staff = Staff.objects.filter(Person=id)
         if staff:
-            organization = Organization.objects.get(id=20)
+            organization = Organization.objects.get(id=staff.Organization.id)
             if  organization:
                 while stardate < enddate:
                       if stardate.weekday() == 5:
