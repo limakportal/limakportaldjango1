@@ -67,7 +67,6 @@ class RightWithApproverSerializer(serializers.ModelSerializer):
             'EndDate',
             'StartDate',
             'DateOfReturn',
-            'Address',
             'Telephone',
             'Approver1',
             'RightNumber',
