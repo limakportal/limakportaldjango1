@@ -18,6 +18,7 @@ import requests
 
 from ..organization.models import Organization
 from ..organization.serializer import OrganizationTreeSerializer
+from ..person.models import Person
 
 
 
@@ -46,19 +47,29 @@ class GoogleView(APIView):
             authoritySerializer=AuthoritySerializer(authority,many=True)
             token = RefreshToken.for_user(accounts) 
             response = {}
-            response['User'] = userSerializer.data
-            response['Authority'] = authoritySerializer.data
-            response['access_token'] = str(token.access_token)
+            # response['User'] = userSerializer.data
+            # response['Authority'] = authoritySerializer.data
+            # response['access_token'] = str(token.access_token)
             # response['refresh_token'] = str(token)
 
-            #kişiye göre organizasyon çekme
 
-            # try:
-            #     organizationObj = Organization.objects.get(id == staff.Organization)
-            #     serializer = OrganizationTreeSerializer(organizationObj)
-            #     response['Menu'] = serializer.data
-            # except :
-            #     response['Menu'] = None
+            response['token'] = str(token.access_token)
+            response['access_token'] = str(token.access_token)
+            responseUser = {}
+            responseUser['id'] = userSerializer.data['id']
+            responseUser['Email'] = userSerializer.data['Email']
+            response['User'] = responseUser
+
+            try:
+                person = Person.objects.get(Email = userSerializer.data['Email'])
+                responsePerson = {}
+                responsePerson['id'] = person.id
+                responsePerson['Name'] = person.Name
+                responsePerson['Surname'] = person.Surname
+                response['Person'] = responsePerson
+            except :
+                response['Person'] = None
+
             
             return Response(response,status=status.HTTP_200_OK)
         except Account.DoesNotExist:
