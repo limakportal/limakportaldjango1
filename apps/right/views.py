@@ -131,7 +131,7 @@ def RightBalance(request,id):
     except RightLeave.DoesNotExist:
         return Response('Kişiye ait izin hakedişi bulunmamaktadır.',status=status.HTTP_404_NOT_FOUND)
 
-@api_view(['POST'])
+@api_view(['PUT'])
 def RightDaysNumber(request,id):
         stardate = datetime.datetime.strptime(request.data['StartDate'],'%Y-%m-%d')
         enddate = datetime.datetime.strptime(request.data['EndDate'],'%Y-%m-%d')
