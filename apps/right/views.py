@@ -99,11 +99,14 @@ class RightDownloadApiView(APIView):
                 filename = 'Ucretsiz_izin_formu.docx'
                 outputfile = "UcretsizResult.docx"
 
-
             doc = DocxTemplate(filename)
+            total = GetRightBalance(id)
+
             context = { 'Name' : person.Name , 'Surname' : person.Surname , 'No' : right.RightNumber , 'GetDate' : datetime.date.today(),
-                         'StartDate' : right.StartDate.date() , 'EndDate' : right.EndDate.date(),
-                         'AppName' : serializer.data['Name'], 'AppSurname' : serializer.data['Surname']}
+                         'SD' : right.StartDate.date() , 'EndDate' : right.EndDate.date(),
+                         'AppName' : serializer.data['Name'], 'AppSurname' : serializer.data['Surname'],
+                         'RD' : right.DateOfReturn.date(), 'Adress' : right.Address , 'Tel' : right.Telephone ,
+                         'Bak' : total , 'Kal' : total - right.RightNumber }
             doc.render(context)
             doc.save(outputfile)
 
@@ -117,19 +120,26 @@ class RightDownloadApiView(APIView):
 @api_view(['GET'])
 def RightBalance(request,id):
     try:
-        rightleave =  RightLeave.objects.filter(Person=id)
-        if rightleave:
-            leave =  rightleave.aggregate(total=Sum('Earning'))
-            right  = Right.objects.filter(Person=id,RightStatus=EnumRightStatus.Onaylandi)
-            number = 0
-            if  right:
-                number =  right.aggregate(total=Sum('RightNumber'))['total']
-            total = leave['total'] - number
-        else:
-           return Response('Kişiye ait izin hakedişi bulunmamaktadır.',status=status.HTTP_404_NOT_FOUND)
+        total = GetRightBalance(id)
         return Response({'total' : total})
     except RightLeave.DoesNotExist:
         return Response('Kişiye ait izin hakedişi bulunmamaktadır.',status=status.HTTP_404_NOT_FOUND)
+
+def GetRightBalance(id):
+        try:
+            rightleave =  RightLeave.objects.filter(Person=id)
+            if rightleave:
+                leave =  rightleave.aggregate(total=Sum('Earning'))
+                right  = Right.objects.filter(Person=id,RightStatus=EnumRightStatus.Onaylandi)
+                number = 0
+                if  right:
+                    number =  right.aggregate(total=Sum('RightNumber'))['total']
+                total = leave['total'] - number
+            else:
+                return 0
+            return total
+        except RightLeave.DoesNotExist:
+            return 0
 
 @api_view(['POST'])
 def RightDaysNumber(request):
