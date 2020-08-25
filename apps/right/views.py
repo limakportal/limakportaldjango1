@@ -138,7 +138,7 @@ def RightDaysNumber(request,id):
         endtime = request.data['EndTime']
         delta = datetime.timedelta(days=1)
         number = 0
-        staff = Staff.objects.filter(Person=id)
+        staff = Staff.objects.get(Person=id)
         if staff:
             organization = Organization.objects.get(id=staff.Organization.id)
             if  organization:
