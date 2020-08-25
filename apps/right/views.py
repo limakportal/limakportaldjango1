@@ -60,7 +60,7 @@ class RightDetails(APIView):
                 baslik = 'İzin Kullanım Hakkında'
                 icerik = 'İzin talebiniz onaylanmıştır. Bakiyenizden ' + str(request.data['RightNumber']) + ' gün düşülmüştür.'
                 mail_yolla(baslik,icerik,personSerializer.data['Email'],[personSerializer.data['Email']])
-            else if  serializer.data['RightStatus'] == EnumRightStatus.Iptal:
+            elif  serializer.data['RightStatus'] == EnumRightStatus.Iptal:
                 person = Person.objects.get(id = serializer.data['Person'])
                 personSerializer = PersonSerializer(person)
                 baslik = 'İzin Kullanım Hakkında'
