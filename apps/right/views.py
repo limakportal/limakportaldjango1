@@ -209,9 +209,9 @@ def PersonRightInfo(request,id):
 
         remainingleave = totalleave - totalright
 
-        personbusiness = PersonBusiness.objects.get(Person=id)
-        if personbusiness:
-            businessyear = personbusiness.JobStartDate
+        personbusiness = PersonBusiness.objects.filter(Person=id)
+        if len(personbusiness) > 0:
+            businessyear = personbusiness[0].JobStartDate
             if datetime.date.today().year - businessyear.year >= 5:
                 nextleave = 20
             else:
