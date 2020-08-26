@@ -153,7 +153,7 @@ def RightDaysNumber(request):
         startime = request.data['StartTime']
         endtime = request.data['EndTime']
         righttypeid = request.data['RightType']
-        righttype = RightType.objects.get(id = righttype)
+        righttype = RightType.objects.get(id = righttypeid)
         delta = datetime.timedelta(days=1)
         number = tmp = 0
         staff = Staff.objects.get(Person=int(request.data['Person']))
