@@ -228,8 +228,8 @@ def PersonRightInfo(request,id):
         if right:
             approvelwaiting = right.aggregate(total=Sum('RightNumber'))['total']
       
-        content = {'totalleave' : totalleave, 'totalright': totalright, 'remainingleave' : remainingleave,
-                'nextyear' : nextyear, 'nextleave': nextleave, 'approvelwaiting' : approvelwaiting, 'detail' : detail}
+        content = [{'totalleave' : totalleave, 'totalright': totalright, 'remainingleave' : remainingleave,
+                'nextyear' : nextyear, 'nextleave': nextleave, 'approvelwaiting' : approvelwaiting, 'detail' : detail} ]
         return Response(content)
 
 @api_view(['GET'])
