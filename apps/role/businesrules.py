@@ -7,6 +7,7 @@ import json
 
 from ..role.models import Role
 from ..authority.models import Authority
+from ..userrole.models import UserRole
 
 from ..role.serializer import RoleSerializer , RoleViewSerializer
 from ..authority.serializer import AuthoritySerializer
@@ -99,6 +100,27 @@ class RoleWithPermissionDetails(APIView):
                         else:
                             transaction.savepoint_rollback(transaction)
                             return Response(authoritySerializer.error_messages , status = status.HTTP_400_BAD_REQUEST)
+
+
+            roleUsers = UserRole.objects.filter(Role_id = id)
+            for roleUser in roleUsers:
+                roleUser.delete()
+
+            accountRequestData = {}
+            accountRequestData = request.data['users']
+            if len(accountRequestData) > 0:
+                for accountData in accountRequestData:
+                    if 'id' in json.loads(json.dumps(accountData)):
+                        data = {}
+                        data['Role'] = id
+                        data['Account'] = accountData['id']
+                        userRoleSerializer = UserRoleSerializer(data = data)
+                        if userRoleSerializer.is_valid():
+                            userRoleSerializer.save()
+                        else:
+                            transaction.savepoint_rollback(transaction)
+                            return Response(userRoleSerializer.error_messages , status = status.HTTP_400_BAD_REQUEST)
+
 
             roleSerializer = RoleViewSerializer(role)
             return Response(roleSerializer.data)
