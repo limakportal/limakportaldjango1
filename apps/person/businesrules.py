@@ -104,6 +104,7 @@ def bornTodayPerson(request):
             data['Name'] = person.Name 
             data['Surname'] = person.Surname
             data['Email'] = person.Email
+            data['BirthDate'] = person.BirthDate
             try:
                 staff = Staff.objects.get(Person=int(personIdenty.Person_id))
                 organization = Organization.objects.get(id = staff.Organization.id)
@@ -137,6 +138,7 @@ def bornMonthPerson(request):
             data['Name'] = person.Name 
             data['Surname'] = person.Surname
             data['Email'] = person.Email
+            data['BirthDate'] = person.BirthDate
             try:
                 staff = Staff.objects.get(Person=int(personIdenty.Person_id))
                 organization = Organization.objects.get(id = staff.Organization.id)
