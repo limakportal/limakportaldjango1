@@ -99,8 +99,7 @@ class ObtainAuthToken(APIView):
             response['Person'] = responsePerson
         except :
             response['Person'] = None
-
-
+            
         requestPermission = {} 
         allPermissions = []
         userRoles = UserRole.objects.filter(Account_id = user.id)
@@ -109,20 +108,7 @@ class ObtainAuthToken(APIView):
             for authority in authorityes:
                 permissions = Permission.objects.filter(id = authority.Permission_id)
                 for permission in permissions:
-
                     allPermissions.append(permission);    
-
                     requestPermission = serializer.data
-                    # try:
-                    #     # permission = Permission.objects.get(id = permission.id)
-                    #     serializer = PersonSerializer(permission)
-                    #     # requestPermission = serializer.data
-                    #     # requestPermission['permission'] = serializer.data
-                    #     response['Permissions'] = serializer.data
-                    # except :
-                    #     pass
-
         response['permissions'] = PermissionSerializer(allPermissions, many=True).data
-
-        # return Response({'token': token.key})
         return Response(response)
