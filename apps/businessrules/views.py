@@ -9,7 +9,7 @@ from rest_framework.serializers import SerializerMethodField
 from django.core.mail import send_mail
 import json
 
-from .serializer import OrganizationWithPersonTreeSerializer
+from .serializer import OrganizationWithPersonTreeSerializer , AccountsDetailSerializer
 
 from ..organization.models import Organization
 from ..staff.models import Staff
@@ -64,7 +64,11 @@ def ResponsiblePersonDetails(request, id):
 
         return Response(response,status=status.HTTP_200_OK)
 
-
+@api_view(['GET'])
+def AccountListDetails(request):
+    accounts = Account.objects.all()
+    serializers = AccountsDetailSerializer(accounts , many = True)
+    return Response(serializers.data)
 
 def mail_yolla(baslik,icerik,to,send):
     # baslik = 'İzin Kullanım Hakkında'
