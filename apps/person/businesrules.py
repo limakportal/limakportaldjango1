@@ -109,12 +109,12 @@ def bornTodayPerson(request):
                 staff = Staff.objects.get(Person=int(personIdenty.Person_id))
                 organization = Organization.objects.get(id = staff.Organization.id)
                 title = Title.objects.get(id = staff.Title_id)
-                data['Birim'] = organization.Name
-                data['Unvan'] = title.Name
+                data['Organization'] = organization.Name
+                data['Title'] = title.Name
                 finallyData.append(data)
             except:
-                data['Birim'] = ''
-                data['Unvan'] = ''
+                data['Organization'] = ''
+                data['Title'] = ''
                 finallyData.append(data)
                  
         return Response(finallyData)
