@@ -13,6 +13,7 @@ from ..personidentity.models import PersonIdentity
 from .serializer import PersonIdentitySerializer
 from rest_framework.decorators import api_view
 from datetime import datetime
+from ..title.models import Title
 
 @api_view(['GET'])
 def PersonApprover(request, id):
@@ -95,13 +96,27 @@ def bornTodayPerson(request):
         
         personidentities = PersonIdentity.objects.filter(BirthDate__day = day, BirthDate__month = month)
         persons = []
+        
+        finallyData = []
         for personIdenty in personidentities:
+            data = {}
             person = Person.objects.get(id = personIdenty.Person_id)
-            staff = Staff.objects.get(id = personIdenty.Person_id)
-            persons.append(person)
-            persons.append(staff)
-        serializer = PersonViewSerializer(persons,many=True)
-        return Response(serializer.data)
+            data['Name'] = person.Name 
+            data['Surname'] = person.Surname
+            data['Email'] = person.Email
+            try:
+                staff = Staff.objects.get(Person=int(personIdenty.Person_id))
+                organization = Organization.objects.get(id = staff.Organization.id)
+                title = Title.objects.get(id = staff.Title_id)
+                data['Birim'] = organization.Name
+                data['Unvan'] = title.Name
+                finallyData.append(data)
+            except:
+                data['Birim'] = ''
+                data['Unvan'] = ''
+                finallyData.append(data)
+                 
+        return Response(finallyData)
     except:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -114,12 +129,26 @@ def bornMonthPerson(request):
         
         personidentities = PersonIdentity.objects.filter(BirthDate__month = month)
         persons = []
+        
+        finallyData = []
         for personIdenty in personidentities:
+            data = {}
             person = Person.objects.get(id = personIdenty.Person_id)
-            staff = Staff.objects.get(id = personIdenty.Person_id)
-            persons.append(person)
-            persons.append(staff)
-        serializer = PersonViewSerializer(persons,many=True)
-        return Response(serializer.data)
+            data['Name'] = person.Name 
+            data['Surname'] = person.Surname
+            data['Email'] = person.Email
+            try:
+                staff = Staff.objects.get(Person=int(personIdenty.Person_id))
+                organization = Organization.objects.get(id = staff.Organization.id)
+                title = Title.objects.get(id = staff.Title_id)
+                data['Birim'] = organization.Name
+                data['Unvan'] = title.Name
+                finallyData.append(data)
+            except:
+                data['Birim'] = ''
+                data['Unvan'] = ''
+                finallyData.append(data)
+                 
+        return Response(finallyData)
     except:
         return Response(status=status.HTTP_404_NOT_FOUND)
