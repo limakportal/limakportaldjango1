@@ -18,7 +18,7 @@ class Right(models.Model):
     Approver1 = models.IntegerField(blank=True,null=True)
     RightType = models.ForeignKey(RightType,on_delete = models.CASCADE,blank=True, null=True)
     RightStatus = models.ForeignKey(RightStatus, on_delete = models.CASCADE,blank=True, null=True)
-    RightNumber = models.IntegerField(blank=True,null=True)
+    RightNumber = models.DecimalField(max_digits=5, decimal_places=5,blank=True,null=True)
     DenyExplanation = models.CharField(max_length=50,blank=True, null=True)
     HrHasField = models.BooleanField(blank=True,default=False)
     KvkkIsChecked = models.BooleanField(blank=True, null=True)
