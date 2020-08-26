@@ -49,5 +49,5 @@ urlpatterns = [
     path('',include('apps.rightleave.urls')),
     path('',include('apps.userrole.urls')),
     path('',include('apps.shift.urls')),
-    # path('',include('apps.businessrules.urls')),
+    path('',include('apps.businessrules.urls')),
 ]

@@ -1,6 +1,6 @@
 from django.urls import path
-from .views import PersonList
+from .views import ResponsiblePersonDetails
 
 urlpatterns = [ 
-    path('menuwithperson', PersonList.as_view()),
+    path('responsibleperson/<int:id>', ResponsiblePersonDetails),
 ]
