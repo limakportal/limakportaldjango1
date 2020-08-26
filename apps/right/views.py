@@ -233,7 +233,7 @@ def GetPersonRightInfo(id):
            for r in rightapprove:
                if r.StartDate.year == item.Year :
                   rightnumber += r.RightNumber
-           det = {'year' : item.Year , 'rightleave' : item.Earning , 'rightnumber': rightnumber, 'remaining' : item.Earning - rightnumber}
+           det = {'year' : item.Year , 'rightleave' : item.Earning , 'rightnumber': rightnumber, 'remaining' : item.Earning - rightnumber, 'personid': item.Person_id, 'rightleaveid': item.id}
            detail.append(det)
            rightnumber = 0
 
