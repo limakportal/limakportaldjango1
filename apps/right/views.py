@@ -152,6 +152,8 @@ def RightDaysNumber(request):
         enddate = datetime.datetime.strptime(request.data['EndDate'],'%Y-%m-%d')
         startime = request.data['StartTime']
         endtime = request.data['EndTime']
+        righttypeid = request.data['RightType']
+        righttype = RightType.objects.get(id = righttype)
         delta = datetime.timedelta(days=1)
         number = tmp = 0
         staff = Staff.objects.get(Person=int(request.data['Person']))
@@ -192,6 +194,11 @@ def RightDaysNumber(request):
         else:
             return Response('Kadro tanımı yapılmamıştır.',status=status.HTTP_404_NOT_FOUND)
         
+        if number > righttype.MaxDayOff:
+            return Response('Maksimum izin gün sayısını geçtiniz. Lütfen izin tarihlerinizi kontrol ediniz.', status=status.HTTP_404_NOT_FOUND) 
+        elif number <= 0:
+            return Response('İzin tarihlerinii kontrol ediniz.',status=status.HTTP_404_NOT_FOUND)
+
         return   Response({'daynumber' : number})
 
 @api_view(['GET'])
