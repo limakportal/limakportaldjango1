@@ -13,10 +13,9 @@ from ..permission.serializer import PermissionSerializer
 
 
 class RoleSerializer(serializers.ModelSerializer):
-    id = serializers.ReadOnlyField()
     class Meta:
         model = Role
-        fields = ('__all__')
+        fields = '__all__'
 
 class PersonSerializer(serializers.ModelSerializer):
     class Meta:

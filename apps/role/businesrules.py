@@ -55,7 +55,7 @@ class RoleWithPermissionAPIView(APIView):
                             transaction.savepoint_rollback(transaction)
                             return Response(userRoleSerializer.error_messages , status = status.HTTP_400_BAD_REQUEST)
             
-            role = self.get_object(roleSerializer.data['id'])
+            role = Role.objects.get(id = roleSerializer.data['id'])
             roleSerializer = RoleViewSerializer(role)
             return Response(roleSerializer.data, status=status.HTTP_201_CREATED)
         else:
