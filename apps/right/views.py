@@ -135,7 +135,8 @@ def GetRightBalance(id):
                 right  = Right.objects.filter(Person=id,RightStatus=EnumRightStatus.Onaylandi)
                 number = 0
                 if  right:
-                    number =  right.aggregate(total=Sum('RightNumber'))['total']
+                    for r in right:
+                      number +=  r.RightNumber
                 total = leave['total'] - number
             else:
                 return 0
@@ -201,7 +202,8 @@ def PersonRightInfo(request,id):
         
         right = Right.objects.filter(Person=id,RightStatus=EnumRightStatus.Onaylandi)
         if right:
-            totalright =  right.aggregate(total=Sum('RightNumber'))['total']
+            for r in right:
+              totalright += r.RightNumber  
 
         remainingleave = totalleave - totalright
 
@@ -226,7 +228,8 @@ def PersonRightInfo(request,id):
 
         right = Right.objects.filter(Person=id,RightStatus=EnumRightStatus.OnayBekliyor)
         if right:
-            approvelwaiting = right.aggregate(total=Sum('RightNumber'))['total']
+            for r in right:
+              approvelwaiting += r.RightNumber  
       
         content = [{'totalleave' : totalleave, 'totalright': totalright, 'remainingleave' : remainingleave,
                 'nextyear' : nextyear, 'nextleave': nextleave, 'approvelwaiting' : approvelwaiting, 'detail' : detail} ]
