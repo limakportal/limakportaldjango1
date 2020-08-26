@@ -58,7 +58,7 @@ class PersonViewSerializer(serializers.ModelSerializer):
     def get_PersonBusiness(self,obj):
         try:
             personBusiness = PersonBusiness.objects.get(Person = obj.id)
-            serializer = PersonBusinessForPersonListSerializer(personBusiness)
+            serializer = PersonBusinessSerializer(personBusiness)
             return serializer.data
         except:
             return None
