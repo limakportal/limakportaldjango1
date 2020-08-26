@@ -150,21 +150,40 @@ def RightDaysNumber(request):
         startime = request.data['StartTime']
         endtime = request.data['EndTime']
         delta = datetime.timedelta(days=1)
-        number = 0
+        number = tmp = 0
         staff = Staff.objects.get(Person=int(request.data['Person']))
         if staff:
             organization = Organization.objects.get(id=staff.Organization.id)
             if  organization:
-                while stardate == enddate:
+                while stardate <= enddate:
                       if stardate.weekday() == 5:
                          if organization.IsSaturdayWorkDay:
-                            number +=1
+                            if tmp == 0 and startime == "13.00":
+                                number += 0.5
+                            else:
+                                number += 1
                       elif stardate.weekday() == 6:
-                              if organization.IsSundayWorkDay:
-                                  number += 1
+                          if organization.IsSundayWorkDay:
+                            if tmp == 0 and startime == "13.00":
+                                number += 0.5
+                            else:
+                                number += 1
                       else:
-                           number += 1
+                           if tmp == 0 and startime == "13.00":
+                                number += 0.5
+                           else:
+                                number += 1
                       stardate += delta
+                      tmp += 1
+                if endtime == "12.00":
+                   if enddate.weekday() == 5:
+                       if organization.IsSaturdayWorkDay:
+                          number -= 0.5
+                   elif enddate.weekday() == 6:
+                       if organization.IsSundayWorkDay:
+                          number -= 0.5
+                   else:
+                        number -= 0.5
             else:
                 return Response('Şirket tanımı yapılmamıştır.',status=status.HTTP_404_NOT_FOUND)
         else:
@@ -190,9 +209,9 @@ def PersonRightInfo(request,id):
 
         remainingleave = totalleave - totalright
 
-        personbusiness = PersonBusiness.objects.get(Person=id)
-        if personbusiness:
-            businessyear = personbusiness.JobStartDate
+        personbusiness = PersonBusiness.objects.filter(Person=id)
+        if len(personbusiness) > 0:
+            businessyear = personbusiness[0].JobStartDate
             if datetime.date.today().year - businessyear.year >= 5:
                 nextleave = 20
             else:
