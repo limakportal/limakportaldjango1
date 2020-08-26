@@ -193,7 +193,7 @@ def RightDaysNumber(request):
 
 @api_view(['GET'])
 def PersonRightInfo(request,id):
-        totalleave = totalright = remainingleave = nextyear = nextleave = approvelwaiting = 0
+        totalleave = totalright = remainingleave = nextyear = nextleave = approvelwaiting = rightnumber =0
 
         rightleave =  RightLeave.objects.filter(Person=id) 
         if rightleave:
@@ -202,10 +202,6 @@ def PersonRightInfo(request,id):
         right = Right.objects.filter(Person=id,RightStatus=EnumRightStatus.Onaylandi)
         if right:
             totalright =  right.aggregate(total=Sum('RightNumber'))['total']
-
-        right = Right.objects.filter(Person=id,RightStatus=EnumRightStatus.OnayBekliyor)
-        if right:
-            approvelwaiting = right.aggregate(total=Sum('RightNumber'))['total']
 
         remainingleave = totalleave - totalright
 
@@ -219,8 +215,21 @@ def PersonRightInfo(request,id):
         
         nextyear = datetime.date.today().year + 1
         
+        detail = []
+        for item in rightleave:
+           for r in right:
+               if r.StartDate.year == item.Year :
+                  rightnumber += r.RightNumber
+           det = {'year' : item.Year , 'rightleave' : item.Earning , 'rightnumber': rightnumber, 'remaining' : item.Earning - rightnumber}
+           detail.append(det)
+           rightnumber = 0
+
+        right = Right.objects.filter(Person=id,RightStatus=EnumRightStatus.OnayBekliyor)
+        if right:
+            approvelwaiting = right.aggregate(total=Sum('RightNumber'))['total']
+      
         content = {'totalleave' : totalleave, 'totalright': totalright, 'remainingleave' : remainingleave,
-                'nextyear' : nextyear, 'nextleave': nextleave, 'approvelwaiting' : approvelwaiting}
+                'nextyear' : nextyear, 'nextleave': nextleave, 'approvelwaiting' : approvelwaiting, 'detail' : detail}
         return Response(content)
 
 @api_view(['GET'])
