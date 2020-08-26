@@ -26,29 +26,22 @@ from ..person.serializer import PersonSerializer
 @api_view(['GET'])
 def ResponsiblePersonDetails(request, id):
         response = {}
+        response['ResponsibleMenu'],response['ResponsiblePersons'] = GetResponsiblePersonDetails(id)
 
-        try:
+        return Response(response,status=status.HTTP_200_OK)
 
-            account = Account.objects.get(id = id)
-            person = Person.objects.get(Email = account.email)
+def GetResponsiblePersonDetails(id):
+    try:
+            person = Person.objects.get(id = id)
             staff = Staff.objects.get(Person = person.id)
-
-
 
             organizationObj = Organization.objects.get(id = staff.Organization_id)
             serializer = OrganizationWithPersonTreeSerializer(organizationObj)
-            response['ResponsibleMenu'] = serializer.data
+            responsibleMenu = serializer.data
 
             persons = []
-            # staffs = Staff.objects.filter(Organization = response['ResponsibleMenu']['id'])
-            # for staff in staffs:
-            #     try:
-            #         person = Person.objects.get(id = staff.Person_id)
-            #         persons.append(person)
-            #     except:
-            #         person = None
-            if response['ResponsibleMenu']['ChildOrganization'] != None:
-                for child in response['ResponsibleMenu']['ChildOrganization']:
+            if responsibleMenu['ChildOrganization'] != None:
+                for child in responsibleMenu['ChildOrganization']:
                     staffs = Staff.objects.filter(Organization = child['id'])
                     for staff in staffs:
                         try:
@@ -57,12 +50,11 @@ def ResponsiblePersonDetails(request, id):
                         except:
                             person = None
 
-            response['ResponsiblePersons'] = PersonSerializer(persons ,many=True).data
-        except :
-            response['ResponsibleMenu'] = None
-            response['ResponsiblePersons'] = None
-
-        return Response(response,status=status.HTTP_200_OK)
+            responsiblePersons = PersonSerializer(persons ,many=True).data
+    except :
+            responsibleMenu = None
+            ResponsiblePersons= None
+    return responsibleMenu,responsiblePersons
 
 @api_view(['GET'])
 def AccountListDetails(request):

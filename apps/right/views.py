@@ -20,6 +20,7 @@ from .serializer import PersonSerializer
 from ..businessrules.views import mail_yolla
 from ..person.businesrules import GetPersonApprover
 from ..personbusiness.models import PersonBusiness
+from ..businessrules.views import GetResponsiblePersonDetails
 
 class RightAPIView(APIView):
     def get(self,request):
@@ -194,8 +195,18 @@ def RightDaysNumber(request):
 
 @api_view(['GET'])
 def PersonRightInfo(request,id):
-        totalleave = totalright = remainingleave = nextyear = nextleave = approvelwaiting = rightnumber =0
+        content = []
+        result = GetPersonRightInfo(id)
+        content.append(result)
+        x,responsePersons = GetResponsiblePersonDetails(id)
+        for person in responsePersons:
+            result = GetPersonRightInfo(person["id"])
+            content.append(result)
+        
+        return Response(content)
 
+def GetPersonRightInfo(id):
+        totalleave = totalright = remainingleave = nextyear = nextleave = approvelwaiting = rightnumber =0
         rightleave =  RightLeave.objects.filter(Person=id) 
         if rightleave:
             totalleave = rightleave.aggregate(total=Sum('Earning'))['total']
@@ -230,11 +241,12 @@ def PersonRightInfo(request,id):
         if right:
             for r in right:
               approvelwaiting += r.RightNumber  
+        
+        person = Person.objects.get(id=id)
       
-        content = [{'totalleave' : totalleave, 'totalright': totalright, 'remainingleave' : remainingleave,
-                'nextyear' : nextyear, 'nextleave': nextleave, 'approvelwaiting' : approvelwaiting, 'detail' : detail} ]
-        return Response(content)
-
+        content = {'person_id' : person.id, 'name' : person.Name , 'surname': person.Surname,'totalleave' : totalleave, 'totalright': totalright, 'remainingleave' : remainingleave,
+                'nextyear' : nextyear, 'nextleave': nextleave, 'approvelwaiting' : approvelwaiting, 'detail' : detail}
+        return content
 @api_view(['GET'])
 def GetRightStatus(request,status_id):
         try:
