@@ -11,6 +11,7 @@ class Permission(models.Model):
     Icon = models.CharField(blank=True,null=True,max_length=200)
     Link = models.CharField(blank=True,null=True,max_length=200)    
     UpperPermission = models.ForeignKey('self', on_delete = models.CASCADE,blank=True, null=True)
+    Order = models.IntegerField(blank=True,null=True)
 
     def children(self):
         return Permission.objects.filter(UpperPermission=self)
