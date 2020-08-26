@@ -207,7 +207,7 @@ def PersonRightInfo(request,id):
         return Response(content)
 
 def GetPersonRightInfo(id):
-        totalleave = totalright = remainingleave = nextyear = nextleave = approvelwaiting = rightnumber =0
+        totalleave = totalright = remainingleave = nextyear = nextleave = approvelwaiting = rightnumber = organiaztion_id = 0
         rightleave =  RightLeave.objects.filter(Person=id) 
         if rightleave:
             totalleave = rightleave.aggregate(total=Sum('Earning'))['total']
@@ -244,9 +244,14 @@ def GetPersonRightInfo(id):
               approvelwaiting += r.RightNumber  
         
         person = Person.objects.get(id=id)
+        staff = Staff.objects.filter(Person=id)
+        if len(staff) > 0:
+             organiaztion = Organization.objects.filter(id=staff[0].Organization.id)
+             if len(organiaztion) > 0:
+                 organiaztion_id = organiaztion[0].id
       
         content = {'person_id' : person.id, 'name' : person.Name , 'surname': person.Surname,'totalleave' : totalleave, 'totalright': totalright, 'remainingleave' : remainingleave,
-                'nextyear' : nextyear, 'nextleave': nextleave, 'approvelwaiting' : approvelwaiting, 'detail' : detail}
+                'nextyear' : nextyear, 'nextleave': nextleave, 'approvelwaiting' : approvelwaiting, 'organization_id' : organiaztion_id, 'detail' : detail}
         return content
 @api_view(['GET'])
 def GetRightStatus(request,status_id):
