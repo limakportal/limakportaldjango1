@@ -199,9 +199,10 @@ def PersonRightInfo(request,id):
         result = GetPersonRightInfo(id)
         content.append(result)
         x,responsePersons = GetResponsiblePersonDetails(id)
-        for person in responsePersons:
-            result = GetPersonRightInfo(person["id"])
-            content.append(result)
+        if responsePersons != None:
+            for person in responsePersons:
+                result = GetPersonRightInfo(person["id"])
+                content.append(result)
         
         return Response(content)
 
