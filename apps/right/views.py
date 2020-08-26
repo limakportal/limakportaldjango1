@@ -212,12 +212,10 @@ def GetPersonRightInfo(id):
         if rightleave:
             totalleave = rightleave.aggregate(total=Sum('Earning'))['total']
         
-        right = Right.objects.filter(Person=id,RightStatus=EnumRightStatus.Onaylandi)
-        if right:
-            for r in right:
+        rightapprove = Right.objects.filter(Person=id,RightStatus=EnumRightStatus.Onaylandi)
+        if rightapprove:
+            for r in rightapprove:
               totalright += r.RightNumber  
-
-        remainingleave = totalleave - totalright
 
         personbusiness = PersonBusiness.objects.filter(Person=id)
         if len(personbusiness) > 0:
@@ -227,21 +225,23 @@ def GetPersonRightInfo(id):
             else:
                 nextleave = 14
         
-        nextyear = datetime.date.today().year + 1
+            nextyear = str(datetime.date.today().year + 1) + '-' + str(businessyear.month) + '-' + str(businessyear.day)
         
         detail = []
         for item in rightleave:
-           for r in right:
+           for r in rightapprove:
                if r.StartDate.year == item.Year :
                   rightnumber += r.RightNumber
            det = {'year' : item.Year , 'rightleave' : item.Earning , 'rightnumber': rightnumber, 'remaining' : item.Earning - rightnumber}
            detail.append(det)
            rightnumber = 0
 
-        right = Right.objects.filter(Person=id,RightStatus=EnumRightStatus.OnayBekliyor)
-        if right:
-            for r in right:
+        rightwaiting = Right.objects.filter(Person=id,RightStatus=EnumRightStatus.OnayBekliyor)
+        if rightwaiting:
+            for r in rightwaiting:
               approvelwaiting += r.RightNumber  
+
+        remainingleave = totalleave - totalright - approvelwaiting
         
         person = Person.objects.get(id=id)
         staff = Staff.objects.filter(Person=id)
@@ -253,6 +253,7 @@ def GetPersonRightInfo(id):
         content = {'person_id' : person.id, 'name' : person.Name , 'surname': person.Surname,'totalleave' : totalleave, 'totalright': totalright, 'remainingleave' : remainingleave,
                 'nextyear' : nextyear, 'nextleave': nextleave, 'approvelwaiting' : approvelwaiting, 'organization_id' : organiaztion_id, 'detail' : detail}
         return content
+
 @api_view(['GET'])
 def GetRightStatus(request,status_id):
         try:
