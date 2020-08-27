@@ -1,6 +1,7 @@
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import api_view , permission_classes
 
 
 from .serializer import RegistrationSerializer
@@ -22,9 +23,11 @@ from ..authority.models import Authority
 from ..permission.models import Permission
 from ..permission.serializer import PermissionSerializer
 
-@api_view(['POST', ])
-def registration_view(request):
 
+
+@api_view(['POST', ])
+# @permission_classes([IsAuthenticated])
+def registration_view(request):
 	if request.method == 'POST':
 		serializer = RegistrationSerializer(data=request.data)
 		data = {}
@@ -75,7 +78,7 @@ class ObtainAuthToken(APIView):
             return Person.objects.get(id=id)
         except Person.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
-
+    # permission_classes = [IsAuthenticated]
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data,
                                            context={'request': request})

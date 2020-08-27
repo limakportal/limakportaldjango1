@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.db import transaction
 import json
-
+from rest_framework.permissions import IsAuthenticated
 
 from ..role.models import Role
 from ..authority.models import Authority
@@ -14,6 +14,7 @@ from ..authority.serializer import AuthoritySerializer
 from ..userrole.serializer import UserRoleSerializer
 
 class RoleWithPermissionAPIView(APIView):
+    # permission_classes = [IsAuthenticated]
     def get(self,request):
         roles = Role.objects.all()
         serializer = RoleViewSerializer(roles ,many = True)

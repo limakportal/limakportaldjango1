@@ -14,7 +14,7 @@ class TitleAPIView(APIView):
     def post(self,request):
         serializer = TitleSerializer(data = request.data)
         if serializer.is_valid():
-            title = Title.objects.filter(Name = request.data['Name'].strip())
+            title = Title.objects.filter(Name = request.data['Name'])
             if len(title):
                 return Response('Bu ünvanda isim tanımlıdır.',status=status.HTTP_404_NOT_FOUND)
             serializer.save()
