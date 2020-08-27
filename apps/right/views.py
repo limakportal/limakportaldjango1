@@ -194,10 +194,17 @@ def RightDaysNumber(request):
         else:
             return Response('Kadro tanımı yapılmamıştır.',status=status.HTTP_404_NOT_FOUND)
         
-        if number > righttype.MaxDayOff:
-            return Response('Maksimum izin gün sayısını geçtiniz. Lütfen izin tarihlerinizi kontrol ediniz.', status=status.HTTP_404_NOT_FOUND) 
-        elif number <= 0:
-            return Response('İzin tarihlerinii kontrol ediniz.',status=status.HTTP_404_NOT_FOUND)
+        if righttypeid == EnumRightTypes.Yillik:
+            content = GetPersonRightInfo(int(request.data['Person']))
+            if number > content['remainingleave']:
+                return Response('Yıllık izin bakiyeniz yetersiz. Tekrar kontrol ediniz.',status=status.HTTP_404_NOT_FOUND)
+
+        elif righttype.MaxDayOff != None and righttype.MaxDayOff>0:
+            if number > righttype.MaxDayOff:
+                return Response('Maksimum izin gün sayısını geçtiniz. Lütfen izin tarihlerinizi kontrol ediniz.', status=status.HTTP_404_NOT_FOUND) 
+
+        if number <= 0:
+                return Response('İzin tarihlerini kontrol ediniz.',status=status.HTTP_404_NOT_FOUND)    
 
         return   Response({'daynumber' : number})
 

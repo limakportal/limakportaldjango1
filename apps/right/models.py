@@ -22,6 +22,7 @@ class Right(models.Model):
     DenyExplanation = models.CharField(max_length=50,blank=True, null=True)
     HrHasField = models.BooleanField(blank=True,default=False)
     KvkkIsChecked = models.BooleanField(blank=True, null=True)
+    RightPicture = models.FileField(blank=True,null=True)
 
     def __str__(self):
         return self.Person.Name
