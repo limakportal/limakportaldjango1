@@ -15,20 +15,49 @@ from ..organization.models import Organization
 from ..staff.models import Staff
 from ..person.models import Person
 from ..account.models import Account
+from ..permission.models import Permission
+from ..authority.models import Authority
+from ..userrole.models import UserRole
 
 
 from ..organization.serializer import OrganizationSerializer ,OrganizationTreeSerializer
 from ..businessrules.serializer import (OrganizationTreeByAccountId)
-from ..person.serializer import PersonSerializer
+from ..person.serializer import PersonSerializer , PersonViewDetailSerializer
 
 
 
 @api_view(['GET'])
 def ResponsiblePersonDetails(request, id):
+        ikKontrol = False
+        person = Person.objects.get(id = id)
+        account = Account.objects.get(email = person.Email)
+        userRoles = UserRole.objects.filter(Account_id = account.id)
+        for userRole in userRoles:
+            try:
+                authorityes = Authority.objects.filter(Role_id = userRole.Role_id)
+                if len(authorityes) > 0:
+                    for authority in authorityes:
+                        permissions = Permission.objects.filter(Code = 'IZN_IK')
+                        for permission in permissions:
+                            if permission.id == authority.Permission_id:
+                                ikKontrol = True
+                                response = {}
+                                response['ResponsiblePersons'] = GetResponsibleIkPersonDetails(id)
+                                return Response(response,status=status.HTTP_200_OK)
+            except:
+                pass
+
+
         response = {}
-        response['ResponsibleMenu'],response['ResponsiblePersons'] = GetResponsiblePersonDetails(id)
+        response['ResponsibleMenu'],response['ResponsiblePersons'],response['Person'] = GetResponsiblePersonDetails(id)
 
         return Response(response,status=status.HTTP_200_OK)
+
+
+def GetResponsibleIkPersonDetails(id):
+    persons = Person.objects.all()
+    serializer = PersonViewDetailSerializer(persons , many = True)
+    return serializer.data
 
 def GetResponsiblePersonDetails(id):
     try:
@@ -38,6 +67,14 @@ def GetResponsiblePersonDetails(id):
             organizationObj = Organization.objects.get(id = staff.Organization_id)
             serializer = OrganizationWithPersonTreeSerializer(organizationObj)
             responsibleMenu = serializer.data
+
+            personRequest = {}
+
+            try:
+                personRequest = PersonViewDetailSerializer(person).data
+
+            except :
+                personRequest = None
 
             persons = []
             if responsibleMenu['ChildOrganization'] != None:
@@ -50,10 +87,10 @@ def GetResponsiblePersonDetails(id):
                         except:
                             person = None
 
-            responsiblePersons = PersonSerializer(persons ,many=True).data
+            responsiblePersons = PersonViewDetailSerializer(persons ,many=True).data
     except :
-            return None , None
-    return responsibleMenu,responsiblePersons
+            return None , None, None
+    return responsibleMenu,responsiblePersons,personRequest
 
 @api_view(['GET'])
 def AccountListDetails(request):

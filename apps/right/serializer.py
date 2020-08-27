@@ -77,5 +77,6 @@ class RightWithApproverSerializer(serializers.ModelSerializer):
             'Approver1FullName',
             'PersonFullName',
             'PersonApprover1',
-            'HrHasField'
+            'HrHasField',
+            'RightPicture'
         )
