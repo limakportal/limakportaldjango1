@@ -28,7 +28,7 @@ from ..person.serializer import PersonSerializer , PersonViewSerializer
 
 @api_view(['GET'])
 def ResponsiblePersonDetails(request, id):
-    if  HasPermissionIK(id):
+    if  HasPermission(id,'IZN_IK'):
         response = {}
         response['ResponsiblePersons'] = GetResponsibleIkPersonDetails(id)
         return Response(response,status=status.HTTP_200_OK)
@@ -38,7 +38,7 @@ def ResponsiblePersonDetails(request, id):
 
     return Response(response,status=status.HTTP_200_OK)
 
-def HasPermissionIK(id):
+def HasPermission(id,code):
         person = Person.objects.get(id = id)
         account = Account.objects.get(email = person.Email)
         userRoles = UserRole.objects.filter(Account_id = account.id)
@@ -47,7 +47,7 @@ def HasPermissionIK(id):
                 authorityes = Authority.objects.filter(Role_id = userRole.Role_id)
                 if len(authorityes) > 0:
                     for authority in authorityes:
-                        permissions = Permission.objects.filter(Code = 'IZN_IK')
+                        permissions = Permission.objects.filter(Code = code)
                         for permission in permissions:
                             if permission.id == authority.Permission_id:
                                 return True

@@ -20,7 +20,7 @@ from .serializer import PersonSerializer
 from ..businessrules.views import mail_yolla
 from ..person.businesrules import GetPersonApprover
 from ..personbusiness.models import PersonBusiness
-from ..businessrules.views import GetResponsiblePersonDetails, HasPermissionIK
+from ..businessrules.views import GetResponsiblePersonDetails, HasPermission
 from ..title.models import Title
 from django.db.models import Q
 
@@ -215,14 +215,14 @@ def RightDaysNumber(request):
 @api_view(['GET'])
 def PersonRightInfo(request,id):
         content = []
-        result = GetPersonRightInfo(id)
-        content.append(result)
-        if HasPermissionIK(id):
+        if HasPermission(id,'IZN_IK'):
             person = Person.objects.all()
             for p in person:
                result = GetPersonRightInfo(p.id)
                content.append(result)
             return Response(content)
+        result = GetPersonRightInfo(id)
+        content.append(result)
         x,responsePersons,y = GetResponsiblePersonDetails(id)
         if responsePersons != None:
             for person in responsePersons:
