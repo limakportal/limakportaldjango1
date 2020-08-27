@@ -22,6 +22,7 @@ from ..person.businesrules import GetPersonApprover
 from ..personbusiness.models import PersonBusiness
 from ..businessrules.views import GetResponsiblePersonDetails, HasPermissionIK
 from ..title.models import Title
+from django.db.models import Q
 
 class RightAPIView(APIView):
     def get(self,request):
@@ -32,7 +33,10 @@ class RightAPIView(APIView):
     def post(self,request):
         serializer = RightSerializer(data = request.data)
         if serializer.is_valid():
-            serializer.save()
+            result = RightController(serializer.validated_data)
+            if result != "":
+                return Response(result,status=status.HTTP_404_NOT_FOUND)
+            serializer.save()               
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -318,3 +322,26 @@ def TodayOnLeavePerson(request):
             return Response(finallyData)
         except:
             return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+def RightController(data):
+        sonucmessage = ""
+        if data:
+            today = datetime.date.today()
+            startdate = data['StartDate'].date()
+            enddate = data['EndDate'].date()
+
+            # rights = Right.objects.filter(Q(StartDate__date = startdate) & Q(EndDate__date = enddate) & Q(Person = data['Person'].id) &   
+            #                                 (Q(RightStatus = EnumRightStatus.Onaylandi) | Q(RightStatus = EnumRightStatus.OnayBekliyor))) 
+
+            # rights = Right.objects.filter(Q(Person = data['Person'].id) & (Q(RightStatus = EnumRightStatus.Onaylandi) | Q(RightStatus = EnumRightStatus.OnayBekliyor)))             
+
+            
+            serializer = RightSerializer(rights,many=True)
+            
+            
+            if startdate < today or startdate > enddate:
+                sonucmessage = "İzin tarihlerini kontrol ediniz."
+            
+        return sonucmessage
+
