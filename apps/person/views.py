@@ -52,6 +52,7 @@ class PersonDetails(APIView):
 
     def put(self, request,id):
         person = self.get_object(id)
+        request.data['Picture'] = base64.b64decode(request.data['Picture'])
         serializer = PersonSerializer(person, data=request.data)
         if serializer.is_valid():
             serializer.save()

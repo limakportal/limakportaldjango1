@@ -24,6 +24,7 @@ from ..personbusiness.models import PersonBusiness
 from ..businessrules.views import GetResponsiblePersonDetails, HasPermission
 from ..title.models import Title
 from django.db.models import Q
+from ..vocationdays.models import VocationDays
 
 class RightAPIView(APIView):
     def get(self,request):
@@ -171,20 +172,34 @@ def RightDaysNumber(request):
         delta = datetime.timedelta(days=1)
         number = tmp = 0
         staff = Staff.objects.get(Person=int(request.data['Person']))
+        vdays = VocationDays.objects.all()
         if staff:
             organization = Organization.objects.get(id=staff.Organization.id)
             if  organization:
                 while stardate <= enddate:
+                      days = vdays.filter(DateDay__date = stardate)
+                      if len(days) > 0:
+                         if days[0].DayType == 0:
+                            number += 0.5
+                         stardate += delta                         
+                         tmp += 1
+                         continue        
                       if stardate.weekday() == 5:
                          if organization.IsSaturdayWorkDay:
-                            if tmp == 0 and startime == "13.00":
-                                number += 0.5
+                            if tmp == 0:
+                               if startime == "13.00":
+                                  number += 0.5
+                               else:
+                                  number += 1
                             else:
                                 number += 1
                       elif stardate.weekday() == 6:
                           if organization.IsSundayWorkDay:
-                            if tmp == 0 and startime == "13.00":
-                                number += 0.5
+                            if tmp == 0:
+                               if startime == "13.00":
+                                  number += 0.5
+                               else:
+                                  number += 1
                             else:
                                 number += 1
                       else:
@@ -192,7 +207,7 @@ def RightDaysNumber(request):
                                 number += 0.5
                            else:
                                 number += 1
-                      stardate += delta
+                      stardate += delta                         
                       tmp += 1
                 if endtime == "12.00":
                    if enddate.weekday() == 5:
