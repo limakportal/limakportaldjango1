@@ -92,6 +92,23 @@ def GetResponsiblePersonDetails(id):
             return None , None, None
     return responsibleMenu,responsiblePersons,personRequest
 
+def GetResponsibleIkPersons():
+    ikPersons = []
+    permissions = Permission.objects.filter(Code = 'IZN_IK')
+    for permission in permissions:
+        authorityes = Authority.objects.filter(Permission = permission.id)
+        for authority in authorityes:
+            userRoles = UserRole.objects.filter(Role = authority.Role_id)
+            for userRole in userRoles:
+                try:
+                    account = Account.objects.get(id = userRole.Account_id)
+                    person = Person.objects.get(Email = account.email)
+                    ikPersons.append(person)
+                except :
+                    pass
+
+    return PersonSerializer(ikPersons , many = True).data
+
 @api_view(['GET'])
 def AccountListDetails(request):
     accounts = Account.objects.all()
