@@ -91,7 +91,7 @@ def GetResponsiblePersonDetails(id):
 
             responsiblePersons = PersonSerializer(persons ,many=True).data
     except :
-            return None , None
+            return None , None, None
     return responsibleMenu,responsiblePersons,personRequest
 
 @api_view(['GET'])

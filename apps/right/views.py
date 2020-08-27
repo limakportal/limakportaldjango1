@@ -213,7 +213,7 @@ def PersonRightInfo(request,id):
         content = []
         result = GetPersonRightInfo(id)
         content.append(result)
-        x,responsePersons = GetResponsiblePersonDetails(id)
+        x,responsePersons,y = GetResponsiblePersonDetails(id)
         if responsePersons != None:
             for person in responsePersons:
                 result = GetPersonRightInfo(person["id"])
