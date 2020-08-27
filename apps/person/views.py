@@ -19,8 +19,6 @@ from apps.personfamily.serializer import PersonFamilySerializer
 import json
 import base64
 
-from django.core.files.base import ContentFile
-
 class PersonAPIView(APIView):
     @permission_classes((IsAuthenticated, ))
     def get(self,request):
@@ -29,8 +27,6 @@ class PersonAPIView(APIView):
         return Response(serializer.data)
 
     def post(self,request):
-        data = ContentFile(base64.b64decode(request.data['Picture']),name='deneme.jpg')
-        request.data['Picture'] = data
         serializer = PersonSerializer(data = request.data)
         if serializer.is_valid():
             serializer.save()
@@ -56,8 +52,6 @@ class PersonDetails(APIView):
 
     def put(self, request,id):
         person = self.get_object(id)
-        data = ContentFile(base64.b64decode(request.data['Picture']),name='deneme.jpg')
-        request.data['Picture'] = data
         serializer = PersonSerializer(person, data=request.data)
         if serializer.is_valid():
             serializer.save()
