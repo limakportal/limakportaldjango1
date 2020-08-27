@@ -20,7 +20,7 @@ from .serializer import PersonSerializer
 from ..businessrules.views import mail_yolla
 from ..person.businesrules import GetPersonApprover
 from ..personbusiness.models import PersonBusiness
-from ..businessrules.views import GetResponsiblePersonDetails
+from ..businessrules.views import GetResponsiblePersonDetails, HasPermissionIK
 from ..title.models import Title
 
 class RightAPIView(APIView):
@@ -213,12 +213,17 @@ def PersonRightInfo(request,id):
         content = []
         result = GetPersonRightInfo(id)
         content.append(result)
+        if HasPermissionIK(id):
+            person = Person.objects.all()
+            for p in person:
+               result = GetPersonRightInfo(p.id)
+               content.append(result)
+            return Response(content)
         x,responsePersons,y = GetResponsiblePersonDetails(id)
         if responsePersons != None:
             for person in responsePersons:
-                result = GetPersonRightInfo(person["id"])
+                result = GetPersonRightInfo(person["Person"]["id"])
                 content.append(result)
-        
         return Response(content)
 
 def GetPersonRightInfo(id):
