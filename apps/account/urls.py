@@ -7,5 +7,5 @@ app_name = "account"
 
 urlpatterns = [ 
     path('register', registration_view, name="register"),
-    path('login', ObtainAuthToken.as_view(), name="login"),
+    # path('login', ObtainAuthToken.as_view(), name="login"),
 ]

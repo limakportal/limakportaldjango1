@@ -1,6 +1,7 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from rest_framework.permissions import IsAuthenticated
 
 
 from .serializer import RegistrationSerializer
@@ -21,6 +22,8 @@ from ..userrole.models import UserRole
 from ..authority.models import Authority
 from ..permission.models import Permission
 from ..permission.serializer import PermissionSerializer
+
+
 
 @api_view(['POST', ])
 def registration_view(request):
