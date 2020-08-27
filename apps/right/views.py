@@ -18,6 +18,7 @@ from docxtpl import DocxTemplate
 from ..person.models import Person
 from .serializer import PersonSerializer
 from ..businessrules.views import mail_yolla
+from ..businessrules.views import GetResponsibleIkPersons
 from ..person.businesrules import GetPersonApprover
 from ..personbusiness.models import PersonBusiness
 from ..businessrules.views import GetResponsiblePersonDetails, HasPermission
@@ -68,6 +69,15 @@ class RightDetails(APIView):
                 icerik = 'İzin talebiniz onaylanmıştır. Bakiyenizden ' + str(request.data['RightNumber']) + ' gün düşülmüştür. İzin sürecinizin tamamlanması için imzalı izin formunuzu izne ayrılmadan önce İnsan Kaynakları Direktörlüğüne iletiniz.'
                 mail_yolla(baslik,icerik,personSerializer.data['Email'],[personSerializer.data['Email']])
                 
+                IKPersons = GetResponsibleIkPersons()
+                if IKPersons != None:
+
+                    for i in IKPersons:
+                        if i['Email'] != "":
+                            baslik = 'İzin Kullanım Hakkında'
+                            icerik = personSerializer.data['Name'] + ' ' + personSerializer.data['Surname'] + ' in ' + str(serializer.validated_data['StartDate'].date()) + '/' + str(serializer.validated_data['EndDate'].date()) + ' tarihleri arasındaki izni onaylanmıştır.'
+                            mail_yolla(baslik,icerik,i['Email'],[i['Email']])
+
             elif  serializer.data['RightStatus'] == EnumRightStatus.Reddedildi:
                 person = Person.objects.get(id = serializer.data['Person'])
                 personSerializer = PersonSerializer(person)
