@@ -98,24 +98,26 @@ def bornTodayPerson(request):
         persons = []
         
         finallyData = []
-        for personIdenty in personidentities:
-            data = {}
-            person = Person.objects.get(id = personIdenty.Person_id)
-            data['Name'] = person.Name 
-            data['Surname'] = person.Surname
-            data['Email'] = person.Email
-            data['BirthDate'] = person.BirthDate
-            try:
-                staff = Staff.objects.get(Person=int(personIdenty.Person_id))
-                organization = Organization.objects.get(id = staff.Organization.id)
-                title = Title.objects.get(id = staff.Title_id)
-                data['Organization'] = organization.Name
-                data['Title'] = title.Name
-                finallyData.append(data)
-            except:
-                data['Organization'] = ''
-                data['Title'] = ''
-                finallyData.append(data)
+        if len(personidentities) > 0:
+
+            for personIdenty in personidentities:
+                data = {}
+                person = Person.objects.get(id = personIdenty.Person_id)
+                data['Name'] = person.Name 
+                data['Surname'] = person.Surname
+                data['Email'] = person.Email
+                data['BirthDate'] = personIdenty.BirthDate
+                try:
+                    staff = Staff.objects.get(Person=int(personIdenty.Person_id))
+                    organization = Organization.objects.get(id = staff.Organization.id)
+                    title = Title.objects.get(id = staff.Title_id)
+                    data['Organization'] = organization.Name
+                    data['Title'] = title.Name
+                    finallyData.append(data)
+                except:
+                    data['Organization'] = ''
+                    data['Title'] = ''
+                    finallyData.append(data)
                  
         return Response(finallyData)
     except:
@@ -132,24 +134,25 @@ def bornMonthPerson(request):
         persons = []
         
         finallyData = []
-        for personIdenty in personidentities:
-            data = {}
-            person = Person.objects.get(id = personIdenty.Person_id)
-            data['Name'] = person.Name 
-            data['Surname'] = person.Surname
-            data['Email'] = person.Email
-            data['BirthDate'] = person.BirthDate
-            try:
-                staff = Staff.objects.get(Person=int(personIdenty.Person_id))
-                organization = Organization.objects.get(id = staff.Organization.id)
-                title = Title.objects.get(id = staff.Title_id)
-                data['Birim'] = organization.Name
-                data['Unvan'] = title.Name
-                finallyData.append(data)
-            except:
-                data['Birim'] = ''
-                data['Unvan'] = ''
-                finallyData.append(data)
+        if len(personidentities) > 0:
+            for personIdenty in personidentities:
+                data = {}
+                person = Person.objects.get(id = personIdenty.Person_id)
+                data['Name'] = person.Name 
+                data['Surname'] = person.Surname
+                data['Email'] = person.Email
+                data['BirthDate'] = personIdenty.BirthDate
+                try:
+                    staff = Staff.objects.get(Person=int(personIdenty.Person_id))
+                    organization = Organization.objects.get(id = staff.Organization.id)
+                    title = Title.objects.get(id = staff.Title_id)
+                    data['Organization'] = organization.Name
+                    data['Title'] = title.Name
+                    finallyData.append(data)
+                except:
+                    data['Organization'] = ''
+                    data['Title'] = ''
+                    finallyData.append(data)
                  
         return Response(finallyData)
     except:
