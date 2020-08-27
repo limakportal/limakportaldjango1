@@ -14,7 +14,7 @@ class OrganizationAPIView(APIView):
     def post(self,request):
         serializer = OrganizationSerializer(data = request.data)
         if serializer.is_valid():
-            organization = Organization.objects.filter(UpperOrganization = request.data['UpperOrganization'], Name = request.data['Name'].strip())
+            organization = Organization.objects.filter(UpperOrganization = request.data['UpperOrganization'], Name = request.data['Name'])
             if len(organization):
                 return Response('Bu birimde aynı isimli organizasyon tanımlıdır.',status=status.HTTP_404_NOT_FOUND)
             serializer.save()
