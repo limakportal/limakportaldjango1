@@ -28,7 +28,6 @@ from ..person.serializer import PersonSerializer
 
 @api_view(['GET'])
 def ResponsiblePersonDetails(request, id):
-        ikKontrol = False
         person = Person.objects.get(id = id)
         account = Account.objects.get(email = person.Email)
         userRoles = UserRole.objects.filter(Account_id = account.id)
@@ -40,7 +39,6 @@ def ResponsiblePersonDetails(request, id):
                         permissions = Permission.objects.filter(Code = 'IZN_IK')
                         for permission in permissions:
                             if permission.id == authority.Permission_id:
-                                ikKontrol = True
                                 response = {}
                                 response['ResponsiblePersons'] = GetResponsibleIkPersonDetails(id)
                                 return Response(response,status=status.HTTP_200_OK)
@@ -58,6 +56,24 @@ def GetResponsibleIkPersonDetails(id):
     persons = Person.objects.all()
     serializer = PersonSerializer(persons , many = True)
     return serializer.data
+
+def GetResponsibleIkPersons():
+    ikPersons = []
+    permissions = Permission.objects.filter(Code = 'IZN_IK')
+    for permission in permissions:
+        authorityes = Authority.objects.filter(Permission = permission.id)
+        for authority in authorityes:
+            userRoles = UserRole.objects.filter(Role = authority.Role_id)
+            for userRole in userRoles:
+                try:
+                    account = Account.objects.get(id = userRole.Account_id)
+                    person = Person.objects.get(Email = account.email)
+                    ikPersons.append(person)
+                except :
+                    pass
+
+    return PersonSerializer(ikPersons , many = True).data
+
 
 def GetResponsiblePersonDetails(id):
     try:
