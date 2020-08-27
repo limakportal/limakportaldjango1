@@ -22,7 +22,7 @@ from ..userrole.models import UserRole
 
 from ..organization.serializer import OrganizationSerializer ,OrganizationTreeSerializer
 from ..businessrules.serializer import (OrganizationTreeByAccountId)
-from ..person.serializer import PersonSerializer , PersonViewDetailSerializer
+from ..person.serializer import PersonSerializer , PersonViewSerializer
 
 
 
@@ -56,7 +56,7 @@ def ResponsiblePersonDetails(request, id):
 
 def GetResponsibleIkPersonDetails(id):
     persons = Person.objects.all()
-    serializer = PersonViewDetailSerializer(persons , many = True)
+    serializer = PersonViewSerializer(persons , many = True)
     return serializer.data
 
 def GetResponsiblePersonDetails(id):
@@ -71,7 +71,7 @@ def GetResponsiblePersonDetails(id):
             personRequest = {}
 
             try:
-                personRequest = PersonViewDetailSerializer(person).data
+                personRequest = PersonViewSerializer(person).data
 
             except :
                 personRequest = None
@@ -87,7 +87,7 @@ def GetResponsiblePersonDetails(id):
                         except:
                             person = None
 
-            responsiblePersons = PersonViewDetailSerializer(persons ,many=True).data
+            responsiblePersons = PersonViewSerializer(persons ,many=True).data
     except :
             return None , None, None
     return responsibleMenu,responsiblePersons,personRequest
