@@ -171,11 +171,11 @@ def RightDaysNumber(request):
         righttype = RightType.objects.get(id = righttypeid)
         delta = datetime.timedelta(days=1)
         number = tmp = 0
-        staff = Staff.objects.get(Person=int(request.data['Person']))
+        staff = Staff.objects.filter(Person=int(request.data['Person']))
         vdays = VocationDays.objects.all()
-        if staff:
-            organization = Organization.objects.get(id=staff.Organization.id)
-            if  organization:
+        if len(staff) > 0:
+            organization = Organization.objects.filter(id=staff[0].Organization.id)
+            if  len(organization) > 0:
                 while stardate <= enddate:
                       days = vdays.filter(DateDay__date = stardate)
                       if len(days) > 0:
@@ -185,7 +185,7 @@ def RightDaysNumber(request):
                          tmp += 1
                          continue        
                       if stardate.weekday() == 5:
-                         if organization.IsSaturdayWorkDay:
+                         if organization[0].IsSaturdayWorkDay:
                             if tmp == 0:
                                if startime == "13.00":
                                   number += 0.5
@@ -194,7 +194,7 @@ def RightDaysNumber(request):
                             else:
                                 number += 1
                       elif stardate.weekday() == 6:
-                          if organization.IsSundayWorkDay:
+                          if organization[0].IsSundayWorkDay:
                             if tmp == 0:
                                if startime == "13.00":
                                   number += 0.5
@@ -211,10 +211,10 @@ def RightDaysNumber(request):
                       tmp += 1
                 if endtime == "12.00":
                    if enddate.weekday() == 5:
-                       if organization.IsSaturdayWorkDay:
+                       if organization[0].IsSaturdayWorkDay:
                           number -= 0.5
                    elif enddate.weekday() == 6:
-                       if organization.IsSundayWorkDay:
+                       if organization[0].IsSundayWorkDay:
                           number -= 0.5
                    else:
                         number -= 0.5
