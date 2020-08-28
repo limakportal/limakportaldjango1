@@ -39,20 +39,20 @@ def ResponsiblePersonDetails(request, id):
     return Response(response,status=status.HTTP_200_OK)
 
 def HasPermission(id,code):
-        person = Person.objects.get(id = id)
-        account = Account.objects.get(email = person.Email)
-        userRoles = UserRole.objects.filter(Account_id = account.id)
-        for userRole in userRoles:
-            try:
-                authorityes = Authority.objects.filter(Role_id = userRole.Role_id)
-                if len(authorityes) > 0:
-                    for authority in authorityes:
-                        permissions = Permission.objects.filter(Code = code)
-                        for permission in permissions:
-                            if permission.id == authority.Permission_id:
-                                return True
-            except:
-                return False
+        try:
+            person = Person.objects.get(id = id)
+            account = Account.objects.get(email = person.Email)
+            userRoles = UserRole.objects.filter(Account_id = account.id)
+            for userRole in userRoles:
+                    authorityes = Authority.objects.filter(Role_id = userRole.Role_id)
+                    if len(authorityes) > 0:
+                        for authority in authorityes:
+                            permissions = Permission.objects.filter(Code = code)
+                            for permission in permissions:
+                                if permission.id == authority.Permission_id:
+                                    return True
+        except:
+            return False
 
 
 def GetResponsibleIkPersonDetails(id):
