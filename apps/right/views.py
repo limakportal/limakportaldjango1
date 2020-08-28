@@ -362,7 +362,7 @@ def RightController(data):
             # rights = Right.objects.filter(Q(Person = data['Person'].id) & (Q(RightStatus = EnumRightStatus.Onaylandi) | Q(RightStatus = EnumRightStatus.OnayBekliyor)))             
 
             
-            serializer = RightSerializer(rights,many=True)
+            # serializer = RightSerializer(rights,many=True)
             
             
             if startdate < today or startdate > enddate:
