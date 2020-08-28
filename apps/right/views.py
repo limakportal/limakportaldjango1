@@ -168,10 +168,11 @@ def RightDaysNumber(request):
         startime = request.data['StartTime']
         endtime = request.data['EndTime']
         righttypeid = request.data['RightType']
+        personid = int(request.data['Person'])
         righttype = RightType.objects.get(id = righttypeid)
         delta = datetime.timedelta(days=1)
         number = tmp = 0
-        staff = Staff.objects.filter(Person=int(request.data['Person']))
+        staff = Staff.objects.filter(Person=personid)
         vdays = VocationDays.objects.all()
         if len(staff) > 0:
             organization = Organization.objects.filter(id=staff[0].Organization.id)
@@ -224,8 +225,10 @@ def RightDaysNumber(request):
             return Response('Kadro tanımı yapılmamıştır.',status=status.HTTP_404_NOT_FOUND)
         
         if righttypeid == EnumRightTypes.Yillik:
-            content = GetPersonRightInfo(int(request.data['Person']))
-            if number > content['remainingleave']:
+            content = GetPersonRightInfo(personid)
+            contentleave = content['remainingleave']
+            contentleave = contentleave + 7 
+            if number > contentleave:
                 return Response('Yıllık izin bakiyeniz yetersiz. Tekrar kontrol ediniz.',status=status.HTTP_404_NOT_FOUND)
 
         elif righttype.MaxDayOff != None and righttype.MaxDayOff>0:
@@ -356,23 +359,53 @@ def TodayOnLeavePerson(request):
 
 
 def RightController(data):
+    try:
         sonucmessage = ""
         if data:
             today = datetime.date.today()
             startdate = data['StartDate'].date()
             enddate = data['EndDate'].date()
+            personid = int(data['Person'].id)
+            righttypeid = int(data['RightType'].id)
+            rightnumber = data['RightNumber']
+            endPrior = datetime.datetime.min.date()
+            currentrights = []
+            righttype = RightType.objects.get(id = righttypeid)
+            rights = Right.objects.filter(Q(Person = personid) & (Q(RightStatus = EnumRightStatus.Onaylandi) | Q(RightStatus = EnumRightStatus.OnayBekliyor)))  
+            for iright in rights:
+                currentrights.append([iright.StartDate.date(),iright.EndDate.date()])
+        
+            currentrights.append([startdate,enddate])
+            count = 0
 
-            # rights = Right.objects.filter(Q(StartDate__date = startdate) & Q(EndDate__date = enddate) & Q(Person = data['Person'].id) &   
-            #                                 (Q(RightStatus = EnumRightStatus.Onaylandi) | Q(RightStatus = EnumRightStatus.OnayBekliyor))) 
+            for r in currentrights:
+                if r[0] > r[1]:
+                    count = count + 1 
+                if r[0] < endPrior:
+                    count = count + 1
+                endPrior = r[1]
+            if count > 0:
+                sonucmessage = "Seçilen tarihler arası izin bulunmaktadır."
+                return sonucmessage
+                
+            if righttypeid == EnumRightTypes.Yillik:
+                content = GetPersonRightInfo(personid)
+                contentleave = content['remainingleave']
+                contentleave = contentleave + 7
+                if rightnumber > contentleave:
+                    sonucmessage = "Yıllık izin bakiyeniz yetersiz. Tekrar kontrol ediniz."
+                    return sonucmessage
 
-            # rights = Right.objects.filter(Q(Person = data['Person'].id) & (Q(RightStatus = EnumRightStatus.Onaylandi) | Q(RightStatus = EnumRightStatus.OnayBekliyor)))             
-
+            elif righttype.MaxDayOff != None and righttype.MaxDayOff>0:
+                if rightnumber > righttype.MaxDayOff:
+                    sonucmessage = "Maksimum izin gün sayısını geçtiniz. Lütfen izin tarihlerinizi kontrol ediniz."
+                    return sonucmessage
             
-            # serializer = RightSerializer(rights,many=True)
-            
-            
-            if startdate < today or startdate > enddate:
+            if startdate < today or startdate > enddate or rightnumber <= 0:
                 sonucmessage = "İzin tarihlerini kontrol ediniz."
+                return sonucmessage
             
         return sonucmessage
+    except:
+        Response("",status=status.HTTP_404_NOT_FOUND)
 
