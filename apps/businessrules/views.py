@@ -23,17 +23,21 @@ from ..userrole.models import UserRole
 from ..organization.serializer import OrganizationSerializer ,OrganizationTreeSerializer
 from ..businessrules.serializer import (OrganizationTreeByAccountId)
 from ..person.serializer import PersonSerializer , PersonViewSerializer
+from ..organization.serializer import OrganizationTreeSerializer
 
 
 
 @api_view(['GET'])
 def ResponsiblePersonDetails(request, id):
-    if  HasPermission(id,'IZN_IK'):
-        response = {}
+    response = {}
+    if  HasPermission(id,'ADMIN'):        
+        response['ResponsiblePersons'] = GetResponsibleAdminPersonDetails(id)
+        return Response(response,status=status.HTTP_200_OK)
+    
+    elif HasPermission(id,'IZN_IK'):
         response['ResponsiblePersons'] = GetResponsibleIkPersonDetails(id)
         return Response(response,status=status.HTTP_200_OK)
-
-    response = {}
+    
     response['ResponsibleMenu'],response['ResponsiblePersons'],response['Person'] = GetResponsiblePersonDetails(id)
 
     return Response(response,status=status.HTTP_200_OK)
@@ -54,8 +58,40 @@ def HasPermission(id,code):
         except:
             return False
 
-
 def GetResponsibleIkPersonDetails(id):
+    try:
+        person = Person.objects.get(id = id)
+        staff = Staff.objects.get(Person_id = person.id)
+
+        organizationObj = Organization.objects.get(id = staff.Organization_id)
+        serializer = OrganizationWithPersonTreeSerializer(organizationObj)
+        responsibleMenu = serializer.data
+
+        persons = []
+
+        sameStaffs =  Staff.objects.filter(Organization = staff.Organization_id)
+        for staff in sameStaffs:
+            try:
+                person = Person.objects.get(id = staff.Person_id)
+                persons.append(person)
+            except:
+                person = None
+
+        if responsibleMenu['ChildOrganization'] != None:
+            for child in responsibleMenu['ChildOrganization']:
+                staffs = Staff.objects.filter(Organization = child['id'])
+                for staff in staffs:
+                    try:
+                        person = Person.objects.get(id = staff.Person_id)
+                        persons.append(person)
+                    except:
+                        person = None
+
+        return  PersonViewSerializer(persons ,many=True).data
+    except :
+        return None
+
+def GetResponsibleAdminPersonDetails(id):
     persons = Person.objects.all()
     serializer = PersonViewSerializer(persons , many = True)
     return serializer.data
