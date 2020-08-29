@@ -3,6 +3,7 @@ from .serializer import AnnouncmentSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+import datetime
 
 
 class AnnouncmentAPIView(APIView):
@@ -12,6 +13,10 @@ class AnnouncmentAPIView(APIView):
         return Response(serializer.data)
 
     def post(self,request):
+        creationTime = request.data['CreationTime'] 
+        createdBy = request.data['CreatedBy'] 
+        request.data['ModificationTime'] = creationTime
+        request.data['ModifiedBy'] = createdBy
         serializer = AnnouncmentSerializer(data = request.data)
         if serializer.is_valid():
             serializer.save()
@@ -33,7 +38,7 @@ class AnnouncmentDetails(APIView):
         return Response(serializer.data)
 
 
-    def put(self, request,id):
+    def put(self, request,id):  
         announcment = self.get_object(id)
         serializer = AnnouncmentSerializer(announcment, data=request.data)
         if serializer.is_valid():
