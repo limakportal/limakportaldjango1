@@ -368,10 +368,14 @@ def RightController(data):
             personid = int(data['Person'].id)
             righttypeid = int(data['RightType'].id)
             rightnumber = data['RightNumber']
+            personapprover = data['Approver1']
             endPrior = datetime.datetime.min.date()
             currentrights = []
 
-            
+            if personid == personapprover:
+                sonucmessage = "İzin giren personel ile yönetici aynı kişi olamaz."
+                return sonucmessage
+
             if startdate < today or startdate > enddate or rightnumber <= 0:
                 sonucmessage = "İzin tarihlerini kontrol ediniz."
                 return sonucmessage
