@@ -370,6 +370,12 @@ def RightController(data):
             rightnumber = data['RightNumber']
             endPrior = datetime.datetime.min.date()
             currentrights = []
+
+            
+            if startdate < today or startdate > enddate or rightnumber <= 0:
+                sonucmessage = "İzin tarihlerini kontrol ediniz."
+                return sonucmessage
+
             righttype = RightType.objects.get(id = righttypeid)
             rights = Right.objects.filter(Q(Person = personid) & (Q(RightStatus = EnumRightStatus.Onaylandi) | Q(RightStatus = EnumRightStatus.OnayBekliyor)))  
             for iright in rights:
@@ -379,9 +385,9 @@ def RightController(data):
             count = 0
             currentrights = sorted(currentrights,key=lambda x: x[0])
             for r in currentrights:
-                if r[0] > r[1]:
+                if r[0] >= r[1]:
                     count = count + 1 
-                if r[0] < endPrior:
+                if r[0] <= endPrior:
                     count = count + 1
                 endPrior = r[1]
             if count > 0:
@@ -401,9 +407,6 @@ def RightController(data):
                     sonucmessage = "Maksimum izin gün sayısını geçtiniz. Lütfen izin tarihlerinizi kontrol ediniz."
                     return sonucmessage
             
-            if startdate < today or startdate > enddate or rightnumber <= 0:
-                sonucmessage = "İzin tarihlerini kontrol ediniz."
-                return sonucmessage
             
         return sonucmessage
     except:
