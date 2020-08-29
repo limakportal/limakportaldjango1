@@ -387,11 +387,12 @@ def RightController(data):
         
             currentrights.append([startdate,enddate])
             count = 0
-            currentrights = sorted(currentrights,key=lambda x: x[0])
+            # currentrights = sorted(currentrights,key=lambda x: x[0])
+            currentrights = sorted(currentrights)
             for r in currentrights:
-                if r[0] >= r[1]:
+                if r[0] > r[1]:
                     count = count + 1 
-                if r[0] <= endPrior:
+                if r[0] < endPrior:
                     count = count + 1
                 endPrior = r[1]
             if count > 0:
