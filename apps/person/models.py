@@ -16,7 +16,7 @@ class Person(models.Model):
     Telephone = models.CharField(max_length=50,blank=True,null=True)
     State = models.IntegerField(blank=True,null=True)
     Email = models.CharField(max_length=50,blank=True,null=True)
-    Picture = models.FileField(blank=True,null=True)
+    Picture = models.BinaryField(blank=True,null=True)
 
 
     def __str__(self):

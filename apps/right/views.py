@@ -18,10 +18,13 @@ from docxtpl import DocxTemplate
 from ..person.models import Person
 from .serializer import PersonSerializer
 from ..businessrules.views import mail_yolla
+from ..businessrules.views import GetResponsibleIkPersons
 from ..person.businesrules import GetPersonApprover
 from ..personbusiness.models import PersonBusiness
-from ..businessrules.views import GetResponsiblePersonDetails
+from ..businessrules.views import GetResponsiblePersonDetails, HasPermission
 from ..title.models import Title
+from django.db.models import Q
+from ..vocationdays.models import VocationDays
 
 class RightAPIView(APIView):
     def get(self,request):
@@ -32,7 +35,10 @@ class RightAPIView(APIView):
     def post(self,request):
         serializer = RightSerializer(data = request.data)
         if serializer.is_valid():
-            serializer.save()
+            result = RightController(serializer.validated_data)
+            if result != "":
+                return Response(result,status=status.HTTP_404_NOT_FOUND)
+            serializer.save()               
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -64,6 +70,15 @@ class RightDetails(APIView):
                 icerik = 'İzin talebiniz onaylanmıştır. Bakiyenizden ' + str(request.data['RightNumber']) + ' gün düşülmüştür. İzin sürecinizin tamamlanması için imzalı izin formunuzu izne ayrılmadan önce İnsan Kaynakları Direktörlüğüne iletiniz.'
                 mail_yolla(baslik,icerik,personSerializer.data['Email'],[personSerializer.data['Email']])
                 
+                IKPersons = GetResponsibleIkPersons()
+                if IKPersons != None:
+
+                    for i in IKPersons:
+                        if i['Email'] != "":
+                            baslik = 'İzin Kullanım Hakkında'
+                            icerik = personSerializer.data['Name'] + ' ' + personSerializer.data['Surname'] + ' in ' + str(serializer.validated_data['StartDate'].date()) + '/' + str(serializer.validated_data['EndDate'].date()) + ' tarihleri arasındaki izni onaylanmıştır.'
+                            mail_yolla(baslik,icerik,i['Email'],[i['Email']])
+
             elif  serializer.data['RightStatus'] == EnumRightStatus.Reddedildi:
                 person = Person.objects.get(id = serializer.data['Person'])
                 personSerializer = PersonSerializer(person)
@@ -157,20 +172,34 @@ def RightDaysNumber(request):
         delta = datetime.timedelta(days=1)
         number = tmp = 0
         staff = Staff.objects.get(Person=int(request.data['Person']))
+        vdays = VocationDays.objects.all()
         if staff:
             organization = Organization.objects.get(id=staff.Organization.id)
             if  organization:
                 while stardate <= enddate:
+                      days = vdays.filter(DateDay__date = stardate)
+                      if len(days) > 0:
+                         if days[0].DayType == 0:
+                            number += 0.5
+                         stardate += delta                         
+                         tmp += 1
+                         continue        
                       if stardate.weekday() == 5:
                          if organization.IsSaturdayWorkDay:
-                            if tmp == 0 and startime == "13.00":
-                                number += 0.5
+                            if tmp == 0:
+                               if startime == "13.00":
+                                  number += 0.5
+                               else:
+                                  number += 1
                             else:
                                 number += 1
                       elif stardate.weekday() == 6:
                           if organization.IsSundayWorkDay:
-                            if tmp == 0 and startime == "13.00":
-                                number += 0.5
+                            if tmp == 0:
+                               if startime == "13.00":
+                                  number += 0.5
+                               else:
+                                  number += 1
                             else:
                                 number += 1
                       else:
@@ -178,7 +207,7 @@ def RightDaysNumber(request):
                                 number += 0.5
                            else:
                                 number += 1
-                      stardate += delta
+                      stardate += delta                         
                       tmp += 1
                 if endtime == "12.00":
                    if enddate.weekday() == 5:
@@ -211,14 +240,19 @@ def RightDaysNumber(request):
 @api_view(['GET'])
 def PersonRightInfo(request,id):
         content = []
+        if HasPermission(id,'IZN_IK'):
+            person = Person.objects.all()
+            for p in person:
+               result = GetPersonRightInfo(p.id)
+               content.append(result)
+            return Response(content)
         result = GetPersonRightInfo(id)
         content.append(result)
         x,responsePersons,y = GetResponsiblePersonDetails(id)
         if responsePersons != None:
             for person in responsePersons:
-                result = GetPersonRightInfo(person["id"])
+                result = GetPersonRightInfo(person["Person"]["id"])
                 content.append(result)
-        
         return Response(content)
 
 def GetPersonRightInfo(id):
@@ -313,3 +347,26 @@ def TodayOnLeavePerson(request):
             return Response(finallyData)
         except:
             return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+def RightController(data):
+        sonucmessage = ""
+        if data:
+            today = datetime.date.today()
+            startdate = data['StartDate'].date()
+            enddate = data['EndDate'].date()
+
+            # rights = Right.objects.filter(Q(StartDate__date = startdate) & Q(EndDate__date = enddate) & Q(Person = data['Person'].id) &   
+            #                                 (Q(RightStatus = EnumRightStatus.Onaylandi) | Q(RightStatus = EnumRightStatus.OnayBekliyor))) 
+
+            # rights = Right.objects.filter(Q(Person = data['Person'].id) & (Q(RightStatus = EnumRightStatus.Onaylandi) | Q(RightStatus = EnumRightStatus.OnayBekliyor)))             
+
+            
+            serializer = RightSerializer(rights,many=True)
+            
+            
+            if startdate < today or startdate > enddate:
+                sonucmessage = "İzin tarihlerini kontrol ediniz."
+            
+        return sonucmessage
+

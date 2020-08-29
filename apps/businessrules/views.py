@@ -22,7 +22,7 @@ from ..userrole.models import UserRole
 
 from ..organization.serializer import OrganizationSerializer ,OrganizationTreeSerializer
 from ..businessrules.serializer import (OrganizationTreeByAccountId)
-from ..person.serializer import PersonSerializer
+from ..person.serializer import PersonSerializer , PersonViewSerializer
 
 
 
@@ -36,25 +36,19 @@ def ResponsiblePersonDetails(request, id):
                 authorityes = Authority.objects.filter(Role_id = userRole.Role_id)
                 if len(authorityes) > 0:
                     for authority in authorityes:
-                        permissions = Permission.objects.filter(Code = 'IZN_IK')
+                        permissions = Permission.objects.filter(Code = code)
                         for permission in permissions:
                             if permission.id == authority.Permission_id:
                                 response = {}
                                 response['ResponsiblePersons'] = GetResponsibleIkPersonDetails(id)
                                 return Response(response,status=status.HTTP_200_OK)
             except:
-                pass
-
-
-        response = {}
-        response['ResponsibleMenu'],response['ResponsiblePersons'],response['Person'] = GetResponsiblePersonDetails(id)
-
-        return Response(response,status=status.HTTP_200_OK)
+                return False
 
 
 def GetResponsibleIkPersonDetails(id):
     persons = Person.objects.all()
-    serializer = PersonSerializer(persons , many = True)
+    serializer = PersonViewSerializer(persons , many = True)
     return serializer.data
 
 def GetResponsibleIkPersons():
@@ -87,12 +81,10 @@ def GetResponsiblePersonDetails(id):
             personRequest = {}
 
             try:
-                personRequest = PersonSerializer(person).data
+                personRequest = PersonViewSerializer(person).data
 
             except :
                 personRequest = None
-
-            
 
             persons = []
             if responsibleMenu['ChildOrganization'] != None:
@@ -105,10 +97,27 @@ def GetResponsiblePersonDetails(id):
                         except:
                             person = None
 
-            responsiblePersons = PersonSerializer(persons ,many=True).data
+            responsiblePersons = PersonViewSerializer(persons ,many=True).data
     except :
             return None , None, None
     return responsibleMenu,responsiblePersons,personRequest
+
+def GetResponsibleIkPersons():
+    ikPersons = []
+    permissions = Permission.objects.filter(Code = 'IZN_IK')
+    for permission in permissions:
+        authorityes = Authority.objects.filter(Permission = permission.id)
+        for authority in authorityes:
+            userRoles = UserRole.objects.filter(Role = authority.Role_id)
+            for userRole in userRoles:
+                try:
+                    account = Account.objects.get(id = userRole.Account_id)
+                    person = Person.objects.get(Email = account.email)
+                    ikPersons.append(person)
+                except :
+                    pass
+
+    return PersonSerializer(ikPersons , many = True).data
 
 @api_view(['GET'])
 def AccountListDetails(request):
