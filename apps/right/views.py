@@ -26,6 +26,10 @@ from ..title.models import Title
 from django.db.models import Q
 from ..vocationdays.models import VocationDays
 
+from ..businessrules.serializer import OrganizationWithPersonTreeSerializer
+
+
+
 class RightAPIView(APIView):
     def get(self,request):
         rights = Right.objects.all().order_by('id')
@@ -243,12 +247,69 @@ def RightDaysNumber(request):
 @api_view(['GET'])
 def PersonRightInfo(request,id):
         content = []
-        if HasPermission(id,'IZN_IK'):
+
+        if HasPermission(id,'ADMIN'):
             person = Person.objects.all()
             for p in person:
                result = GetPersonRightInfo(p.id)
                content.append(result)
             return Response(content)
+
+        elif HasPermission(id,'IZN_IK'):
+
+            person = Person.objects.get(id = id)
+            staff = Staff.objects.get(Person_id = person.id)
+
+            organizationObj = Organization.objects.get(id = staff.Organization_id)
+            serializer = OrganizationWithPersonTreeSerializer(organizationObj)
+            responsibleMenu = serializer.data
+
+            persons = []
+
+            sameStaffs =  Staff.objects.filter(Organization = staff.Organization_id)
+            for staff in sameStaffs:
+                try:
+                    person = Person.objects.get(id = staff.Person_id)
+                    persons.append(person)
+                except:
+                    person = None
+
+            if responsibleMenu['ChildOrganization'] != None:
+                for child in responsibleMenu['ChildOrganization']:
+                    staffs = Staff.objects.filter(Organization = child['id'])
+                    for staff in staffs:
+                        try:
+                            person = Person.objects.get(id = staff.Person_id)
+                            persons.append(person)
+                        except:
+                            person = None
+
+            person = Person.objects.all()
+            for p in persons:
+               result = GetPersonRightInfo(p.id)
+               content.append(result)
+            return Response(content)
+                
+        try:
+            staff = Staff.objects.get(Person_id = id)
+            organization = Organization.objects.get(id = staff.Organization_id)
+            
+            if organization.ManagerTitle_id == staff.Title_id and staff.Organization_id == organization.id:
+                staffs = Staff.objects.filter(Organization_id = staff.Organization_id)
+                for staff in staffs:
+                    try:
+                        person = Person.objects.get(id = staff.Person_id)
+                        result = GetPersonRightInfo(person.id)
+                        content.append(result)
+
+                    except :
+                        pass
+
+                return Response(content)
+        except:
+            pass
+        
+        
         result = GetPersonRightInfo(id)
         content.append(result)
         x,responsePersons,y = GetResponsiblePersonDetails(id)
