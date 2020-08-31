@@ -399,6 +399,10 @@ def TodayOnLeavePerson(request):
                 data['Name'] = person.Name 
                 data['Surname'] = person.Surname
                 data['Email'] = person.Email
+                data['StartDate'] = right.StartDate.date()
+                data['EndDate'] = right.EndDate.date()
+                data['RightNumber'] = right.RightNumber
+                data['RightType'] = EnumRightTypes(right.RightType_id).name
                 try:
                     staff = Staff.objects.get(Person=int(person.id))
                     organization = Organization.objects.get(id = staff.Organization_id)
