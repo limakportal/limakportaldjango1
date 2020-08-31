@@ -339,6 +339,9 @@ def GetPersonRightInfo(id):
                 nextleave = 14
         
             nextyear = str(datetime.date.today().year + 1) + '-' + str(businessyear.month) + '-' + str(businessyear.day)
+            registerno = personbusiness[0].RegisterNo
+            jobstartdate = personbusiness[0].JobStartDate
+            formerseniority = personbusiness[0].FormerSeniority
         
         rightwaiting = Right.objects.filter(Person=id,RightStatus=EnumRightStatus.OnayBekliyor)
         if rightwaiting:
@@ -370,7 +373,8 @@ def GetPersonRightInfo(id):
            rightwaitingnumber = 0
       
         content = {'person_id' : person.id, 'name' : person.Name , 'surname': person.Surname,'totalleave' : totalleave, 'totalright': totalright, 'remainingleave' : remainingleave,
-                'nextyear' : nextyear, 'nextleave': nextleave, 'approvelwaiting' : approvelwaiting, 'organization_id' : organiaztion_id, 'detail' : detail}
+                'nextyear' : nextyear, 'nextleave': nextleave, 'approvelwaiting' : approvelwaiting, 'organization_id' : organiaztion_id, 'detail' : detail, 
+                'RegisterNo' : registerno , 'JobStartDate': jobstartdate, 'FormerSeniority': formerseniority}
         return content
 
 @api_view(['GET'])
