@@ -26,6 +26,10 @@ from ..title.models import Title
 from django.db.models import Q
 from ..vocationdays.models import VocationDays
 
+from ..businessrules.serializer import OrganizationWithPersonTreeSerializer
+
+
+
 class RightAPIView(APIView):
     def get(self,request):
         rights = Right.objects.all().order_by('id')
@@ -168,14 +172,15 @@ def RightDaysNumber(request):
         startime = request.data['StartTime']
         endtime = request.data['EndTime']
         righttypeid = request.data['RightType']
+        personid = int(request.data['Person'])
         righttype = RightType.objects.get(id = righttypeid)
         delta = datetime.timedelta(days=1)
         number = tmp = 0
-        staff = Staff.objects.get(Person=int(request.data['Person']))
+        staff = Staff.objects.filter(Person=personid)
         vdays = VocationDays.objects.all()
-        if staff:
-            organization = Organization.objects.get(id=staff.Organization.id)
-            if  organization:
+        if len(staff) > 0:
+            organization = Organization.objects.filter(id=staff[0].Organization.id)
+            if  len(organization) > 0:
                 while stardate <= enddate:
                       days = vdays.filter(DateDay__date = stardate)
                       if len(days) > 0:
@@ -185,7 +190,7 @@ def RightDaysNumber(request):
                          tmp += 1
                          continue        
                       if stardate.weekday() == 5:
-                         if organization.IsSaturdayWorkDay:
+                         if organization[0].IsSaturdayWorkDay:
                             if tmp == 0:
                                if startime == "13.00":
                                   number += 0.5
@@ -194,7 +199,7 @@ def RightDaysNumber(request):
                             else:
                                 number += 1
                       elif stardate.weekday() == 6:
-                          if organization.IsSundayWorkDay:
+                          if organization[0].IsSundayWorkDay:
                             if tmp == 0:
                                if startime == "13.00":
                                   number += 0.5
@@ -211,10 +216,10 @@ def RightDaysNumber(request):
                       tmp += 1
                 if endtime == "12.00":
                    if enddate.weekday() == 5:
-                       if organization.IsSaturdayWorkDay:
+                       if organization[0].IsSaturdayWorkDay:
                           number -= 0.5
                    elif enddate.weekday() == 6:
-                       if organization.IsSundayWorkDay:
+                       if organization[0].IsSundayWorkDay:
                           number -= 0.5
                    else:
                         number -= 0.5
@@ -224,8 +229,10 @@ def RightDaysNumber(request):
             return Response('Kadro tanımı yapılmamıştır.',status=status.HTTP_404_NOT_FOUND)
         
         if righttypeid == EnumRightTypes.Yillik:
-            content = GetPersonRightInfo(int(request.data['Person']))
-            if number > content['remainingleave']:
+            content = GetPersonRightInfo(personid)
+            contentleave = content['remainingleave']
+            contentleave = contentleave + 7 
+            if number > contentleave:
                 return Response('Yıllık izin bakiyeniz yetersiz. Tekrar kontrol ediniz.',status=status.HTTP_404_NOT_FOUND)
 
         elif righttype.MaxDayOff != None and righttype.MaxDayOff>0:
@@ -240,12 +247,69 @@ def RightDaysNumber(request):
 @api_view(['GET'])
 def PersonRightInfo(request,id):
         content = []
-        if HasPermission(id,'IZN_IK'):
+
+        if HasPermission(id,'ADMIN'):
             person = Person.objects.all()
             for p in person:
                result = GetPersonRightInfo(p.id)
                content.append(result)
             return Response(content)
+
+        elif HasPermission(id,'IZN_IK'):
+
+            person = Person.objects.get(id = id)
+            staff = Staff.objects.get(Person_id = person.id)
+
+            organizationObj = Organization.objects.get(id = staff.Organization_id)
+            serializer = OrganizationWithPersonTreeSerializer(organizationObj)
+            responsibleMenu = serializer.data
+
+            persons = []
+
+            sameStaffs =  Staff.objects.filter(Organization = staff.Organization_id)
+            for staff in sameStaffs:
+                try:
+                    person = Person.objects.get(id = staff.Person_id)
+                    persons.append(person)
+                except:
+                    person = None
+
+            if responsibleMenu['ChildOrganization'] != None:
+                for child in responsibleMenu['ChildOrganization']:
+                    staffs = Staff.objects.filter(Organization = child['id'])
+                    for staff in staffs:
+                        try:
+                            person = Person.objects.get(id = staff.Person_id)
+                            persons.append(person)
+                        except:
+                            person = None
+
+            person = Person.objects.all()
+            for p in persons:
+               result = GetPersonRightInfo(p.id)
+               content.append(result)
+            return Response(content)
+                
+        try:
+            staff = Staff.objects.get(Person_id = id)
+            organization = Organization.objects.get(id = staff.Organization_id)
+            
+            if organization.ManagerTitle_id == staff.Title_id and staff.Organization_id == organization.id:
+                staffs = Staff.objects.filter(Organization_id = staff.Organization_id)
+                for staff in staffs:
+                    try:
+                        person = Person.objects.get(id = staff.Person_id)
+                        result = GetPersonRightInfo(person.id)
+                        content.append(result)
+
+                    except :
+                        pass
+
+                return Response(content)
+        except:
+            pass
+        
+        
         result = GetPersonRightInfo(id)
         content.append(result)
         x,responsePersons,y = GetResponsiblePersonDetails(id)
@@ -256,7 +320,7 @@ def PersonRightInfo(request,id):
         return Response(content)
 
 def GetPersonRightInfo(id):
-        totalleave = totalright = remainingleave = nextyear = nextleave = approvelwaiting = rightnumber = organiaztion_id = 0
+        totalleave = totalright = remainingleave = nextyear = nextleave = approvelwaiting = rightnumber = organiaztion_id = rightwaitingnumber =  0
         rightleave =  RightLeave.objects.filter(Person=id) 
         if rightleave:
             totalleave = rightleave.aggregate(total=Sum('Earning'))['total']
@@ -275,16 +339,10 @@ def GetPersonRightInfo(id):
                 nextleave = 14
         
             nextyear = str(datetime.date.today().year + 1) + '-' + str(businessyear.month) + '-' + str(businessyear.day)
+            registerno = personbusiness[0].RegisterNo
+            jobstartdate = personbusiness[0].JobStartDate
+            formerseniority = personbusiness[0].FormerSeniority
         
-        detail = []
-        for item in rightleave:
-           for r in rightapprove:
-               if r.StartDate.year == item.Year :
-                  rightnumber += r.RightNumber
-           det = {'year' : item.Year , 'rightleave' : item.Earning , 'rightnumber': rightnumber, 'remaining' : item.Earning - rightnumber, 'personid': item.Person_id, 'rightleaveid': item.id}
-           detail.append(det)
-           rightnumber = 0
-
         rightwaiting = Right.objects.filter(Person=id,RightStatus=EnumRightStatus.OnayBekliyor)
         if rightwaiting:
             for r in rightwaiting:
@@ -298,9 +356,25 @@ def GetPersonRightInfo(id):
              organiaztion = Organization.objects.filter(id=staff[0].Organization.id)
              if len(organiaztion) > 0:
                  organiaztion_id = organiaztion[0].id
+        
+        detail = []
+        for item in rightleave:
+           for r in rightapprove:
+               if r.StartDate.year == item.Year :
+                  rightnumber += r.RightNumber
+           for r in rightwaiting:
+               if r.StartDate.year == item.Year :
+                  rightwaitingnumber += r.RightNumber
+
+           det = {'year' : item.Year , 'rightleave' : item.Earning , 'rightnumber': rightnumber, 'remaining' : item.Earning - rightnumber, 'personid': item.Person_id, 'rightleaveid': item.id,
+                  'approvelwaiting' : rightwaitingnumber}
+           detail.append(det)
+           rightnumber = 0
+           rightwaitingnumber = 0
       
         content = {'person_id' : person.id, 'name' : person.Name , 'surname': person.Surname,'totalleave' : totalleave, 'totalright': totalright, 'remainingleave' : remainingleave,
-                'nextyear' : nextyear, 'nextleave': nextleave, 'approvelwaiting' : approvelwaiting, 'organization_id' : organiaztion_id, 'detail' : detail}
+                'nextyear' : nextyear, 'nextleave': nextleave, 'approvelwaiting' : approvelwaiting, 'organization_id' : organiaztion_id, 'detail' : detail, 
+                'RegisterNo' : registerno , 'JobStartDate': jobstartdate, 'FormerSeniority': formerseniority}
         return content
 
 @api_view(['GET'])
@@ -350,23 +424,61 @@ def TodayOnLeavePerson(request):
 
 
 def RightController(data):
+    try:
         sonucmessage = ""
         if data:
             today = datetime.date.today()
             startdate = data['StartDate'].date()
             enddate = data['EndDate'].date()
+            personid = int(data['Person'].id)
+            righttypeid = int(data['RightType'].id)
+            rightnumber = data['RightNumber']
+            personapprover = data['Approver1']
+            endPrior = datetime.datetime.min.date()
+            currentrights = []
 
-            # rights = Right.objects.filter(Q(StartDate__date = startdate) & Q(EndDate__date = enddate) & Q(Person = data['Person'].id) &   
-            #                                 (Q(RightStatus = EnumRightStatus.Onaylandi) | Q(RightStatus = EnumRightStatus.OnayBekliyor))) 
+            if personid == personapprover:
+                sonucmessage = "İzin giren personel ile yönetici aynı kişi olamaz."
+                return sonucmessage
 
-            # rights = Right.objects.filter(Q(Person = data['Person'].id) & (Q(RightStatus = EnumRightStatus.Onaylandi) | Q(RightStatus = EnumRightStatus.OnayBekliyor)))             
-
-            
-            serializer = RightSerializer(rights,many=True)
-            
-            
-            if startdate < today or startdate > enddate:
+            if startdate < today or startdate > enddate or rightnumber <= 0:
                 sonucmessage = "İzin tarihlerini kontrol ediniz."
+                return sonucmessage
+
+            righttype = RightType.objects.get(id = righttypeid)
+            rights = Right.objects.filter(Q(Person = personid) & (Q(RightStatus = EnumRightStatus.Onaylandi) | Q(RightStatus = EnumRightStatus.OnayBekliyor)))  
+            for iright in rights:
+                currentrights.append([iright.StartDate.date(),iright.EndDate.date()])
+        
+            currentrights.append([startdate,enddate])
+            count = 0
+            # currentrights = sorted(currentrights,key=lambda x: x[0])
+            currentrights = sorted(currentrights)
+            for r in currentrights:
+                if r[0] > r[1]:
+                    count = count + 1 
+                if r[0] < endPrior:
+                    count = count + 1
+                endPrior = r[1]
+            if count > 0:
+                sonucmessage = "Seçilen tarihler arası izin bulunmaktadır."
+                return sonucmessage
+                
+            if righttypeid == EnumRightTypes.Yillik:
+                content = GetPersonRightInfo(personid)
+                contentleave = content['remainingleave']
+                contentleave = contentleave + 7
+                if rightnumber > contentleave:
+                    sonucmessage = "Yıllık izin bakiyeniz yetersiz. Tekrar kontrol ediniz."
+                    return sonucmessage
+
+            elif righttype.MaxDayOff != None and righttype.MaxDayOff>0:
+                if rightnumber > righttype.MaxDayOff:
+                    sonucmessage = "Maksimum izin gün sayısını geçtiniz. Lütfen izin tarihlerinizi kontrol ediniz."
+                    return sonucmessage
+            
             
         return sonucmessage
+    except:
+        Response("",status=status.HTTP_404_NOT_FOUND)
 

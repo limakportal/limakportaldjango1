@@ -5,6 +5,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
+from rest_framework.decorators import api_view
+import datetime
 
 
 class VocationAPIView(APIView):
@@ -42,4 +44,13 @@ class VocationDetails(APIView):
                 serializer.save()
                 return Response(serializer.data)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def VocationDaysByMonthh(request,month):
+    try:
+        vdays = VocationDays.objects.filter(DateDay__year = datetime.date.today().year, DateDay__month = month)
+        serializer = VocationDaysSerializer(vdays,many=True)
+        return Response(serializer.data)
+    except:
+        pass
 

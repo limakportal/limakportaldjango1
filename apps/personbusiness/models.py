@@ -14,6 +14,7 @@ class PersonBusiness(models.Model):
     SGKRegisterNo = models.CharField(max_length=100,blank=True,null=True)
     SGKEnterDate = models.DateTimeField(auto_now_add=True,max_length=50,blank=True,null=True)
     LeaveDate = models.DateTimeField(blank=True, null=True)
+    FormerSeniority = models.IntegerField(blank=True,null=True)
 
     def __str__(self):
         return self.Person.Name

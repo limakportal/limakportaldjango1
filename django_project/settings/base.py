@@ -75,6 +75,8 @@ INSTALLED_APPS = [
     'apps.rightleave',
     'apps.userrole',
     'apps.shift',
+    'apps.announcment',
+    'apps.announcmentorganization',
     # 'apps.businessrules',
 ]
 #google token
