@@ -7,6 +7,8 @@ from ..permission.models import Permission
 
 from ..permission.serializer import PermissionSerializer
 
+from ..businessrules.views import IsManager
+
 class TokenObtainPairPatchedSerializer(TokenObtainPairSerializer):
      def to_representation(self, instance):
          r = super(TokenObtainPairPatchedSerializer, self).to_representation(instance)
@@ -47,6 +49,8 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
                     allPermissions.append(permission);    
 
         request['permissions'] = PermissionSerializer(allPermissions, many=True).data
+        request['IsManager'] = IsManager(person.id)
+
         data.update(request)
         # data.update({'Person': responsePerson})
         # and everything else you want to send in the response
