@@ -39,9 +39,29 @@ def ResponsiblePersonDetails(request, id):
         response['ResponsiblePersons'] = GetResponsibleIkPersonDetails(id)
         return Response(response,status=status.HTTP_200_OK)
     
+    elif IsManager(id):
+        response['ResponsiblePersons'] = GetManagerPersonsDetail(id)
+        return Response(response,status=status.HTTP_200_OK)
+    
     response['ResponsibleMenu'],response['ResponsiblePersons'],response['Person'] = GetResponsiblePersonDetails(id)
 
     return Response(response,status=status.HTTP_200_OK)
+
+
+def GetManagerPersonsDetail(personId):
+    try:
+        staff = Staff.objects.get(Person_id = personId)
+        staffs = Staff.objects.filter(Organization_id = staff.Organization_id)
+        persons = []
+        for staff in staffs:
+            try:
+                person = Person.objects.get(id = staff.Person_id)
+                persons.append(person)
+            except:
+                pass
+        return PersonViewSerializer(persons , many=True).data
+    except:
+        return None
 
 def HasPermission(id,code):
         try:
