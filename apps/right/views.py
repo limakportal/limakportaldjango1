@@ -18,7 +18,7 @@ from docxtpl import DocxTemplate
 from ..person.models import Person
 from .serializer import PersonSerializer
 from ..businessrules.views import mail_yolla
-from ..businessrules.views import GetResponsibleIkPersons
+from ..businessrules.views import GetResponsibleIkPersons , IsManager
 from ..person.businesrules import GetPersonApprover
 from ..personbusiness.models import PersonBusiness
 from ..businessrules.views import GetResponsiblePersonDetails, HasPermission
@@ -45,7 +45,6 @@ class RightAPIView(APIView):
             serializer.save()               
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 class RightDetails(APIView):
 
@@ -289,27 +288,21 @@ def PersonRightInfo(request,id):
                result = GetPersonRightInfo(p.id)
                content.append(result)
             return Response(content)
-                
-        try:
+
+        if IsManager(id):
             staff = Staff.objects.get(Person_id = id)
-            organization = Organization.objects.get(id = staff.Organization_id)
-            
-            if organization.ManagerTitle_id == staff.Title_id and staff.Organization_id == organization.id:
-                staffs = Staff.objects.filter(Organization_id = staff.Organization_id)
-                for staff in staffs:
-                    try:
-                        person = Person.objects.get(id = staff.Person_id)
-                        result = GetPersonRightInfo(person.id)
-                        content.append(result)
+            staffs = Staff.objects.filter(Organization_id = staff.Organization_id)
+            for staff in staffs:
+                try:
+                    person = Person.objects.get(id = staff.Person_id)
+                    result = GetPersonRightInfo(person.id)
+                    content.append(result)
 
-                    except :
-                        pass
+                except :
+                    pass
 
-                return Response(content)
-        except:
-            pass
-        
-        
+            return Response(content)
+
         result = GetPersonRightInfo(id)
         content.append(result)
         x,responsePersons,y = GetResponsiblePersonDetails(id)

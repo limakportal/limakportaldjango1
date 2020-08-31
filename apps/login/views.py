@@ -23,6 +23,7 @@ from ..permission.models import Permission
 from ..permission.views import PermissionSerializer
 from ..userrole.models import UserRole
 
+from ..businessrules.views import IsManager
 
 
 class HelloView(APIView):
@@ -85,7 +86,7 @@ class GoogleView(APIView):
                         allPermissions.append(permission);    
 
             response['permissions'] = PermissionSerializer(allPermissions, many=True).data
-
+            request['IsManager'] = IsManager(person.id)
             
             return Response(response,status=status.HTTP_200_OK)
         except Account.DoesNotExist:

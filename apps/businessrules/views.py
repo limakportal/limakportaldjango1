@@ -165,6 +165,17 @@ def GetResponsibleIkPersons():
 
     return PersonSerializer(ikPersons , many = True).data
 
+def IsManager(personId):
+    try:
+        staff = Staff.objects.get(Person_id = personId)
+        organization = Organization.objects.get(id = staff.Organization_id)
+        if organization.ManagerTitle_id == staff.Title_id and staff.Organization_id == organization.id:
+            return True
+        return False
+    except :
+        return False
+
+
 @api_view(['GET'])
 def AccountListDetails(request):
     accounts = Account.objects.all()
