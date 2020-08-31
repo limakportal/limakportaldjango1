@@ -49,7 +49,10 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
                     allPermissions.append(permission);    
 
         request['permissions'] = PermissionSerializer(allPermissions, many=True).data
-        request['IsManager'] = IsManager(person.id)
+        if request['Person'] != None:
+            request['IsManager'] = IsManager(person.id)
+        else:
+            request['IsManager'] = None
 
         data.update(request)
         # data.update({'Person': responsePerson})

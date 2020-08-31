@@ -64,6 +64,8 @@ class GoogleView(APIView):
             responseUser['Email'] = data['email']
             response['User'] = responseUser
 
+
+
             try:
                 person = Person.objects.get(Email = data['email'])
                 responsePerson = {}
@@ -73,6 +75,9 @@ class GoogleView(APIView):
                 response['Person'] = responsePerson
             except :
                 response['Person'] = None
+                requestIsManager = None
+
+        
 
 
             allPermissions = []
@@ -86,7 +91,11 @@ class GoogleView(APIView):
                         allPermissions.append(permission);    
 
             response['permissions'] = PermissionSerializer(allPermissions, many=True).data
-            response['IsManager'] = IsManager(person.id)
+            if response['Person'] != None:
+                response['IsManager'] = IsManager(person.id)
+            else:
+                response['IsManager'] = None
+
             
             return Response(response,status=status.HTTP_200_OK)
         except Account.DoesNotExist:
