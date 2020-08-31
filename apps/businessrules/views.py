@@ -9,6 +9,7 @@ from rest_framework.serializers import SerializerMethodField
 from django.core.mail import send_mail
 import json
 
+
 from .serializer import OrganizationWithPersonTreeSerializer , AccountsDetailSerializer
 
 from ..organization.models import Organization
@@ -95,6 +96,24 @@ def GetResponsibleAdminPersonDetails(id):
     persons = Person.objects.all()
     serializer = PersonViewSerializer(persons , many = True)
     return serializer.data
+
+def GetResponsibleIkPersons():
+    ikPersons = []
+    permissions = Permission.objects.filter(Code = 'IZN_IK')
+    for permission in permissions:
+        authorityes = Authority.objects.filter(Permission = permission.id)
+        for authority in authorityes:
+            userRoles = UserRole.objects.filter(Role = authority.Role_id)
+            for userRole in userRoles:
+                try:
+                    account = Account.objects.get(id = userRole.Account_id)
+                    person = Person.objects.get(Email = account.email)
+                    ikPersons.append(person)
+                except :
+                    pass
+
+    return PersonSerializer(ikPersons , many = True).data
+
 
 def GetResponsiblePersonDetails(id):
     try:
