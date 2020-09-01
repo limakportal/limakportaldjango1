@@ -166,82 +166,96 @@ def GetRightBalance(id):
 
 @api_view(['POST'])
 def RightDaysNumber(request):
-        stardate = datetime.datetime.strptime(request.data['StartDate'],'%Y-%m-%d')
-        enddate = datetime.datetime.strptime(request.data['EndDate'],'%Y-%m-%d')
-        startime = request.data['StartTime']
-        endtime = request.data['EndTime']
-        righttypeid = request.data['RightType']
-        personid = int(request.data['Person'])
-        righttype = RightType.objects.get(id = righttypeid)
-        delta = datetime.timedelta(days=1)
-        number = tmp = 0
-        staff = Staff.objects.filter(Person=personid)
-        vdays = VocationDays.objects.all()
-        if len(staff) > 0:
-            organization = Organization.objects.filter(id=staff[0].Organization.id)
-            if  len(organization) > 0:
-                while stardate <= enddate:
-                      days = vdays.filter(DateDay__date = stardate)
-                      if len(days) > 0:
-                         if days[0].DayType == 0:
-                            number += 0.5
-                         stardate += delta                         
-                         tmp += 1
-                         continue        
-                      if stardate.weekday() == 5:
-                         if organization[0].IsSaturdayWorkDay:
-                            if tmp == 0:
-                               if startime == "13.00":
-                                  number += 0.5
-                               else:
-                                  number += 1
-                            else:
-                                number += 1
-                      elif stardate.weekday() == 6:
-                          if organization[0].IsSundayWorkDay:
-                            if tmp == 0:
-                               if startime == "13.00":
-                                  number += 0.5
-                               else:
-                                  number += 1
-                            else:
-                                number += 1
-                      else:
-                           if tmp == 0 and startime == "13.00":
+    stardate = datetime.datetime.strptime(request.data['StartDate'],'%Y-%m-%d')
+    enddate = datetime.datetime.strptime(request.data['EndDate'],'%Y-%m-%d')
+    startime = request.data['StartTime']
+    endtime = request.data['EndTime']
+    righttypeid = request.data['RightType']
+    personid = int(request.data['Person'])
+    righttype = RightType.objects.get(id = righttypeid)
+    delta = datetime.timedelta(days=1)
+    number = tmp = 0
+    staff = Staff.objects.filter(Person=personid)
+    vdays = VocationDays.objects.all()
+    if len(staff) > 0:
+        organization = Organization.objects.filter(id=staff[0].Organization.id)
+        if  len(organization) > 0:
+            while stardate <= enddate:
+                days = vdays.filter(DateDay__date = stardate)
+                if len(days) > 0:
+                    if days[0].DayType == 0:
+                        number += 0.5
+                    stardate += delta                         
+                    tmp += 1
+                    continue 
+                if stardate.weekday() == 4:
+                    if tmp == 0:
+                        if startime == "13.00":
+                            number += 1.5
+                        else:
+                            number += 2
+                    else:
+                        number += 2      
+                    stardate += delta                         
+                    tmp += 1
+                if stardate.weekday() == 5:
+                    stardate += delta                         
+                    tmp += 1
+                    # if organization[0].IsSaturdayWorkDay:
+                    #     if tmp == 0:
+                    #         if startime == "13.00":
+                    #             number += 0.5
+                    #         else:
+                    #             number += 1
+                    #     else:
+                    #         number += 1
+                elif stardate.weekday() == 6:
+                    if organization[0].IsSundayWorkDay:
+                        if tmp == 0:
+                            if startime == "13.00":
                                 number += 0.5
-                           else:
+                            else:
                                 number += 1
-                      stardate += delta                         
-                      tmp += 1
-                if endtime == "12.00":
-                   if enddate.weekday() == 5:
-                       if organization[0].IsSaturdayWorkDay:
-                          number -= 0.5
-                   elif enddate.weekday() == 6:
-                       if organization[0].IsSundayWorkDay:
-                          number -= 0.5
-                   else:
+                        else:
+                            number += 1
+                else:
+                    if tmp == 0 and startime == "13.00":
+                        number += 0.5
+                    else:
+                        number += 1
+                stardate += delta                         
+                tmp += 1
+            if endtime == "12.00":
+                if enddate.weekday() == 4:
+                    number -= 1.5
+                elif enddate.weekday() == 5:
+                    if organization[0].IsSaturdayWorkDay:
                         number -= 0.5
-            else:
-                return Response('Şirket tanımı yapılmamıştır.',status=status.HTTP_404_NOT_FOUND)
+                elif enddate.weekday() == 6:
+                    if organization[0].IsSundayWorkDay:
+                        number -= 0.5
+                else:
+                    number -= 0.5
         else:
-            return Response('Kadro tanımı yapılmamıştır.',status=status.HTTP_404_NOT_FOUND)
+            return Response('Şirket tanımı yapılmamıştır.',status=status.HTTP_404_NOT_FOUND)
+    else:
+        return Response('Kadro tanımı yapılmamıştır.',status=status.HTTP_404_NOT_FOUND)
         
-        if righttypeid == EnumRightTypes.Yillik:
-            content = GetPersonRightInfo(personid)
-            contentleave = content['remainingleave']
-            contentleave = contentleave + 7 
-            if number > contentleave:
-                return Response('Yıllık izin bakiyeniz yetersiz. Tekrar kontrol ediniz.',status=status.HTTP_404_NOT_FOUND)
+    if righttypeid == EnumRightTypes.Yillik:
+        content = GetPersonRightInfo(personid)
+        contentleave = content['remainingleave']
+        contentleave = contentleave + 7 
+        if number > contentleave:
+            return Response('Yıllık izin bakiyeniz yetersiz. Tekrar kontrol ediniz.',status=status.HTTP_404_NOT_FOUND)
 
-        elif righttype.MaxDayOff != None and righttype.MaxDayOff>0:
-            if number > righttype.MaxDayOff:
-                return Response('Maksimum izin gün sayısını geçtiniz. Lütfen izin tarihlerinizi kontrol ediniz.', status=status.HTTP_404_NOT_FOUND) 
+    elif righttype.MaxDayOff != None and righttype.MaxDayOff>0:
+        if number > righttype.MaxDayOff:
+            return Response('Maksimum izin gün sayısını geçtiniz. Lütfen izin tarihlerinizi kontrol ediniz.', status=status.HTTP_404_NOT_FOUND) 
 
-        if number <= 0:
-                return Response('İzin tarihlerini kontrol ediniz.',status=status.HTTP_404_NOT_FOUND)    
+    if number <= 0:
+        return Response('İzin tarihlerini kontrol ediniz.',status=status.HTTP_404_NOT_FOUND)    
 
-        return   Response({'daynumber' : number})
+    return   Response({'daynumber' : number})
 
 @api_view(['GET'])
 def PersonRightInfo(request,id):
