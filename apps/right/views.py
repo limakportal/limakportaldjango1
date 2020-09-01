@@ -347,7 +347,7 @@ def GetPersonRightInfo(id):
                 nextleave = 14
         
             nextyear = str(datetime.date.today().year + 1) + '-' + str(businessyear.month) + '-' + str(businessyear.day)
-            registerno = personbusiness[0].RegisterNo if  personbusiness[0].RegisterNo != None else ''
+            registerno = personbusiness[0].RegisterNo
             jobstartdate = personbusiness[0].JobStartDate
             formerseniority = personbusiness[0].FormerSeniority
         
