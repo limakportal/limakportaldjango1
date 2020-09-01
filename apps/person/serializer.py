@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Person
+from .fields import Base64ImageField
 
 from apps.gender.serializer import GenderSerializer
 from apps.nationality.serializer import NationalitySerializer
@@ -16,10 +17,22 @@ from apps.personfamily.serializer import PersonFamilySerializer
 from apps.staff.models import Staff
 from apps.staff.serializer import StafForPersonSerializer
 
+
 class PersonSerializer(serializers.ModelSerializer):
+    Picture = Base64ImageField(use_url=True, write_only=True, max_length=None)
+
+    def create(self, validated_data):
+        picture = validated_data.pop('Picture')
+
+        validated_data['PictureType'] = picture.content_type
+        validated_data['Picture'] = picture.read()
+
+        return super(PersonSerializer, self).create(validated_data=validated_data)
+
     class Meta:
         model = Person       
-        fields = ('__all__')
+        fields = ('id', 'Name', 'Surname', 'IdentityID', 'Address', 'Telephone', 'State', 'Email', 'Nationality', 'Picture', 'PictureType', 'PictureData')
+
 
 class PersonForListViewSerializer(serializers.ModelSerializer):
     class Meta:

@@ -1,8 +1,10 @@
-from rest_framework.views import APIView 
+from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import SessionAuthentication
 from django.db import transaction
 
 from .models import Person
@@ -16,8 +18,18 @@ from apps.personeducation.serializer import PersonEducationSerializer
 from apps.personfamily.models import PersonFamily
 from apps.personfamily.serializer import PersonFamilySerializer
 
+import io
 import json
-import base64
+
+
+
+class PersonViewSet(ModelViewSet):
+    permission_classes = (IsAuthenticated, )
+    queryset = Person.objects.all()
+    serializer_class = PersonSerializer
+
+    
+
 
 class PersonAPIView(APIView):
     @permission_classes((IsAuthenticated, ))
@@ -27,7 +39,10 @@ class PersonAPIView(APIView):
         return Response(serializer.data)
 
     def post(self,request):
-        serializer = PersonSerializer(data = request.data)
+        data = request.data.copy()
+        serializer = PersonSerializer(data = data)
+
+        import pdb; pdb.set_trace()
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -52,7 +67,6 @@ class PersonDetails(APIView):
 
     def put(self, request,id):
         person = self.get_object(id)
-        request.data['Picture'] = base64.b64decode(request.data['Picture'])
         serializer = PersonSerializer(person, data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -123,6 +137,7 @@ class PersonWithPersonInformationAPIView(APIView):
                 return Response(status=status.HTTP_404_NOT_FOUND)        
         else:                
             transaction.savepoint_rollback(transactionSaveId)
+            return Response(data=personSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class PersonWithPersonInformationDetails(APIView):
 
