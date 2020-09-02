@@ -120,3 +120,41 @@ class RightAllDetailsSerializer(serializers.ModelSerializer):
         else:
             return 0
         return total
+
+class RightAllDetailsSerializer2(serializers.ModelSerializer):
+    TotalRightBalance = serializers.SerializerMethodField()
+    class Meta:
+        model = Right
+        fields = (
+            'id',
+            'Person',
+            'EndDate',
+            'StartDate',
+            'DateOfReturn',
+            'Telephone',
+            'Approver1',
+            'RightType',
+            'RightStatus',
+            'RightNumber',
+            'DenyExplanation',
+            'HrHasField',
+            'KvkkIsChecked',
+            'RightPicture',
+            'TotalRightBalance'
+            )
+    def get_TotalRightBalance(self,obj):
+        # totalleavebalance = GetRightBalance(obj.id)
+        # return totalleavebalance
+
+        rightleave =  RightLeave.objects.filter(Person=obj.Person_id)
+        if rightleave:
+            leave =  rightleave.aggregate(total=Sum('Earning'))
+            right  = Right.objects.filter(Person=obj.id,RightStatus=EnumRightStatus.Onaylandi,RightType= EnumRightTypes.Yillik)
+            number = 0
+            if  right:
+                for r in right:
+                    number +=  r.RightNumber
+            total = leave['total'] - number
+        else:
+            return 0
+        return total
