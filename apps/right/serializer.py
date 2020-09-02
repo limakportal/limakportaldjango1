@@ -16,6 +16,7 @@ class RightSerializer(serializers.ModelSerializer):
         model = Right
         fields = ('__all__')
 
+
 class RightWithApproverSerializer(serializers.ModelSerializer):
     Person = PersonSerializer()
     RightStatus = RightStatusSerializer()

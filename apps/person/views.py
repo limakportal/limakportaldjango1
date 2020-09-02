@@ -8,7 +8,7 @@ from rest_framework.authentication import SessionAuthentication
 from django.db import transaction
 
 from .models import Person
-from .serializer import PersonSerializer , PersonViewSerializer , PersonViewDetailSerializer 
+from .serializer import PersonSerializer , PersonViewSerializer , PersonViewDetailSerializer , PersonCreateSerializer
 from apps.personidentity.models import PersonIdentity
 from apps.personidentity.serializer import PersonIdentitySerializer
 from apps.personbusiness.models import PersonBusiness
@@ -23,14 +23,6 @@ import json
 
 
 
-class PersonViewSet(ModelViewSet):
-    permission_classes = (IsAuthenticated, )
-    queryset = Person.objects.all()
-    serializer_class = PersonSerializer
-
-    
-
-
 class PersonAPIView(APIView):
     @permission_classes((IsAuthenticated, ))
     def get(self,request):
@@ -40,7 +32,7 @@ class PersonAPIView(APIView):
 
     def post(self,request):
         data = request.data.copy()
-        serializer = PersonSerializer(data = data)
+        serializer = PersonCreateSerializer(data = data)
 
         import pdb; pdb.set_trace()
         if serializer.is_valid():

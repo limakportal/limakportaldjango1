@@ -18,7 +18,7 @@ from apps.staff.models import Staff
 from apps.staff.serializer import StafForPersonSerializer
 
 
-class PersonSerializer(serializers.ModelSerializer):
+class PersonCreateSerializer(serializers.ModelSerializer):
     Picture = Base64ImageField(use_url=True, write_only=True, max_length=None)
 
     def create(self, validated_data):
@@ -33,6 +33,13 @@ class PersonSerializer(serializers.ModelSerializer):
         model = Person       
         fields = ('id', 'Name', 'Surname', 'IdentityID', 'Address', 'Telephone', 'State', 'Email', 'Nationality', 'Picture', 'PictureType', 'PictureData')
 
+
+class PersonSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Person
+        fields = (
+            '__all__'
+        )
 
 class PersonForListViewSerializer(serializers.ModelSerializer):
     class Meta:
