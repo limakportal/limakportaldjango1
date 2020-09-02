@@ -20,11 +20,13 @@ class Person(models.Model):
     State = models.IntegerField(blank=True,null=True)
     Email = models.CharField(max_length=50,blank=True,null=True)
     Picture = models.BinaryField(blank=True,null=True)
-    PictureType = models.CharField(max_length=50, blank=True, null=True)
+    PictureType = models.CharField(max_length=50, blank=True, null=True, default="image/png")
 
     @property
     def PictureData(self):
-        return f"data:{self.PictureType};base64,{base64.b64encode(self.Picture).decode('utf-8')}"
+        if self.Picture:
+            return f"data:{self.PictureType};base64,{base64.b64encode(self.Picture).decode('utf-8')}"
+        return None
 
 
     def __str__(self):
