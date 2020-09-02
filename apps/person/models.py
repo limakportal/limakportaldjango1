@@ -24,7 +24,7 @@ class Person(models.Model):
 
     @property
     def PictureData(self):
-        return f"data:{self.PictureType};base64,{base64.b64encode(self.Picture).decode('utf-8')}"
+        return f"data:{self.PictureTypes};base64,{base64.b64encode(self.Picture).decode('utf-8')}"
 
 
     def __str__(self):
