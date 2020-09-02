@@ -71,7 +71,7 @@ class RightDetails(APIView):
                 personSerializer = PersonSerializer(person)
                 baslik = 'İzin Kullanım Hakkında'
                 icerik = 'İzin talebiniz onaylanmıştır. Bakiyenizden ' + str(request.data['RightNumber']) + ' gün düşülmüştür. İzin sürecinizin tamamlanması için imzalı izin formunuzu izne ayrılmadan önce İnsan Kaynakları Direktörlüğüne iletiniz.'
-                mail_yolla(baslik,icerik,personSerializer.data['Email'],[personSerializer.data['Email']])
+                # mail_yolla(baslik,icerik,personSerializer.data['Email'],[personSerializer.data['Email']])
                 
                 IKPersons = GetResponsibleIkPersons()
                 if IKPersons != None:
@@ -80,14 +80,14 @@ class RightDetails(APIView):
                         if i['Email'] != "":
                             baslik = 'İzin Kullanım Hakkında'
                             icerik = personSerializer.data['Name'] + ' ' + personSerializer.data['Surname'] + ' in ' + str(serializer.validated_data['StartDate'].date()) + '/' + str(serializer.validated_data['EndDate'].date()) + ' tarihleri arasındaki izni onaylanmıştır.'
-                            mail_yolla(baslik,icerik,i['Email'],[i['Email']])
+                            # mail_yolla(baslik,icerik,i['Email'],[i['Email']])
 
             elif  serializer.data['RightStatus'] == EnumRightStatus.Reddedildi:
                 person = Person.objects.get(id = serializer.data['Person'])
                 personSerializer = PersonSerializer(person)
                 baslik = 'İzin Kullanım Hakkında'
                 icerik = 'İzin talebiniz reddedilmiştir.'
-                mail_yolla(baslik,icerik,personSerializer.data['Email'],[personSerializer.data['Email']])
+                # mail_yolla(baslik,icerik,personSerializer.data['Email'],[personSerializer.data['Email']])
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
