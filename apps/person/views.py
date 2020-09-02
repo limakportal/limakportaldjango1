@@ -25,22 +25,21 @@ import json
 
 class PersonAPIView(APIView):
     @permission_classes((IsAuthenticated, ))
-    def get(self,request):
-        persons = Person.objects.all().order_by('id')
-        serializer = PersonSerializer(persons,many=True)
-        return Response(serializer.data)
+    # def get(self,request):
+    #     persons = Person.objects.all().order_by('id')
+    #     serializer = PersonSerializer(persons,many=True)
+    #     return Response(serializer.data)
 
     def post(self,request):
         data = request.data.copy()
         serializer = PersonCreateSerializer(data = data)
 
-        import pdb; pdb.set_trace()
+        # import pdb; pdb.set_trace()
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-            # return Response({"message":"Personel Eklendi","status":"201"}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        # return Response({"message":serializer.errors,"status":"400"}, status=status.HTTP_400_BAD_REQUEST)
+
 
 class PersonDetails(APIView):
 
