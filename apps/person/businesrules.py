@@ -75,17 +75,64 @@ def PersonApprover(request, id):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
 def GetPersonApprover(id):
-        staff = Staff.objects.get(Person = id)
-        organization = Organization.objects.get(id = staff.Organization.id)
-        if organization.CanApproveRight:
-            personel = Person.objects.get(id=id)
-            serializer = PersonSerializer(personel)
-        else:
-            staffs = Staff.objects.get(Organization = organization.UpperOrganization.id)
-            personel = Person.objects.get(id=staffs.Person.id)
-            serializer = PersonSerializer(personel)
+            staff = Staff.objects.get(Person = id)
+            organization = Organization.objects.get(id = staff.Organization.id)
+            if organization.CanApproveRight:
+                if organization.ManagerTitle == None:
+                    return Response('Kişinin bağlı olduğu birimde yönetici bulunmamaktadır.',status=status.HTTP_404_NOT_FOUND)
+                
+                ystaff = Staff.objects.get(Organization=organization.id,Title = organization.ManagerTitle.id)
+                
+                if ystaff == None:
+                    return Response('Kişinin bağlı olduğu birimde yönetici bulunmamaktadır.',status=status.HTTP_404_NOT_FOUND)
+                personel = Person.objects.get(id=ystaff.Person.id)
+                if personel.id == id:
+                    staffs = Staff.objects.get(Organization = organization.UpperOrganization.id)
+                    personel = Person.objects.get(id=staffs.Person.id)
+                    serializer = PersonSerializer(personel)
+                    # data = {}
+                    # data['id'] = serializer.data['id']
+                    # data['FullName'] = serializer.data['Name'] + ' ' + serializer.data['Surname']
+                    return serializer
+                serializer = PersonSerializer(personel)
+                # data = {}
+                # data['id'] = serializer.data['id']
+                # data['FullName'] = serializer.data['Name'] + ' ' + serializer.data['Surname']
+                return serializer
+            else:
+                neworganization = Organization.objects.get(id = organization.UpperOrganization.id)
+                if neworganization.CanApproveRight:
+                    newstaff = Staff.objects.get(Organization=neworganization.id,Title = neworganization.ManagerTitle.id)
+                
+                if newstaff == None:
+                    return Response('Kişinin bağlı olduğum birimde yönetici bulunmamaktadır.',status=status.HTTP_404_NOT_FOUND)
+                personel = Person.objects.get(id=newstaff.Person.id)
+                if personel.id == id:
+                    staffs = Staff.objects.get(Organization = organization.UpperOrganization.id)
+                    personel = Person.objects.get(id=staffs.Person.id)
+                    serializer = PersonSerializer(personel)
+                    # data = {}
+                    # data['id'] = serializer.data['id']
+                    # data['FullName'] = serializer.data['Name'] + ' ' + serializer.data['Surname']
+                    return serializer
+                serializer = PersonSerializer(personel)
+                # data = {}
+                # data['id'] = serializer.data['id']
+                # data['FullName'] = serializer.data['Name'] + ' ' + serializer.data['Surname']
+                return serializer
+
+
+                # staff = Staff.objects.get(Person = id)
+                # organization = Organization.objects.get(id = staff.Organization.id)
+                # if organization.CanApproveRight:
+                #     personel = Person.objects.get(id=id)
+                #     serializer = PersonSerializer(personel)
+                # else:
+                #     staffs = Staff.objects.get(Organization = organization.UpperOrganization.id)
+                #     personel = Person.objects.get(id=staffs.Person.id)
+                #     serializer = PersonSerializer(personel)
         
-        return serializer
+                # return serializer
 
 @api_view(['GET'])
 def bornTodayPerson(request):
