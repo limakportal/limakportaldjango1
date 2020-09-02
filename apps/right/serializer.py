@@ -25,6 +25,7 @@ class RightWithApproverSerializer(serializers.ModelSerializer):
     Approver1FullName = serializers.SerializerMethodField('apporover1_full_name')
     PersonFullName = serializers.SerializerMethodField('person_full_name')
     PersonApprover1 = serializers.SerializerMethodField()
+    TotalRightBalance = serializers.SerializerMethodField()
 
     def apporover1_full_name(self,obj):
         if obj.Approver1 != None:
@@ -60,6 +61,23 @@ class RightWithApproverSerializer(serializers.ModelSerializer):
             except:
                 return None
 
+    def get_TotalRightBalance(self,obj):
+        # totalleavebalance = GetRightBalance(obj.id)
+        # return totalleavebalance
+
+        rightleave =  RightLeave.objects.filter(Person=obj.Person_id)
+        if rightleave:
+            leave =  rightleave.aggregate(total=Sum('Earning'))
+            right  = Right.objects.filter(Person=obj.id,RightStatus=EnumRightStatus.Onaylandi,RightType= EnumRightTypes.Yillik)
+            number = 0
+            if  right:
+                for r in right:
+                    number +=  r.RightNumber
+            total = leave['total'] - number
+        else:
+            return 0
+        return total
+
 
     # def get_PersonApprover2(self,obj):
     #     if obj.Approver1 != None:
@@ -85,7 +103,8 @@ class RightWithApproverSerializer(serializers.ModelSerializer):
             'PersonFullName',
             'PersonApprover1',
             'HrHasField',
-            'RightPicture'
+            'RightPicture',
+            'TotalRightBalance'
         )
 
 
