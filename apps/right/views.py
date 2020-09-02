@@ -152,7 +152,7 @@ def GetRightBalance(id):
             rightleave =  RightLeave.objects.filter(Person=id)
             if rightleave:
                 leave =  rightleave.aggregate(total=Sum('Earning'))
-                right  = Right.objects.filter(Person=id,RightStatus=EnumRightStatus.Onaylandi)
+                right  = Right.objects.filter(Person=id,RightStatus=EnumRightStatus.Onaylandi,RightType= EnumRightTypes.Yillik)
                 number = 0
                 if  right:
                     for r in right:
