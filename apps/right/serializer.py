@@ -4,6 +4,12 @@ from apps.person.serializer import PersonSerializer
 from apps.rightstatus.serializer import RightStatusSerializer
 from apps.righttype.serializer import RightTypeSerializer
 from apps.person.models import Person
+from ..rightleave.models import RightLeave
+from django.db.models import Sum
+from ..utils.enums import EnumRightTypes,EnumRightStatus
+from ..businessrules.views import mail_yolla
+
+
 
 class RightSerializer(serializers.ModelSerializer):
     class Meta:
@@ -80,3 +86,36 @@ class RightWithApproverSerializer(serializers.ModelSerializer):
             'HrHasField',
             'RightPicture'
         )
+
+
+class RightAllDetailsSerializer(serializers.ModelSerializer):
+    RightAll = serializers.SerializerMethodField()
+    TotalRightBalance = serializers.SerializerMethodField()
+    class Meta:
+        model = Person
+        fields = (
+            'RightAll',
+            'TotalRightBalance'
+            )
+    def get_RightAll(self,obj):
+
+        rights = Right.objects.filter(Person_id = obj.id)
+        serializer = RightSerializer(rights , many = True)
+        return serializer.data
+
+    def get_TotalRightBalance(self,obj):
+        # totalleavebalance = GetRightBalance(obj.id)
+        # return totalleavebalance
+
+        rightleave =  RightLeave.objects.filter(Person=obj.id)
+        if rightleave:
+            leave =  rightleave.aggregate(total=Sum('Earning'))
+            right  = Right.objects.filter(Person=obj.id,RightStatus=EnumRightStatus.Onaylandi,RightType= EnumRightTypes.Yillik)
+            number = 0
+            if  right:
+                for r in right:
+                    number +=  r.RightNumber
+            total = leave['total'] - number
+        else:
+            return 0
+        return total

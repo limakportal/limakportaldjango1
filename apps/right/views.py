@@ -1,5 +1,5 @@
 from .models import Right
-from .serializer import RightSerializer , RightWithApproverSerializer
+from .serializer import RightSerializer , RightWithApproverSerializer , RightAllDetailsSerializer
 from ..righttype.models import RightType
 from ..rightleave.models import RightLeave
 from rest_framework.views import APIView
@@ -502,4 +502,22 @@ def RightController(data):
         return sonucmessage
     except:
         Response("",status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
+def RightAllDetails(request):
+    rights = Right.objects.all().order_by('Person_id')
+    persons = []
+    for right in rights:
+        try:
+            person = Person.objects.get(id = right.Person_id)
+            if person not in persons:                  
+                persons.append(person)
+        except :
+            pass
+
+    serializer = RightAllDetailsSerializer(persons,many=True)
+    return Response(serializer.data)
+
+
 
