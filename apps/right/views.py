@@ -342,7 +342,7 @@ def GetPersonRightInfo(id):
         if rightleave:
             totalleave = rightleave.aggregate(total=Sum('Earning'))['total']
         
-        rightapprove = Right.objects.filter(Person=id,RightStatus=EnumRightStatus.Onaylandi)
+        rightapprove = Right.objects.filter(Person=id,RightStatus=EnumRightStatus.Onaylandi,RightType = EnumRightTypes.Yillik)
         if rightapprove:
             for r in rightapprove:
               totalright += r.RightNumber  
