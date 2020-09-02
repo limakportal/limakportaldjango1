@@ -82,8 +82,8 @@ class PersonWithPersonInformationAPIView(APIView):
         transactionSaveId = transaction.savepoint()
 
         personSerializer = PersonSerializer(data = request.data['Person'] )
-        if PersonCreateSerializer.is_valid():
-            person = PersonCreateSerializer.save()
+        if PersonSerializer.is_valid():
+            person = PersonSerializer.save()
 
             personIdentitySerializer = PersonIdentitySerializer(data = request.data['PersonIdentity'])   
             if len(request.data['PersonIdentity']) > 0 :
