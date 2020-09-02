@@ -24,14 +24,14 @@ class PersonSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         picture = validated_data.pop('Picture')
 
-        validated_data['PictureTypes'] = picture.content_type
+        validated_data['PictureType'] = picture.content_type
         validated_data['Picture'] = picture.read()
 
         return super(PersonSerializer, self).create(validated_data=validated_data)
 
     class Meta:
         model = Person       
-        fields = ('id', 'Name', 'Surname', 'IdentityID', 'Address', 'Telephone', 'State', 'Email', 'Nationality', 'Picture', 'PictureTypes', 'PictureData')
+        fields = ('id', 'Name', 'Surname', 'IdentityID', 'Address', 'Telephone', 'State', 'Email', 'Nationality', 'Picture', 'PictureType', 'PictureData')
 
 
 class PersonForListViewSerializer(serializers.ModelSerializer):
