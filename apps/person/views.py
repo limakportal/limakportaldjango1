@@ -25,10 +25,10 @@ import json
 
 class PersonAPIView(APIView):
     @permission_classes((IsAuthenticated, ))
-    # def get(self,request):
-    #     persons = Person.objects.all().order_by('id')
-    #     serializer = PersonSerializer(persons,many=True)
-    #     return Response(serializer.data)
+    def get(self,request):
+        persons = Person.objects.all().order_by('id')
+        serializer = PersonSerializer(persons,many=True)
+        return Response(serializer.data)
 
     def post(self,request):
         data = request.data.copy()
