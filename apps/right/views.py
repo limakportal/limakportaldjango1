@@ -166,6 +166,7 @@ def GetRightBalance(id):
 
 @api_view(['POST'])
 def RightDaysNumber(request):
+    result = {}
     stardate = datetime.datetime.strptime(request.data['StartDate'],'%Y-%m-%d')
     enddate = datetime.datetime.strptime(request.data['EndDate'],'%Y-%m-%d')
     startime = request.data['StartTime']
@@ -189,15 +190,16 @@ def RightDaysNumber(request):
                     tmp += 1
                     continue 
                 if stardate.weekday() == 4:
-                    if tmp == 0:
-                        if startime == "13.00":
-                            number += 1.5
+                    if organization[0].IsSaturdayWorkDay:
+                        if tmp == 0:
+                            if startime == "13.00":
+                                number += 1.5
+                            else:
+                                number += 2
                         else:
-                            number += 2
-                    else:
-                        number += 2      
-                    stardate += delta                         
-                    tmp += 1
+                            number += 2      
+                        stardate += delta                         
+                        tmp += 1
                 if stardate.weekday() == 5:
                     stardate += delta                         
                     tmp += 1
@@ -227,7 +229,8 @@ def RightDaysNumber(request):
                 tmp += 1
             if endtime == "12.00":
                 if enddate.weekday() == 4:
-                    number -= 1.5
+                    if organization[0].IsSaturdayWorkDay:
+                        number -= 1.5
                 elif enddate.weekday() == 5:
                     if organization[0].IsSaturdayWorkDay:
                         number -= 0.5
@@ -253,9 +256,15 @@ def RightDaysNumber(request):
             return Response('Maksimum izin gün sayısını geçtiniz. Lütfen izin tarihlerinizi kontrol ediniz.', status=status.HTTP_404_NOT_FOUND) 
 
     if number <= 0:
-        return Response('İzin tarihlerini kontrol ediniz.',status=status.HTTP_404_NOT_FOUND)    
+        return Response('İzin tarihlerini kontrol ediniz.',status=status.HTTP_404_NOT_FOUND)
 
-    return   Response({'daynumber' : number})
+    result['daynumber'] = number
+    if endtime == "12.00":
+        result['DateOfReturn'] = enddate
+    else:
+        result['DateOfReturn'] = stardate
+
+    return   Response(result)
 
 @api_view(['GET'])
 def PersonRightInfo(request,id):
