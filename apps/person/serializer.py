@@ -25,7 +25,7 @@ class PersonSerializer(serializers.ModelSerializer):
             '__all__'
         )
 
-class PersonCreateSerializer(serializers.ModelSerializer):
+class PersonCreateUpdateSerializer(serializers.ModelSerializer):
     Picture = Base64ImageField(use_url=True, write_only=True, max_length=None)
 
     def create(self, validated_data):
@@ -34,7 +34,15 @@ class PersonCreateSerializer(serializers.ModelSerializer):
         validated_data['PictureType'] = picture.content_type
         validated_data['Picture'] = picture.read()
 
-        return super(PersonCreateSerializer, self).create(validated_data=validated_data)
+        return super(PersonCreateUpdateSerializer, self).create(validated_data=validated_data)
+    
+    def update(self, instance, validated_data):
+        picture = validated_data.pop('Picture')
+
+        validated_data['PictureType'] = picture.content_type
+        validated_data['Picture'] = picture.read()
+
+        return super(PersonCreateUpdateSerializer, self).update(instance=instance, validated_data=validated_data)
 
     class Meta:
         model = Person       

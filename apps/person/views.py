@@ -8,7 +8,7 @@ from rest_framework.authentication import SessionAuthentication
 from django.db import transaction
 
 from .models import Person
-from .serializer import PersonSerializer , PersonViewSerializer , PersonViewDetailSerializer , PersonCreateSerializer
+from .serializer import PersonSerializer , PersonViewSerializer , PersonViewDetailSerializer , PersonCreateUpdateSerializer
 from apps.personidentity.models import PersonIdentity
 from apps.personidentity.serializer import PersonIdentitySerializer
 from apps.personbusiness.models import PersonBusiness
@@ -22,53 +22,11 @@ import io
 import json
 
 
+class PersonViewSet(ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = PersonCreateUpdateSerializer
+    queryset = Person.objects.all()
 
-class PersonAPIView(APIView):
-    @permission_classes((IsAuthenticated, ))
-    def get(self,request):
-        persons = Person.objects.all().order_by('id')
-        serializer = PersonSerializer(persons,many=True)
-        return Response(serializer.data)
-
-    def post(self,request):
-        data = request.data.copy()
-        serializer = PersonCreateSerializer(data = data)
-
-        # import pdb; pdb.set_trace()
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class PersonDetails(APIView):
-
-    def get_object(self,id):
-        try:
-            return Person.objects.get(id=id)
-        except Person.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
-
-    def get(self, request, id):
-        person = self.get_object(id)
-        serializer = PersonSerializer(person)
-        return Response(serializer.data)
-
-
-    def put(self, request,id):
-        person = self.get_object(id)
-        serializer = PersonSerializer(person, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-    def delete(self, request, id):
-        person = self.get_object(id)
-        person.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
 
 class PersonWithPersonInformationAPIView(APIView):
     def get(self,request):
@@ -81,9 +39,9 @@ class PersonWithPersonInformationAPIView(APIView):
 
         transactionSaveId = transaction.savepoint()
 
-        personSerializer = PersonSerializer(data = request.data['Person'] )
-        if PersonSerializer.is_valid():
-            person = PersonSerializer.save()
+        personSerializer = PersonCreateUpdateSerializer(data = request.data['Person'] )
+        if personSerializer.is_valid():
+            person = personSerializer.save()
 
             personIdentitySerializer = PersonIdentitySerializer(data = request.data['PersonIdentity'])   
             if len(request.data['PersonIdentity']) > 0 :
@@ -145,14 +103,14 @@ class PersonWithPersonInformationDetails(APIView):
         return Response(serializer.data)
 
     @transaction.atomic
-    def put(self, request,id):
+    def put(self, request, id):
 
         transactionSaveId = transaction.savepoint()
 
         person = self.get_object(id)
         getPersonData = {}
         getPersonData = request.data['Person']
-        serializer = PersonSerializer(person, data = getPersonData)
+        serializer = PersonCreateUpdateSerializer(person, data = getPersonData)
         if serializer.is_valid():
             serializer.save()
 
