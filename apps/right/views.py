@@ -22,7 +22,7 @@ from ..businessrules.views import mail_yolla
 from ..businessrules.views import GetResponsibleIkPersons , IsManager
 from ..person.businesrules import GetPersonApprover
 from ..personbusiness.models import PersonBusiness
-from ..businessrules.views import GetResponsiblePersonDetails, HasPermission
+from ..businessrules.views import GetResponsiblePersonDetails, HasPermission,GetManagerPersonsDetail
 from ..title.models import Title
 from django.db.models import Q
 from ..vocationdays.models import VocationDays
@@ -30,7 +30,6 @@ from ..vocationdays.models import VocationDays
 from ..businessrules.serializer import OrganizationWithPersonTreeSerializer
 
 from .bussinessrules import TotalWorkedTime ,NextRightTime ,PersonDeserveRight ,NextRight
-
 
 
 
@@ -318,13 +317,13 @@ def PersonRightInfo(request,id):
 
         if IsManager(id):
             staff = Staff.objects.get(Person_id = id)
-            staffs = Staff.objects.filter(Organization_id = staff.Organization_id)
-            for staff in staffs:
-                try:
-                    person = Person.objects.get(id = staff.Person_id)
-                    result = GetPersonRightInfo(person.id)
-                    content.append(result)
+            # tum personları bul. sadece kendi birimi değil.
+            persons = GetManagerPersonsDetail(staff.Organization_id)
 
+            for p in persons:
+                try:
+                    result = GetPersonRightInfo(p["id"])
+                    content.append(result)
                 except :
                     pass
 
