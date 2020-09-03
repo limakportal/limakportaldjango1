@@ -391,10 +391,14 @@ def GetPersonRightInfo(id):
            detail.append(det)
            rightnumber = 0
            rightwaitingnumber = 0
-      
+
+        try:
+            personRightDeverse = PersonRightDeverse(person.id)
+        except :
+            personRightDeverse = None      
         content = {'person_id' : person.id, 'name' : person.Name , 'surname': person.Surname,'totalleave' : totalleave, 'totalright': totalright, 'remainingleave' : remainingleave,
                 'nextyear' : nextyear, 'nextleave': nextleave, 'approvelwaiting' : approvelwaiting, 'organization_id' : organiaztion_id, 'detail' : detail, 
-                'RegisterNo' : registerno , 'JobStartDate': jobstartdate, 'FormerSeniority': formerseniority , 'PersonRightDeverse':PersonRightDeverse(person.id)}
+                'RegisterNo' : registerno , 'JobStartDate': jobstartdate, 'FormerSeniority': formerseniority , 'PersonRightDeverse':personRightDeverse}
         return content
 
 @api_view(['GET'])
