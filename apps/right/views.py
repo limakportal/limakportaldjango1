@@ -1,5 +1,5 @@
 from .models import Right
-from .serializer import RightSerializer , RightWithApproverSerializer , RightAllDetailsSerializer
+from .serializer import RightSerializer , RightWithApproverSerializer , RightAllDetailsSerializer ,PersonDeserveRightSerializer
 from ..righttype.models import RightType
 from ..rightleave.models import RightLeave
 from rest_framework.views import APIView
@@ -17,6 +17,7 @@ import datetime
 from docxtpl import DocxTemplate
 from ..person.models import Person
 from .serializer import PersonSerializer
+from ..personbusiness.serializer import PersonBusinessSerializer
 from ..businessrules.views import mail_yolla
 from ..businessrules.views import GetResponsibleIkPersons , IsManager
 from ..person.businesrules import GetPersonApprover
@@ -27,6 +28,9 @@ from django.db.models import Q
 from ..vocationdays.models import VocationDays
 
 from ..businessrules.serializer import OrganizationWithPersonTreeSerializer
+
+from .bussinessrules import TotalWorkedTime ,NextRightTime ,PersonDeserveRight ,NextRight
+
 
 
 
@@ -519,5 +523,16 @@ def RightAllDetails(request):
     serializer = RightAllDetailsSerializer(persons,many=True)
     return Response(serializer.data)
 
+@api_view(['GET'])
+def RightDeverse(request,id):
+    result = {}
+    result['BalanceRigt'] = PersonDeserveRight(id) - GetRightBalance(id)
+    result['TotalWorkedTime'] = TotalWorkedTime(id)
+    result['NextRightTime'] = NextRightTime(id)
+    result['PersonDeserveRight'] = PersonDeserveRight(id)
+    result['NextRight'] = NextRight(id)
+    return Response(result)
 
+
+    
 

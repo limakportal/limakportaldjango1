@@ -1,5 +1,17 @@
 from django.urls import path
-from .views import RightAPIView , RightDetails , RightWithApproverAPIView, RightDownloadApiView, RightBalance, RightDaysNumber ,PersonRightInfo, GetRightStatus, TodayOnLeavePerson, RightAllDetails
+from .views import( 
+    RightAPIView , 
+    RightDetails , 
+    RightWithApproverAPIView, 
+    RightDownloadApiView, 
+    RightBalance, 
+    RightDaysNumber ,
+    PersonRightInfo, 
+    GetRightStatus, 
+    TodayOnLeavePerson, 
+    RightAllDetails,
+    RightDeverse
+)
 
 
 urlpatterns = [ 
@@ -13,4 +25,6 @@ urlpatterns = [
     path('getrightstatus/<int:status_id>', GetRightStatus),
     path('todayonleaveperson', TodayOnLeavePerson),
     path('rightalldetails', RightAllDetails),
+    path('rightdeverse/<int:id>', RightDeverse),
+  
 ]
