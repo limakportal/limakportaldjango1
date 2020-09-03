@@ -9,6 +9,7 @@ from django.db.models import Sum
 from ..utils.enums import EnumRightTypes,EnumRightStatus
 from ..businessrules.views import mail_yolla
 
+from .bussinessrules import PersonRightDeverse
 
 
 class RightSerializer(serializers.ModelSerializer):
@@ -26,6 +27,7 @@ class RightWithApproverSerializer(serializers.ModelSerializer):
     PersonFullName = serializers.SerializerMethodField('person_full_name')
     PersonApprover1 = serializers.SerializerMethodField()
     TotalRightBalance = serializers.SerializerMethodField()
+    PersonRightDeverse = serializers.SerializerMethodField()
 
     def apporover1_full_name(self,obj):
         if obj.Approver1 != None:
@@ -77,6 +79,16 @@ class RightWithApproverSerializer(serializers.ModelSerializer):
         else:
             return 0
         return total
+    
+    def get_PersonRightDeverse(self,obj):
+        try:
+            result = PersonRightDeverse(obj.Person_id)
+            return result      
+        except:
+            return None
+        
+         
+    
 
 
     # def get_PersonApprover2(self,obj):
@@ -104,7 +116,8 @@ class RightWithApproverSerializer(serializers.ModelSerializer):
             'PersonApprover1',
             'HrHasField',
             'RightPicture',
-            'TotalRightBalance'
+            'TotalRightBalance',
+            'PersonRightDeverse'
         )
 
 

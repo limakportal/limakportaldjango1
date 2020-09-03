@@ -1,7 +1,12 @@
 import datetime
 from datetime import timedelta
+from django.db.models import Sum
+from ..utils.enums import EnumRightTypes,EnumRightStatus
 
 from ..personbusiness.models import PersonBusiness
+
+from ..rightleave.models import RightLeave
+
 
 def WorkedTotalDays(personId):
     try:
@@ -85,3 +90,29 @@ def NextRight(personId):
         return 0
     return right
  
+
+def PersonRightDeverse(personId):
+    result = {}
+    result['BalanceRigth'] = PersonDeserveRight(personId) - GetRightBalance(personId)
+    result['TotalWorkedTime'] = TotalWorkedTime(personId)
+    result['NextRightTime'] = NextRightTime(personId)
+    result['PersonDeserveRight'] = PersonDeserveRight(personId)
+    result['NextRight'] = NextRight(personId)
+    return result
+
+def GetRightBalance(id):
+        try:
+            rightleave =  RightLeave.objects.filter(Person=id)
+            if rightleave:
+                leave =  rightleave.aggregate(total=Sum('Earning'))
+                right  = Right.objects.filter(Person=id,RightStatus=EnumRightStatus.Onaylandi,RightType= EnumRightTypes.Yillik)
+                number = 0
+                if  right:
+                    for r in right:
+                      number +=  r.RightNumber
+                total = leave['total'] - number
+            else:
+                return 0
+            return total
+        except RightLeave.DoesNotExist:
+            return 0
