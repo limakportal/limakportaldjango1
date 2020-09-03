@@ -49,7 +49,7 @@ def TotalWorkedTime(personId):
         if workedYear > 0:
            totalWorkedTime = totalWorkedTime +str(workedYear) + ' Yıl '
         if workedMounth > 0:
-            totalWorkedTime = totalWorkedTime + ' ' + str(workedMounth) + ' Ay '
+            totalWorkedTime = totalWorkedTime + str(workedMounth) + ' Ay '
         if workedDay > 0:
             totalWorkedTime = totalWorkedTime + str(workedDay) + ' Gün'
     except :
