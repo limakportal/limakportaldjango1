@@ -110,7 +110,10 @@ class PersonWithPersonInformationDetails(APIView):
         person = self.get_object(id)
         getPersonData = {}
         getPersonData = request.data['Person']
-        serializer = PersonCreateUpdateSerializer(person, data = getPersonData)
+        if  request.data['Person']['PictureType'] != None :
+            serializer = PersonCreateUpdateSerializer(person, data = getPersonData)
+        else:
+            serializer = PersonSerializer(person, data = getPersonData)  
         if serializer.is_valid():
             serializer.save()
 
