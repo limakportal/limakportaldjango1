@@ -326,7 +326,7 @@ def PersonRightInfo(request,id):
                     content.append(result)
                 except :
                     pass
-
+            content.append(GetPersonRightInfo(id))
             return Response(content)
 
         result = GetPersonRightInfo(id)
