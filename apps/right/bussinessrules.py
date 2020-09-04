@@ -7,6 +7,8 @@ from ..personbusiness.models import PersonBusiness
 
 from ..rightleave.models import RightLeave
 
+from .models import Right
+
 
 def WorkedTotalDays(personId):
     try:
