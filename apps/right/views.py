@@ -29,7 +29,7 @@ from ..vocationdays.models import VocationDays
 
 from ..businessrules.serializer import OrganizationWithPersonTreeSerializer
 
-from .bussinessrules import TotalWorkedTime ,NextRightTime ,PersonDeserveRight ,NextRight
+from .bussinessrules import TotalWorkedTime ,NextRightTime ,PersonDeserveRight ,NextRight ,PersonRightDeverse , GetRightBalance
 
 
 
@@ -150,22 +150,22 @@ def RightBalance(request,id):
     except RightLeave.DoesNotExist:
         return Response('Kişiye ait izin hakedişi bulunmamaktadır.',status=status.HTTP_404_NOT_FOUND)
 
-def GetRightBalance(id):
-        try:
-            rightleave =  RightLeave.objects.filter(Person=id)
-            if rightleave:
-                leave =  rightleave.aggregate(total=Sum('Earning'))
-                right  = Right.objects.filter(Person=id,RightStatus=EnumRightStatus.Onaylandi,RightType= EnumRightTypes.Yillik)
-                number = 0
-                if  right:
-                    for r in right:
-                      number +=  r.RightNumber
-                total = leave['total'] - number
-            else:
-                return 0
-            return total
-        except RightLeave.DoesNotExist:
-            return 0
+# def GetRightBalance(id):
+#         try:
+#             rightleave =  RightLeave.objects.filter(Person=id)
+#             if rightleave:
+#                 leave =  rightleave.aggregate(total=Sum('Earning'))
+#                 right  = Right.objects.filter(Person=id,RightStatus=EnumRightStatus.Onaylandi,RightType= EnumRightTypes.Yillik)
+#                 number = 0
+#                 if  right:
+#                     for r in right:
+#                       number +=  r.RightNumber
+#                 total = leave['total'] - number
+#             else:
+#                 return 0
+#             return total
+#         except RightLeave.DoesNotExist:
+#             return 0
 
 @api_view(['POST'])
 def RightDaysNumber(request):
@@ -391,10 +391,14 @@ def GetPersonRightInfo(id):
            detail.append(det)
            rightnumber = 0
            rightwaitingnumber = 0
-      
+
+        try:
+            personRightDeverse = PersonRightDeverse(person.id)
+        except :
+            personRightDeverse = None      
         content = {'person_id' : person.id, 'name' : person.Name , 'surname': person.Surname,'totalleave' : totalleave, 'totalright': totalright, 'remainingleave' : remainingleave,
                 'nextyear' : nextyear, 'nextleave': nextleave, 'approvelwaiting' : approvelwaiting, 'organization_id' : organiaztion_id, 'detail' : detail, 
-                'RegisterNo' : registerno , 'JobStartDate': jobstartdate, 'FormerSeniority': formerseniority}
+                'RegisterNo' : registerno , 'JobStartDate': jobstartdate, 'FormerSeniority': formerseniority , 'PersonRightDeverse':personRightDeverse}
         return content
 
 @api_view(['GET'])
@@ -436,11 +440,18 @@ def TodayOnLeavePerson(request):
                     title = Title.objects.get(id = staff.Title_id)
                     data['Organization'] = organization.Name
                     data['Title'] = title.Name
-                    finallyData.append(data)
+                    # finallyData.append(data)
                 except:
                     data['Organization'] = ''
                     data['Title'] = ''
-                    finallyData.append(data)
+                    # finallyData.append(data)
+                try:
+                    data['PersonRightDeverse'] = PersonRightDeverse(person.id)
+                except :
+                    data['PersonRightDeverse'] = None
+                finallyData.append(data)              
+                
+                
                  
             return Response(finallyData)
         except:
@@ -525,14 +536,17 @@ def RightAllDetails(request):
 
 @api_view(['GET'])
 def RightDeverse(request,id):
-    result = {}
-    result['BalanceRigt'] = PersonDeserveRight(id) - GetRightBalance(id)
-    result['TotalWorkedTime'] = TotalWorkedTime(id)
-    result['NextRightTime'] = NextRightTime(id)
-    result['PersonDeserveRight'] = PersonDeserveRight(id)
-    result['NextRight'] = NextRight(id)
+    try:
+        result = PersonRightDeverse(id)
+    except :
+        result = None
     return Response(result)
 
-
-    
-
+# def PersonRightDeverse(personId):
+#     result = {}
+#     result['BalanceRigth'] = PersonDeserveRight(personId) - GetRightBalance(personId)
+#     result['TotalWorkedTime'] = TotalWorkedTime(personId)
+#     result['NextRightTime'] = NextRightTime(personId)
+#     result['PersonDeserveRight'] = PersonDeserveRight(personId)
+#     result['NextRight'] = NextRight(personId)
+#     return result
