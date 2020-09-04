@@ -95,12 +95,19 @@ def NextRight(personId):
 
 def PersonRightDeverse(personId):
     result = {}
-    result['BalanceRigth'] = PersonDeserveRight(personId) - GetRightBalance(personId)
+    right  = Right.objects.filter(Person=personId,RightStatus=EnumRightStatus.Onaylandi,RightType= EnumRightTypes.Yillik)
+    number = 0
+    if  right:
+        for r in right:
+            number +=  r.RightNumber
+    result['BalanceRigth'] = PersonDeserveRight(personId) - number
     result['TotalWorkedTime'] = TotalWorkedTime(personId)
     result['NextRightTime'] = NextRightTime(personId)
     result['PersonDeserveRight'] = PersonDeserveRight(personId)
     result['NextRight'] = NextRight(personId)
     return result
+
+    
 
 def GetRightBalance(id):
         try:
