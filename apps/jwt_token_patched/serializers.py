@@ -42,7 +42,6 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             personRequest['Name'] = person.Name
             personRequest['Surname'] = person.Surname
             request['Person'] = personRequest
-            personRequest['id'] = userSerializer.data['id']
 
             request['token'] = str(token.access_token)
             request['access_token'] = str(token.access_token)
