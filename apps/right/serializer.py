@@ -9,7 +9,7 @@ from django.db.models import Sum
 from ..utils.enums import EnumRightTypes,EnumRightStatus
 from ..businessrules.views import mail_yolla
 
-from .bussinessrules import PersonRightDeverse
+from .bussinessrules import PersonRightDeverse,PersonDeserveRight
 
 
 class RightSerializer(serializers.ModelSerializer):
@@ -66,19 +66,26 @@ class RightWithApproverSerializer(serializers.ModelSerializer):
     def get_TotalRightBalance(self,obj):
         # totalleavebalance = GetRightBalance(obj.id)
         # return totalleavebalance
-
-        rightleave =  RightLeave.objects.filter(Person=obj.Person_id)
-        if rightleave:
-            leave =  rightleave.aggregate(total=Sum('Earning'))
-            right  = Right.objects.filter(Person=obj.id,RightStatus=EnumRightStatus.Onaylandi,RightType= EnumRightTypes.Yillik)
-            number = 0
-            if  right:
-                for r in right:
-                    number +=  r.RightNumber
-            total = leave['total'] - number
-        else:
-            return 0
+        right  = Right.objects.filter(Person=obj.Person_id,RightStatus=EnumRightStatus.Onaylandi,RightType= EnumRightTypes.Yillik)
+        number = 0
+        if  right:
+            for r in right:
+                number +=  r.RightNumber
+        total = PersonDeserveRight(obj.Person_id) - number
         return total
+
+        # rightleave =  RightLeave.objects.filter(Person=obj.Person_id)
+        # if rightleave:
+        #     leave =  rightleave.aggregate(total=Sum('Earning'))
+        #     right  = Right.objects.filter(Person=obj.id,RightStatus=EnumRightStatus.Onaylandi,RightType= EnumRightTypes.Yillik)
+        #     number = 0
+        #     if  right:
+        #         for r in right:
+        #             number +=  r.RightNumber
+        #     total = leave['total'] - number
+        # else:
+        #     return 0
+        # return total
     
     def get_PersonRightDeverse(self,obj):
         try:
