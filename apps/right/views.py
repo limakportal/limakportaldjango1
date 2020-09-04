@@ -132,7 +132,7 @@ class RightDownloadApiView(APIView):
                          'SD' : right.StartDate.date() , 'EndDate' : right.EndDate.date(),
                          'AppName' : serializer.data['Name'], 'AppSurname' : serializer.data['Surname'],
                          'RD' : right.DateOfReturn.date(), 'Tel' : right.Telephone ,
-                         'Bak' : total , 'Kal' : total - right.RightNumber , 'JD' : personbusiness.JobStartDate }
+                         'Bak' : total , 'Kal' : total - right.RightNumber , 'JD' : personbusiness.JobStartDate.date() }
             doc.render(context)
             doc.save(outputfile)
 
