@@ -112,6 +112,7 @@ class RightDownloadApiView(APIView):
             right = Right.objects.get(id=id)
             righttype = RightType.objects.get(id=right.RightType.id)
             person = Person.objects.get(id=right.Person.id)
+            personbusiness = PersonBusiness.objects.get(Person=right.Person.id)
             serializer = GetPersonApprover(person.id)
 
             if  righttype.RightMainType.id == EnumRightTypes.Yillik:
@@ -131,7 +132,7 @@ class RightDownloadApiView(APIView):
                          'SD' : right.StartDate.date() , 'EndDate' : right.EndDate.date(),
                          'AppName' : serializer.data['Name'], 'AppSurname' : serializer.data['Surname'],
                          'RD' : right.DateOfReturn.date(), 'Tel' : right.Telephone ,
-                         'Bak' : total , 'Kal' : total - right.RightNumber }
+                         'Bak' : total , 'Kal' : total - right.RightNumber , 'JD' : personbusiness.JobStartDate }
             doc.render(context)
             doc.save(outputfile)
 
