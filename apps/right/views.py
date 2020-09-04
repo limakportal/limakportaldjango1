@@ -274,49 +274,49 @@ def RightDaysNumber(request):
 def PersonRightInfo(request,id):
         content = []
 
-        if HasPermission(id,'ADMIN'):
+        if HasPermission(id,'ADMIN') or HasPermission(id,'IZN_IK'):
             person = Person.objects.all()
             for p in person:
                result = GetPersonRightInfo(p.id)
                content.append(result)
             return Response(content)
 
-        elif HasPermission(id,'IZN_IK'):
+        # elif HasPermission(id,'IZN_IK'):
 
-            person = Person.objects.get(id = id)
-            staff = Staff.objects.get(Person_id = person.id)
+        #     person = Person.objects.get(id = id)
+        #     staff = Staff.objects.get(Person_id = person.id)
 
-            organizationObj = Organization.objects.get(id = staff.Organization_id)
-            serializer = OrganizationWithPersonTreeSerializer(organizationObj)
-            responsibleMenu = serializer.data
+        #     organizationObj = Organization.objects.get(id = staff.Organization_id)
+        #     serializer = OrganizationWithPersonTreeSerializer(organizationObj)
+        #     responsibleMenu = serializer.data
 
-            persons = []
+        #     persons = []
 
-            sameStaffs =  Staff.objects.filter(Organization = staff.Organization_id)
-            for staff in sameStaffs:
-                try:
-                    person = Person.objects.get(id = staff.Person_id)
-                    persons.append(person)
-                except:
-                    person = None
+        #     sameStaffs =  Staff.objects.filter(Organization = staff.Organization_id)
+        #     for staff in sameStaffs:
+        #         try:
+        #             person = Person.objects.get(id = staff.Person_id)
+        #             persons.append(person)
+        #         except:
+        #             person = None
 
-            if responsibleMenu['ChildOrganization'] != None:
-                for child in responsibleMenu['ChildOrganization']:
-                    staffs = Staff.objects.filter(Organization = child['id'])
-                    for staff in staffs:
-                        try:
-                            person = Person.objects.get(id = staff.Person_id)
-                            persons.append(person)
-                        except:
-                            person = None
+        #     if responsibleMenu['ChildOrganization'] != None:
+        #         for child in responsibleMenu['ChildOrganization']:
+        #             staffs = Staff.objects.filter(Organization = child['id'])
+        #             for staff in staffs:
+        #                 try:
+        #                     person = Person.objects.get(id = staff.Person_id)
+        #                     persons.append(person)
+        #                 except:
+        #                     person = None
 
-            person = Person.objects.all()
-            for p in persons:
-               result = GetPersonRightInfo(p.id)
-               content.append(result)
-            return Response(content)
+        #     person = Person.objects.all()
+        #     for p in persons:
+        #        result = GetPersonRightInfo(p.id)
+        #        content.append(result)
+        #     return Response(content)
 
-        if IsManager(id):
+        elif IsManager(id):
             staff = Staff.objects.get(Person_id = id)
             # tum personları bul. sadece kendi birimi değil.
             persons = GetManagerPersonsDetail(staff.Organization_id)
