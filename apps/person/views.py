@@ -17,6 +17,7 @@ from apps.personeducation.models import PersonEducation
 from apps.personeducation.serializer import PersonEducationSerializer
 from apps.personfamily.models import PersonFamily
 from apps.personfamily.serializer import PersonFamilySerializer
+from ..businessrules.views import  HasPermission,GetResponsibleAdminPersonDetails,GetResponsibleIkPersonDetails,GetManagerPersonsDetail,IsManager,GetManagerPersonsDetailNoneSerializer
 
 import io
 import json
@@ -30,9 +31,21 @@ class PersonViewSet(ModelViewSet):
 
 class PersonWithPersonInformationAPIView(APIView):
     def get(self,request):
-        persons = Person.objects.all().order_by('id')
-        serializer = PersonViewSerializer(persons,many=True)
-        return Response(serializer.data)
+        if(request.user.is_authenticated):
+            p = Person.objects.get(Email = request.user.email)
+            if HasPermission(p.id, 'ADMIN'):
+                return Response(GetResponsibleAdminPersonDetails(p.id))
+            elif HasPermission(p.id, 'IZN_IK'):
+                return Response(GetResponsibleIkPersonDetails(p.id))
+            elif IsManager(p.id):
+                persons = GetManagerPersonsDetailNoneSerializer(p.id)
+                serializer = PersonViewSerializer(persons, many=True)
+                return Response(serializer.data)
+
+        #yetkiye göre gelmeli.
+        #persons = Person.objects.all().order_by('id')
+        #serializer = PersonViewSerializer(persons,many=True)
+        #return Response(serializer.data)
 
     @transaction.atomic
     def post(self,request):

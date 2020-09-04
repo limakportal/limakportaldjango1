@@ -64,6 +64,14 @@ def GetPersonsByOrganizationId(organizationId, personArr):
     except:
         return None
 
+def GetManagerPersonsDetailNoneSerializer(personId):
+    try:
+        staff = Staff.objects.get(Person_id=personId)
+        personArr = []
+        return GetPersonsByOrganizationId(staff.Organization_id, personArr)
+    except:
+        return None
+
 
 def GetManagerPersonsDetail(personId):
     try:

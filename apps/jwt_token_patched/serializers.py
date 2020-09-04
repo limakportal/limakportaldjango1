@@ -8,6 +8,9 @@ from ..permission.models import Permission
 from ..permission.serializer import PermissionSerializer
 
 from ..businessrules.views import IsManager
+from apps.account.models import Account
+from apps.account.serializer import AccountSerializer
+from rest_framework_simplejwt.tokens import RefreshToken
 
 class TokenObtainPairPatchedSerializer(TokenObtainPairSerializer):
      def to_representation(self, instance):
@@ -28,7 +31,10 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         userRequest = {}
         userRequest['id'] = self.user.id
         userRequest['Email'] = self.user.email
-        request['User'] = userRequest       
+        request['User'] = userRequest
+        accounts = Account.objects.get(email=self.user.email)
+        userSerializer = AccountSerializer(accounts)
+        token = RefreshToken.for_user(accounts)
         try:
             person = Person.objects.get(Email = self.user.email)
             personRequest = {}
@@ -36,6 +42,15 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             personRequest['Name'] = person.Name
             personRequest['Surname'] = person.Surname
             request['Person'] = personRequest
+            personRequest['id'] = userSerializer.data['id']
+
+            request['token'] = str(token.access_token)
+            request['access_token'] = str(token.access_token)
+            responseUser = {}
+            responseUser['id'] = userSerializer.data['id']
+            responseUser['Email'] = self.user.email
+            request['User'] = responseUser
+
         except :
             request['Person'] = None
         permissionRequest = {}
