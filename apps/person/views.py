@@ -41,6 +41,9 @@ class PersonWithPersonInformationAPIView(APIView):
                 persons = GetManagerPersonsDetailNoneSerializer(p.id)
                 serializer = PersonViewSerializer(persons, many=True)
                 return Response(serializer.data)
+            else:
+                serializer = PersonViewSerializer(Person.objects.get(id=p.id), many=True)
+                return Response(serializer.data)
 
         #yetkiye göre gelmeli.
         #persons = Person.objects.all().order_by('id')
