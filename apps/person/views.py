@@ -42,7 +42,9 @@ class PersonWithPersonInformationAPIView(APIView):
                 serializer = PersonViewSerializer(persons, many=True)
                 return Response(serializer.data)
             else:
-                serializer = PersonViewSerializer(Person.objects.get(id=p.id), many=True)
+                persons  =[]
+                persons.append(p)
+                serializer = PersonViewSerializer(persons, many=True)
                 return Response(serializer.data)
 
         #yetkiye göre gelmeli.
