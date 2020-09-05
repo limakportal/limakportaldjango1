@@ -44,4 +44,5 @@ urlpatterns = [
     path('',include('apps.jwt_token_patched.urls')),
     path('',include('apps.announcment.urls')),
     path('',include('apps.announcmentorganization.urls')),
+    path('',include('apps.dashboard.urls')),
 ]

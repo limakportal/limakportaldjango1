@@ -1,0 +1,77 @@
+
+from ..person.models import Person
+from ..account.models import Account
+from ..userrole.models import UserRole
+from ..authority.models import Authority
+from ..permission.models import Permission
+from ..staff.models import Staff
+from ..organization.models import Organization
+
+
+from ..person.serializer import PersonSerializer
+
+
+
+
+def PersonPermissionControl(personId, permissionCode):
+    try:
+        person = Person.objects.get(id = personId)
+        account = Account.objects.get(email = person.Email)
+        userRoles = UserRole.objects.filter(Account_id = account.id)
+        for userRole in userRoles:
+            authorityes = Authority.objects.filter(Role_id = userRole.Role_id)
+            if len(authorityes) > 0:
+                for authority in authorityes:
+                    permissions = Permission.objects.filter(Code = permissionCode)
+                    for permission in permissions:
+                        if permission.id == authority.Permission_id:
+                            return True
+    except:
+        return False
+
+def GetAllPersonsWithLen():
+    result = {}
+    persons = Person.objects.all()
+    result['Persons'] = PersonSerializer(persons , many = True).data
+    result['PersonsLen'] = len(persons)
+    return result
+
+def IsManager(personId):
+    try:
+        staff = Staff.objects.get(Person_id=personId)
+        organization = Organization.objects.get(id = staff.Organization_id)
+        if organization.ManagerTitle_id == staff.Title_id and staff.Organization_id == organization.id:
+            return True
+        return False
+    except:
+        return False
+
+def GetPersonsWithLenManager(personId):
+    result = {}
+    staff = Staff.objects.get(Person_id = personId)
+    personsArr = []
+    persons = GetPersonsByOrganizationId(staff.Organization_id, personsArr)
+    result['Persons'] = PersonSerializer(persons , many = True).data
+    result['PersonsLen'] = len(persons)
+    return result
+
+def GetPersonsByOrganizationId(organizationId, personArr):
+    try:
+        # bu birimdeki kadrolar ve personeller
+        staffs = Staff.objects.filter(Organization_id=organizationId)
+        for s in staffs:
+            try:
+                person = Person.objects.get(id = s.Person_id)
+                personArr.append(person)
+            except:
+                pass
+
+        lowerOrganization = Organization.objects.filter(UpperOrganization=organizationId)
+
+        for o in lowerOrganization:
+            GetPersonsByOrganizationId(o.id, personArr)
+        return personArr
+    except:
+        return None
+
+
