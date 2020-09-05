@@ -14,6 +14,7 @@ from ..person.serializer import PersonSerializer
 
 
 def PersonPermissionControl(personId, permissionCode):
+    """ ADMIN ve IZN_IK Yetki Kontrol """
     try:
         person = Person.objects.get(id = personId)
         account = Account.objects.get(email = person.Email)
@@ -30,6 +31,7 @@ def PersonPermissionControl(personId, permissionCode):
         return False
 
 def GetAllPersonsWithLen():
+    """ Bütün Personeller ve Sayısı """
     result = {}
     persons = Person.objects.all()
     result['Persons'] = PersonSerializer(persons , many = True).data
@@ -37,6 +39,7 @@ def GetAllPersonsWithLen():
     return result
 
 def IsManager(personId):
+    """ Personel Yönetici Kontrol """
     try:
         staff = Staff.objects.get(Person_id=personId)
         organization = Organization.objects.get(id = staff.Organization_id)
@@ -47,6 +50,7 @@ def IsManager(personId):
         return False
 
 def GetPersonsWithLenManager(personId):
+    """ Yöneticinin Sorumlu Olduğu Personeller ve Sayısı """
     result = {}
     staff = Staff.objects.get(Person_id = personId)
     personsArr = []
@@ -56,8 +60,8 @@ def GetPersonsWithLenManager(personId):
     return result
 
 def GetPersonsByOrganizationId(organizationId, personArr):
+    """ Yöneticinin Sorumlu Olduğu Personeller ve Sayısı """
     try:
-        # bu birimdeki kadrolar ve personeller
         staffs = Staff.objects.filter(Organization_id=organizationId)
         for s in staffs:
             try:
