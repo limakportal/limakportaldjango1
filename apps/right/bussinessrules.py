@@ -23,7 +23,7 @@ def WorkedTotalDays(personId):
         return 0
     return dayDifference
 
-def PersonDeserveRight(personId):
+def TotalDeservedRight(personId):
     try:
         daysDifference = WorkedTotalDays(personId)
         workingYear = 0
@@ -40,7 +40,7 @@ def PersonDeserveRight(personId):
         return 0
     return totalRigts
 
-def TotalWorkedTime(personId):
+def NumberOfDaysSubjestToRight(personId):
     try:
         dayDifference = WorkedTotalDays(personId)
         workedYear = 0
@@ -63,7 +63,7 @@ def TotalWorkedTime(personId):
         return ''
     return totalWorkedTime
 
-def NextRightTime(personId):
+def NextRighNumberOfDaysSubjestToRighttTime(personId):
     try:
         personWorkedTotalDays = WorkedTotalDays(personId)
         personWorkedTotalYears = personWorkedTotalDays // 360
@@ -75,7 +75,7 @@ def NextRightTime(personId):
     return nextRight
 
 
-def NextRight(personId):
+def RightToBeDeserved(personId):
     try:
         daysDifference = WorkedTotalDays(personId)
         workingYear = 0
@@ -93,21 +93,39 @@ def NextRight(personId):
     return right
  
 
-def PersonRightDeverse(personId):
+def PersonRightSummary(personId):
     result = {}
+
+    totalDeservedRight = TotalDeservedRight(personId)
+    totalApprovedRight = TotalApprovedRight(personId)
+    totalAwatingApprovelRight = TotalAwatingApprovelRight(personId)
+
+    result['TotalDeservedRight '] = totalDeservedRight
+    result['TotalApprovedRight  '] = totalApprovedRight
+    result['TotalAwatingApprovelRight'] = totalAwatingApprovelRight
+    result['BalanceRigth'] = totalDeservedRight - ( totalApprovedRight + totalAwatingApprovelRight )
+    result['NumberOfDaysSubjestToRight'] = NumberOfDaysSubjestToRight(personId)
+    result['NextRighNumberOfDaysSubjestToRighttTime'] = NextRighNumberOfDaysSubjestToRighttTime(personId)
+    result['RightToBeDeserved '] = RightToBeDeserved(personId)
+
+    return result
+
+def TotalApprovedRight(personId):
     right  = Right.objects.filter(Person=personId,RightStatus=EnumRightStatus.Onaylandi,RightType= EnumRightTypes.Yillik)
     number = 0
     if  right:
         for r in right:
             number +=  r.RightNumber
-    result['BalanceRigth'] = PersonDeserveRight(personId) - number
-    result['TotalWorkedTime'] = TotalWorkedTime(personId)
-    result['NextRightTime'] = NextRightTime(personId)
-    result['PersonDeserveRight'] = PersonDeserveRight(personId)
-    result['NextRight'] = NextRight(personId)
-    return result
+    return number
 
-    
+def TotalAwatingApprovelRight(personId):
+    right  = Right.objects.filter(Person=personId,RightStatus=EnumRightStatus.OnayBekliyor,RightType= EnumRightTypes.Yillik)
+    number = 0
+    if  right:
+        for r in right:
+            number +=  r.RightNumber
+    return number
+
 
 def GetRightBalance(id):
         try:

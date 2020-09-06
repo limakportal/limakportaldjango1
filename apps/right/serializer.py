@@ -9,7 +9,7 @@ from django.db.models import Sum
 from ..utils.enums import EnumRightTypes,EnumRightStatus
 from ..businessrules.views import mail_yolla
 
-from .bussinessrules import PersonRightDeverse,PersonDeserveRight
+from .bussinessrules import PersonRightSummary
 
 
 class RightSerializer(serializers.ModelSerializer):
@@ -26,83 +26,7 @@ class RightWithApproverSerializer(serializers.ModelSerializer):
     Approver1FullName = serializers.SerializerMethodField('apporover1_full_name')
     PersonFullName = serializers.SerializerMethodField('person_full_name')
     PersonApprover1 = serializers.SerializerMethodField()
-    TotalRightBalance = serializers.SerializerMethodField()
-    PersonRightDeverse = serializers.SerializerMethodField()
-
-    def apporover1_full_name(self,obj):
-        if obj.Approver1 != None:
-            try:
-                personel = Person.objects.get(id=obj.Approver1)
-                serializer = PersonSerializer(personel).data
-                return serializer['Name'] + ' ' + serializer['Surname']
-            except:
-                return None
-        return None
-
-    # def apporover2_full_name(self,obj):
-    #     if obj.Approver1 != None:
-    #         personel = Person.objects.get(id=obj.Approver2)
-    #         serializer = PersonSerializer(personel).data
-    #         return serializer['Name'] + ' ' + serializer['Surname']
-    #     return None
-
-    def person_full_name(self,obj):
-        try:
-            person = Person.objects.get(id=obj.Person.id)
-            serializer = PersonSerializer(person).data
-            return serializer['Name'] + ' ' +serializer['Surname']
-        except:
-            return None
-
-    def get_PersonApprover1(self,obj):
-        if obj.Approver1 != None:
-            try:
-                person = Person.objects.get(id = obj.Approver1)
-                serializer = PersonSerializer(person).data
-                return serializer
-            except:
-                return None
-
-    def get_TotalRightBalance(self,obj):
-        # totalleavebalance = GetRightBalance(obj.id)
-        # return totalleavebalance
-        right  = Right.objects.filter(Person=obj.Person_id,RightStatus=EnumRightStatus.Onaylandi,RightType= EnumRightTypes.Yillik)
-        number = 0
-        if  right:
-            for r in right:
-                number +=  r.RightNumber
-        total = PersonDeserveRight(obj.Person_id) - number
-        return total
-
-        # rightleave =  RightLeave.objects.filter(Person=obj.Person_id)
-        # if rightleave:
-        #     leave =  rightleave.aggregate(total=Sum('Earning'))
-        #     right  = Right.objects.filter(Person=obj.id,RightStatus=EnumRightStatus.Onaylandi,RightType= EnumRightTypes.Yillik)
-        #     number = 0
-        #     if  right:
-        #         for r in right:
-        #             number +=  r.RightNumber
-        #     total = leave['total'] - number
-        # else:
-        #     return 0
-        # return total
-    
-    def get_PersonRightDeverse(self,obj):
-        try:
-            result = PersonRightDeverse(obj.Person_id)
-            return result      
-        except:
-            return None
-        
-         
-    
-
-
-    # def get_PersonApprover2(self,obj):
-    #     if obj.Approver1 != None:
-    #         person = Person.objects.get(id = obj.Approver2)
-    #         serializer = PersonSerializer(person).data
-    #         return serializer
+    PersonRightSummary = serializers.SerializerMethodField()
 
     class Meta:
         model = Right
@@ -123,9 +47,45 @@ class RightWithApproverSerializer(serializers.ModelSerializer):
             'PersonApprover1',
             'HrHasField',
             'RightPicture',
-            'TotalRightBalance',
-            'PersonRightDeverse'
+            'PersonRightSummary'
         )
+
+    def apporover1_full_name(self,obj):
+        if obj.Approver1 != None:
+            try:
+                personel = Person.objects.get(id=obj.Approver1)
+                serializer = PersonSerializer(personel).data
+                return serializer['Name'] + ' ' + serializer['Surname']
+            except:
+                return None
+        return None
+
+    def person_full_name(self,obj):
+        try:
+            person = Person.objects.get(id=obj.Person.id)
+            serializer = PersonSerializer(person).data
+            return serializer['Name'] + ' ' +serializer['Surname']
+        except:
+            return None
+
+    def get_PersonApprover1(self,obj):
+        if obj.Approver1 != None:
+            try:
+                person = Person.objects.get(id = obj.Approver1)
+                serializer = PersonSerializer(person).data
+                return serializer
+            except:
+                return None
+
+    
+    def get_PersonRightSummary(self,obj):
+        try:
+            result = PersonRightSummary(obj.Person_id)
+            return result      
+        except:
+            return None
+
+
 
 
 class RightAllDetailsSerializer(serializers.ModelSerializer):

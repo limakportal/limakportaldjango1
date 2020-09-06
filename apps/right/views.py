@@ -29,7 +29,7 @@ from ..vocationdays.models import VocationDays
 
 from ..businessrules.serializer import OrganizationWithPersonTreeSerializer
 
-from .bussinessrules import TotalWorkedTime ,NextRightTime ,PersonDeserveRight ,NextRight ,PersonRightDeverse , GetRightBalance
+from .bussinessrules import   GetRightBalance , PersonRightSummary 
 
 
 
@@ -394,12 +394,12 @@ def GetPersonRightInfo(id):
            rightwaitingnumber = 0
 
         try:
-            personRightDeverse = PersonRightDeverse(person.id)
+            personRightSummary = PersonRightSummary(person.id)
         except :
-            personRightDeverse = None      
-        content = {'person_id' : person.id, 'name' : person.Name , 'surname': person.Surname,'totalleave' : totalleave, 'totalright': totalright, 'remainingleave' : remainingleave,
-                'nextyear' : nextyear, 'nextleave': nextleave, 'approvelwaiting' : approvelwaiting, 'organization_id' : organiaztion_id, 'detail' : detail, 
-                'RegisterNo' : registerno , 'JobStartDate': jobstartdate, 'FormerSeniority': formerseniority , 'PersonRightDeverse':personRightDeverse}
+            personRightSummary = None      
+        content = {'person_id' : person.id, 'name' : person.Name , 'surname': person.Surname, 
+                'organization_id' : organiaztion_id, 'detail' : detail, 
+                'RegisterNo' : registerno , 'JobStartDate': jobstartdate, 'FormerSeniority': formerseniority , 'PersonRightSummary':personRightSummary}
         return content
 
 @api_view(['GET'])
@@ -447,9 +447,9 @@ def TodayOnLeavePerson(request):
                     data['Title'] = ''
                     # finallyData.append(data)
                 try:
-                    data['PersonRightDeverse'] = PersonRightDeverse(person.id)
+                    data['PersonRightSummary'] = PersonRightSummary(person.id)
                 except :
-                    data['PersonRightDeverse'] = None
+                    data['PersonRightSummary'] = None
                 finallyData.append(data)              
                 
                 
@@ -536,18 +536,10 @@ def RightAllDetails(request):
     return Response(serializer.data)
 
 @api_view(['GET'])
-def RightDeverse(request,id):
+def RightSummary(request,id):
     try:
-        result = PersonRightDeverse(id)
+        result = PersonRightSummary(id)
     except :
         result = None
     return Response(result)
 
-# def PersonRightDeverse(personId):
-#     result = {}
-#     result['BalanceRigth'] = PersonDeserveRight(personId) - GetRightBalance(personId)
-#     result['TotalWorkedTime'] = TotalWorkedTime(personId)
-#     result['NextRightTime'] = NextRightTime(personId)
-#     result['PersonDeserveRight'] = PersonDeserveRight(personId)
-#     result['NextRight'] = NextRight(personId)
-#     return result

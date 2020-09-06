@@ -10,8 +10,9 @@ from .views import(
     GetRightStatus, 
     TodayOnLeavePerson, 
     RightAllDetails,
-    RightDeverse
+    RightSummary  
 )
+
 
 
 urlpatterns = [ 
@@ -25,6 +26,6 @@ urlpatterns = [
     path('getrightstatus/<int:status_id>', GetRightStatus),
     path('todayonleaveperson', TodayOnLeavePerson),
     path('rightalldetails', RightAllDetails),
-    path('rightdeverse/<int:id>', RightDeverse),
+    path('rightsummary/<int:id>', RightSummary),
   
 ]
