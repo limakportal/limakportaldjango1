@@ -101,10 +101,13 @@ class RightDetails(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 class RightWithApproverAPIView(APIView):
-    def get(self,request):
-        rights = Right.objects.all().order_by('id')
-        serializer = RightWithApproverSerializer(rights,many=True)
-        return Response(serializer.data)
+    def get(self,request,id):
+        rights = Right.objects.filter(Person=id).order_by('id')
+        if len(rights) > 0:
+            serializer = RightWithApproverSerializer(rights,many=True)
+            return Response(serializer.data)
+        else:
+            pass
 
 class RightDownloadApiView(APIView):
     def get(self,request,id):    
@@ -249,8 +252,8 @@ def RightDaysNumber(request):
         return Response('Kadro tanımı yapılmamıştır.',status=status.HTTP_404_NOT_FOUND)
         
     if righttypeid == EnumRightTypes.Yillik:
-        content = GetPersonRightInfo(personid)
-        contentleave = content['remainingleave']
+        content = PersonRightSummary(personid)
+        contentleave = content['BalanceRigth']
         contentleave = contentleave + 7 
         if number > contentleave:
             return Response('Yıllık izin bakiyeniz yetersiz. Tekrar kontrol ediniz.',status=status.HTTP_404_NOT_FOUND)
@@ -501,8 +504,8 @@ def RightController(data):
                 return sonucmessage
                 
             if righttypeid == EnumRightTypes.Yillik:
-                content = GetPersonRightInfo(personid)
-                contentleave = content['remainingleave']
+                content = PersonRightSummary(personid)
+                contentleave = content['BalanceRigth']
                 contentleave = contentleave + 7
                 if rightnumber > contentleave:
                     sonucmessage = "Yıllık izin bakiyeniz yetersiz. Tekrar kontrol ediniz."

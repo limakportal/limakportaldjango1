@@ -18,7 +18,7 @@ from .views import(
 urlpatterns = [ 
     path('rights', RightAPIView.as_view()),
     path('rights/<int:id>', RightDetails.as_view()),
-    path('rightsDesc', RightWithApproverAPIView.as_view()),
+    path('rightsDesc/<int:id>', RightWithApproverAPIView.as_view()),
     path('rightsDownload/<int:id>', RightDownloadApiView.as_view()),
     path('rightsBalance/<int:id>', RightBalance),
     path('righsDayNumber', RightDaysNumber),
