@@ -101,8 +101,17 @@ class RightDetails(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 class RightWithApproverAPIView(APIView):
+    def get(self,request):
+        rights = Right.objects.all().order_by('id')
+        if len(rights) > 0:
+            serializer = RightWithApproverSerializer(rights,many=True)
+            return Response(serializer.data)
+        else:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+class RightWithApproverDetail(APIView):
     def get(self,request,id):
-        rights = Right.objects.filter(Person=id).order_by('id')
+        rights = Right.objects.filter(Person_id = id)
         if len(rights) > 0:
             serializer = RightWithApproverSerializer(rights,many=True)
             return Response(serializer.data)
