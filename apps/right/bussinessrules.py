@@ -10,22 +10,53 @@ from ..rightleave.models import RightLeave
 from .models import Right
 
 
+
+
 def WorkedTotalDays(personId):
     try:
         personBusiness = PersonBusiness.objects.get(Person_id = personId)
         dToday = datetime.datetime.now()
         today =  datetime.date(dToday.year,dToday.month,dToday.day)
         getJobStartDate = datetime.date(personBusiness.JobStartDate.year,personBusiness.JobStartDate.month,personBusiness.JobStartDate.day)
-        dayDifference = (today - getJobStartDate).days + personBusiness.FormerSeniority
+
+        totalYear = 0
+        totalMounth = 0
+        totalDay = 0
+        if today.month > getJobStartDate.month or today.month == getJobStartDate.month:
+            totalYear = today.year - getJobStartDate.year
+            totalMounth = today.month - getJobStartDate.month
+            totalDay = abs(today.day - getJobStartDate.day)
+
+        else:
+            totalYear = today.year - getJobStartDate.year -1
+            totalMounth = today.month
+            totalDay = abs(today.day - getJobStartDate.day)
+        oldYear = (personBusiness.FormerSeniority // 360)
+        oldMounth = (personBusiness.FormerSeniority - (oldYear*360)) // 30
+        oldDay = personBusiness.FormerSeniority - ((oldYear*360) +  oldMounth*30)
+
+        totalDay = totalDay + oldDay 
+
+        if oldDay > 29:
+            totalMounth = totalMounth + 1
+            totalDay = totalDay + oldDay - 30
+
+        totalMounth = totalMounth + oldMounth
+
+        if oldMounth > 11:
+            totalYear = totalYear + 1
+            totalMounth = totalMounth + oldMounth - 12
+
+        totalYear = totalYear + oldYear
+        dayDifference = (totalYear *360 ) + (totalMounth *30) + (totalDay)    
         if dayDifference < 1:
             dayDifference = 0
     except:
         return 0
     return dayDifference
 
-def TotalDeservedRight(personId):
+def TotalDeservedRight(personId, daysDifference):
     try:
-        daysDifference = WorkedTotalDays(personId)
         workingYear = 0
         totalRigts = 0
         if daysDifference > 359:
@@ -40,9 +71,8 @@ def TotalDeservedRight(personId):
         return 0
     return totalRigts
 
-def NumberOfDaysSubjestToRight(personId):
+def NumberOfDaysSubjestToRight(personId,dayDifference):
     try:
-        dayDifference = WorkedTotalDays(personId)
         workedYear = 0
         if dayDifference > 359:
             workedYear = dayDifference // 360
@@ -63,9 +93,9 @@ def NumberOfDaysSubjestToRight(personId):
         return ''
     return totalWorkedTime
 
-def NextRighNumberOfDaysSubjestToRighttTime(personId):
+def NextRighNumberOfDaysSubjestToRighttTime(personId , dayDifference):
     try:
-        personWorkedTotalDays = WorkedTotalDays(personId)
+        personWorkedTotalDays = dayDifference
         personWorkedTotalYears = personWorkedTotalDays // 360
         nextRightDay = 360 - (personWorkedTotalDays - (personWorkedTotalYears * 360))
         nextRightDate = datetime.datetime.now() + timedelta(nextRightDay )
@@ -75,9 +105,9 @@ def NextRighNumberOfDaysSubjestToRighttTime(personId):
     return nextRight
 
 
-def RightToBeDeserved(personId):
+def RightToBeDeserved(personId,dayDifference):
     try:
-        daysDifference = WorkedTotalDays(personId)
+        daysDifference = dayDifference
         workingYear = 0
         right = 0
         if daysDifference > 359:
@@ -96,7 +126,9 @@ def RightToBeDeserved(personId):
 def PersonRightSummary(personId):
     result = {}
 
-    totalDeservedRight = TotalDeservedRight(personId)
+    dayDifference = WorkedTotalDays(personId)
+
+    totalDeservedRight = TotalDeservedRight(personId,dayDifference)
     totalApprovedRight = TotalApprovedRight(personId)
     totalAwatingApprovelRight = TotalAwatingApprovelRight(personId)
 
@@ -104,9 +136,9 @@ def PersonRightSummary(personId):
     result['TotalApprovedRight'] = totalApprovedRight
     result['TotalAwatingApprovelRight'] = totalAwatingApprovelRight
     result['BalanceRigth'] = totalDeservedRight - ( totalApprovedRight + totalAwatingApprovelRight )
-    result['NumberOfDaysSubjestToRight'] = NumberOfDaysSubjestToRight(personId)
-    result['NextRighNumberOfDaysSubjestToRighttTime'] = NextRighNumberOfDaysSubjestToRighttTime(personId)
-    result['RightToBeDeserved'] = RightToBeDeserved(personId)
+    result['NumberOfDaysSubjestToRight'] = NumberOfDaysSubjestToRight(personId,dayDifference)
+    result['NextRighNumberOfDaysSubjestToRighttTime'] = NextRighNumberOfDaysSubjestToRighttTime(personId,dayDifference)
+    result['RightToBeDeserved'] = RightToBeDeserved(personId,dayDifference)
 
     return result
 
