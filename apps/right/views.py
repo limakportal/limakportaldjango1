@@ -139,13 +139,15 @@ class RightDownloadApiView(APIView):
                 outputfile = "UcretsizResult.docx"
 
             doc = DocxTemplate(filename)
-            total = GetRightBalance(id)
+            personsummary = PersonRightSummary(person.id)
+            total = personsummary["BalanceRigth"]
 
             context = { 'Name' : person.Name , 'Surname' : person.Surname , 'No' : right.RightNumber , 'GetDate' : datetime.date.today(),
                          'SD' : right.StartDate.date() , 'EndDate' : right.EndDate.date(),
                          'AppName' : serializer.data['Name'], 'AppSurname' : serializer.data['Surname'],
                          'RD' : right.DateOfReturn.date(), 'Tel' : right.Telephone ,
-                         'Bak' : total , 'Kal' : total - right.RightNumber , 'JD' : personbusiness.JobStartDate.date() }
+                         'Bak' : total , 'Kal' : total - right.RightNumber , 'JD' : personbusiness.JobStartDate.date(), 'SCNO' : personbusiness.SGKRegisterNo,
+                         'KIDEM' : personsummary["NumberOfDaysSubjestToRight"] }
             doc.render(context)
             doc.save(outputfile)
 
