@@ -69,9 +69,9 @@ class RightDetails(APIView):
         right = self.get_object(id)
         serializer = RightSerializer(right, data=request.data)
         if serializer.is_valid():
-            result = RightController(serializer.validated_data)
-            if result != "":
-                return Response(result,status=status.HTTP_404_NOT_FOUND)
+            # result = RightController(serializer.validated_data)
+            # if result != "":
+            #     return Response(result,status=status.HTTP_404_NOT_FOUND)
             serializer.save()
             if  serializer.data['RightStatus'] == EnumRightStatus.Onaylandi:
                 person = Person.objects.get(id = serializer.data['Person'])
