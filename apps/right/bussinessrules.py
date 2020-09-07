@@ -30,12 +30,12 @@ def TotalDeservedRight(personId):
         totalRigts = 0
         if daysDifference > 359:
             workingYear = daysDifference//360
-        if workingYear < 5:
+        if workingYear <= 5:
             totalRigts = workingYear * 14
-        elif workingYear > 4 and workingYear < 15:
-            totalRigts = workingYear * 20
+        elif workingYear > 5 and workingYear <= 15:
+            totalRigts = 14 * 5 + (workingYear - 5) * 20
         else:
-            totalRigts = workingYear * 26
+            totalRigts = 14 * 5 + 10 * 20 + (workingYear - 15) * 26
     except:
         return 0
     return totalRigts

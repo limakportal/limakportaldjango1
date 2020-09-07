@@ -14,6 +14,7 @@ from ..organization.models import Organization
 from ..staff.models import Staff
 from ..person.models import Person
 import datetime
+import pytz
 from docxtpl import DocxTemplate
 from ..person.models import Person
 from .serializer import PersonSerializer
@@ -475,15 +476,22 @@ def RightController(data):
     try:
         sonucmessage = ""
         if data:
-            today = datetime.date.today()
-            startdate = data['StartDate'].date()
-            enddate = data['EndDate'].date()
+            today = datetime.datetime.utcnow()
+            today = today.replace(tzinfo=pytz.utc)
+            startdate = data['StartDate']
+            enddate = data['EndDate']
             personid = int(data['Person'].id)
             righttypeid = int(data['RightType'].id)
             rightnumber = data['RightNumber']
             personapprover = data['Approver1']
-            endPrior = datetime.datetime.min.date()
+            endPrior = datetime.datetime.min
+            endPrior = endPrior.replace(tzinfo=pytz.utc)
             currentrights = []
+
+            righttype = RightType.objects.get(id = righttypeid)
+            rights = Right.objects.filter(Q(Person = personid) & (Q(RightStatus = EnumRightStatus.Onaylandi) | Q(RightStatus = EnumRightStatus.OnayBekliyor)))  
+            for iright in rights:
+                currentrights.append([iright.StartDate,iright.EndDate])
 
             if personid == personapprover:
                 sonucmessage = "İzin giren personel ile yönetici aynı kişi olamaz."
@@ -493,10 +501,7 @@ def RightController(data):
                 sonucmessage = "İzin tarihlerini kontrol ediniz."
                 return sonucmessage
 
-            righttype = RightType.objects.get(id = righttypeid)
-            rights = Right.objects.filter(Q(Person = personid) & (Q(RightStatus = EnumRightStatus.Onaylandi) | Q(RightStatus = EnumRightStatus.OnayBekliyor)))  
-            for iright in rights:
-                currentrights.append([iright.StartDate.date(),iright.EndDate.date()])
+           
         
             currentrights.append([startdate,enddate])
             count = 0
