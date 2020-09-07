@@ -17,16 +17,17 @@ from ..title.models import Title
 
 @api_view(['GET'])
 def PersonApprover(request, id):
+        global newstaff
         try:
             staff = Staff.objects.get(Person = id)
             organization = Organization.objects.get(id = staff.Organization.id)
             if organization.CanApproveRight:
-                if organization.ManagerTitle == None:
+                if organization.ManagerTitle is None:
                     return Response('Kişinin bağlı olduğu birimde yönetici bulunmamaktadır.',status=status.HTTP_404_NOT_FOUND)
                 
                 ystaff = Staff.objects.get(Organization=organization.id,Title = organization.ManagerTitle.id)
                 
-                if ystaff == None:
+                if ystaff is None:
                     return Response('Kişinin bağlı olduğu birimde yönetici bulunmamaktadır.',status=status.HTTP_404_NOT_FOUND)
                 personel = Person.objects.get(id=ystaff.Person.id)
                 if personel.id == id:
@@ -47,7 +48,7 @@ def PersonApprover(request, id):
                 if neworganization.CanApproveRight:
                     newstaff = Staff.objects.get(Organization=neworganization.id,Title = neworganization.ManagerTitle.id)
                 
-                if newstaff == None:
+                if newstaff is None:
                     return Response('Kişinin bağlı olduğum birimde yönetici bulunmamaktadır.',status=status.HTTP_404_NOT_FOUND)
                 personel = Person.objects.get(id=newstaff.Person.id)
                 if personel.id == id:
@@ -72,7 +73,7 @@ def PersonApprover(request, id):
                 # return Response(data)
 
         except:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return Response("Kadro Bulunamadı",status=status.HTTP_404_NOT_FOUND)
 
 def GetPersonApprover(id):
             staff = Staff.objects.get(Person = id)
