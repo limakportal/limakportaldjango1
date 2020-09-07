@@ -100,13 +100,13 @@ def PersonRightSummary(personId):
     totalApprovedRight = TotalApprovedRight(personId)
     totalAwatingApprovelRight = TotalAwatingApprovelRight(personId)
 
-    result['TotalDeservedRight '] = totalDeservedRight
-    result['TotalApprovedRight  '] = totalApprovedRight
+    result['TotalDeservedRight'] = totalDeservedRight
+    result['TotalApprovedRight'] = totalApprovedRight
     result['TotalAwatingApprovelRight'] = totalAwatingApprovelRight
     result['BalanceRigth'] = totalDeservedRight - ( totalApprovedRight + totalAwatingApprovelRight )
     result['NumberOfDaysSubjestToRight'] = NumberOfDaysSubjestToRight(personId)
     result['NextRighNumberOfDaysSubjestToRighttTime'] = NextRighNumberOfDaysSubjestToRighttTime(personId)
-    result['RightToBeDeserved '] = RightToBeDeserved(personId)
+    result['RightToBeDeserved'] = RightToBeDeserved(personId)
 
     return result
 
