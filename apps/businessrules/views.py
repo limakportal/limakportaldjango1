@@ -131,7 +131,7 @@ def GetResponsibleIkPersonDetails(id):
                     except:
                         person = None
 
-        return PersonViewSerializer(persons, many=True).data
+        return PersonViewSerializer(persons.order_by("Name"), many=True).data
     except:
         return None
 
