@@ -39,7 +39,7 @@ class PersonWithPersonInformationAPIView(APIView):
                 return Response(GetResponsibleIkPersonDetails(p.id))
             elif IsManager(p.id):
                 persons = GetManagerPersonsDetailNoneSerializer(p.id)
-                serializer = PersonViewSerializer(persons.order_by("Name"), many=True)
+                serializer = PersonViewSerializer(persons, many=True)
                 return Response(serializer.data)
             else:
                 persons  =[]

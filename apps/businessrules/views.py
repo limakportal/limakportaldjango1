@@ -60,7 +60,7 @@ def GetPersonsByOrganizationId(organizationId, personArr):
 
         for o in altBirimler:
             GetPersonsByOrganizationId(o.id, personArr)
-        return personArr
+        return personArr.order_by("Name")
     except:
         return None
 
