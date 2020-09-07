@@ -224,6 +224,16 @@ def IsManager(personId):
 
 
 @api_view(['GET'])
+def ManagerPersons(request):
+    managerpersons = []
+    persons = Person.objects.all()
+    for person in persons:
+        if IsManager(person.id):
+            managerpersons.append(person)
+    return Response(PersonSerializer(managerpersons, many=True).data)
+                
+
+@api_view(['GET'])
 def AccountListDetails(request):
     accounts = Account.objects.all()
     serializers = AccountsDetailSerializer(accounts, many=True)
