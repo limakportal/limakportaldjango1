@@ -146,7 +146,7 @@ class RightDownloadApiView(APIView):
                          'SD' : right.StartDate.date() , 'EndDate' : right.EndDate.date(),
                          'AppName' : serializer.data['Name'], 'AppSurname' : serializer.data['Surname'],
                          'RD' : right.DateOfReturn.date(), 'Tel' : right.Telephone ,
-                         'Bak' : total , 'Kal' : total - right.RightNumber , 'JD' : personbusiness.JobStartDate.date(), 'SCNO' : personbusiness.SGKRegisterNo,
+                         'Bak' : total , 'Kal' : total - right.RightNumber , 'JD' : personbusiness.JobStartDate.date(), 'SCNO' : personbusiness.RegisterNo,
                          'KIDEM' : personsummary["NumberOfDaysSubjestToRight"] }
             doc.render(context)
             doc.save(outputfile)
