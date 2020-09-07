@@ -137,7 +137,7 @@ def GetResponsibleIkPersonDetails(id):
 
 
 def GetResponsibleAdminPersonDetails(id):
-    persons = Person.objects.all()
+    persons = Person.objects.all().order_by("Name")
     serializer = PersonViewSerializer(persons, many=True)
     return serializer.data
 
