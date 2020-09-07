@@ -55,21 +55,26 @@ def WorkedTotalDays(personId):
         return 0
     return dayDifference
 
-def TotalDeservedRight(personId, daysDifference):
+def TotalDeservedRight(personId):
     try:
-        workingYear = 0
-        totalRigts = 0
-        if daysDifference > 359:
-            workingYear = daysDifference//360
-        if workingYear <= 5:
-            totalRigts = workingYear * 14
-        elif workingYear > 5 and workingYear <= 15:
-            totalRigts = 14 * 5 + (workingYear - 5) * 20
-        else:
-            totalRigts = 14 * 5 + 10 * 20 + (workingYear - 15) * 26
+        totalleave = 0
+        rightleave = RightLeave.objects.filter(Person_id = personId)
+        if len(rightleave) > 0:
+            totalleave = rightleave.aggregate(total=Sum('Earning'))['total']
+        
+        # workingYear = 0
+        # totalRigts = 0
+        # if daysDifference > 359:
+        #     workingYear = daysDifference//360
+        # if workingYear <= 5:
+        #     totalRigts = workingYear * 14
+        # elif workingYear > 5 and workingYear <= 15:
+        #     totalRigts = 14 * 5 + (workingYear - 5) * 20
+        # else:
+        #     totalRigts = 14 * 5 + 10 * 20 + (workingYear - 15) * 26
     except:
         return 0
-    return totalRigts
+    return totalleave
 
 def NumberOfDaysSubjestToRight(personId,dayDifference):
     try:
@@ -128,7 +133,7 @@ def PersonRightSummary(personId):
 
     dayDifference = WorkedTotalDays(personId)
 
-    totalDeservedRight = TotalDeservedRight(personId,dayDifference)
+    totalDeservedRight = TotalDeservedRight(personId)
     totalApprovedRight = TotalApprovedRight(personId)
     totalAwatingApprovelRight = TotalAwatingApprovelRight(personId)
 
