@@ -60,7 +60,7 @@ def GetPersonsByOrganizationId(organizationId, personArr):
 
         for o in altBirimler:
             GetPersonsByOrganizationId(o.id, personArr)
-        return personArr.order_by("Name")
+        return personArr
     except:
         return None
 
@@ -131,7 +131,7 @@ def GetResponsibleIkPersonDetails(id):
                     except:
                         person = None
 
-        return PersonViewSerializer(persons.order_by("Name"), many=True).data
+        return PersonViewSerializer(persons, many=True).data
     except:
         return None
 
