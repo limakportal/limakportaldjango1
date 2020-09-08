@@ -40,7 +40,7 @@ class PersonWithPersonInformationAPIView(APIView):
             if HasPermission(p.id, 'ADMIN'):
                 return Response(GetResponsibleAdminPersonDetails(p.id))
             elif HasPermission(p.id, 'IZN_IK'):
-                return Response(GetResponsibleIkPersonDetails(p.id))
+                return Response(GetResponsibleAdminPersonDetails(p.id))
             elif IsManager(p.id):
                 persons = GetManagerPersonsDetailNoneSerializer(p.id)
                 serializer = PersonViewSerializer(persons, many=True)
