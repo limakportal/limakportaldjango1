@@ -22,7 +22,7 @@ class VocationAPIView(APIView):
         if serializer.is_valid():
             days = VocationDays.objects.filter(DateDay__date = serializer.validated_data['DateDay'].date())
             if len(days) > 0:
-                return Response("Girilen tarihde tatil günü mevcuttur", status=status.HTTP_400_BAD_REQUEST)
+                return Response("Girilen tarihde tatil günü mevcuttur", status=status.HTTP_404_NOT_FOUND)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -47,7 +47,7 @@ class VocationDetails(APIView):
             if serializer.is_valid():
                 days = VocationDays.objects.filter(~Q(id = id) & Q(DateDay__date = serializer.validated_data['DateDay'].date()))
                 if len(days) > 0:
-                   return Response("Girilen tarihde tatil günü mevcuttur", status=status.HTTP_400_BAD_REQUEST)
+                   return Response("Girilen tarihde tatil günü mevcuttur", status=status.HTTP_404_NOT_FOUND)
                 serializer.save()
                 return Response(serializer.data)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
