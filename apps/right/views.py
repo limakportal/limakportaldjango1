@@ -161,6 +161,41 @@ class RightDownloadApiView(APIView):
         except Right.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
+
+@api_view(['PUT'])
+def ApproveRight(request,id):
+    try:
+        right = Right.objects.get(id = id)
+        getrequest = RightSerializer(right).data
+        if getrequest['RightStatus'] == int(EnumRightStatus.Iptal):
+            return Response("İptal durumunda olan izin onaylanamaz.",status=status.HTTP_404_NOT_FOUND)
+        serializer = RightSerializer(right,data = getrequest)
+        serializer.initial_data['RightStatus'] = int(EnumRightStatus.Onaylandi)
+        if serializer.is_valid():
+            serializer.save()               
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    except:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+  
+@api_view(['PUT'])
+def DenyRight(request,id):
+    try:
+        right = Right.objects.get(id = id)
+        getrequest = RightSerializer(right).data
+        if getrequest['RightStatus'] == int(EnumRightStatus.Iptal):
+            return Response("İptal durumunda olan izin reddedilemez.",status=status.HTTP_404_NOT_FOUND)
+        serializer = RightSerializer(right,data = getrequest)
+        serializer.initial_data['RightStatus'] = int(EnumRightStatus.Reddedildi)
+        serializer.initial_data['DenyExplanation'] = request.data['DenyExplanation']
+        if serializer.is_valid():
+            serializer.save()               
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        Response(str(e),status=status.HTTP_404_NOT_FOUND)
+
+
 @api_view(['GET'])
 def RightBalance(request,id):
     try:
@@ -184,7 +219,7 @@ def RightBalance(request,id):
 #                 return 0
 #             return total
 #         except RightLeave.DoesNotExist:
-#             return 0
+#             return 0      
 
 @api_view(['POST'])
 def RightDaysNumber(request):

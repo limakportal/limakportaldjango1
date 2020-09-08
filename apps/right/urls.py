@@ -11,7 +11,9 @@ from .views import(
     TodayOnLeavePerson, 
     RightAllDetails,
     RightSummary,
-    RightWithApproverDetail  
+    RightWithApproverDetail,
+    ApproveRight,
+    DenyRight  
 )
 
 
@@ -29,5 +31,7 @@ urlpatterns = [
     path('todayonleaveperson', TodayOnLeavePerson),
     path('rightalldetails', RightAllDetails),
     path('rightsummary/<int:id>', RightSummary),
+    path('approveright/<int:id>', ApproveRight),
+    path('denyright/<int:id>', DenyRight),
   
 ]
