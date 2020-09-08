@@ -111,7 +111,8 @@ class PersonViewDetailSerializer(serializers.ModelSerializer):
             'PersonIdentity',
             'PersonBusiness',
             'PersonEducation',
-            'PersonFamily'
+            'PersonFamily',
+            'Staff'
         )
 
     # Id = serializers.CharField(source='id')
@@ -122,6 +123,7 @@ class PersonViewDetailSerializer(serializers.ModelSerializer):
     PersonBusiness = serializers.SerializerMethodField()
     PersonEducation = serializers.SerializerMethodField()
     PersonFamily = serializers.SerializerMethodField()
+    Staff = serializers.SerializerMethodField()
 
     def get_Person(self,obj):
         try:
@@ -156,6 +158,14 @@ class PersonViewDetailSerializer(serializers.ModelSerializer):
         personFamilys = PersonFamily.objects.filter(Person = obj.id)
         serializer = PersonFamilySerializer(personFamilys , many = True)
         return serializer.data
+
+    def get_Staff(self,obj):
+        try:
+            staff = Staff.objects.get(Person = obj.id)
+            serializer = StafForPersonSerializer(staff)
+            return serializer.data
+        except:
+            return None
 
 
 

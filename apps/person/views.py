@@ -19,6 +19,10 @@ from apps.personfamily.models import PersonFamily
 from apps.personfamily.serializer import PersonFamilySerializer
 from ..businessrules.views import  HasPermission,GetResponsibleAdminPersonDetails,GetResponsibleIkPersonDetails,GetManagerPersonsDetail,IsManager,GetManagerPersonsDetailNoneSerializer
 
+from ..staff.serializer import StaffSerializer
+
+from ..staff.models import Staff
+
 import io
 import json
 
@@ -78,6 +82,13 @@ class PersonWithPersonInformationAPIView(APIView):
                 else:
                     transaction.savepoint_rollback(transactionSaveId)
 
+            staffSerializer = StaffSerializer(data = request.data['Staff'])
+            if len(request.data['Staff']) > 0:
+                staffSerializer.initial_data['Person'] = person.id
+                if staffSerializer.is_valid():
+                    staffSerializer.save()
+                else:
+                    transaction.savepoint_rollback(transactionSaveId)
 
             if len(request.data['PersonEducation']) > 0:
                 for personEducation in request.data['PersonEducation']:
@@ -179,6 +190,29 @@ class PersonWithPersonInformationDetails(APIView):
                             transaction.savepoint_rollback(transactionSaveId)
                             return Response(personBusinessAddSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+            getStaffData = {}
+            getStaffData = request.data['Staff']
+            if len(getStaffData) > 0:
+                if 'id' in json.loads(json.dumps(getStaffData)):
+                    staffObj = Staff.objects.get(id = getStaffData['id'])
+                    staffEditSerializer = StaffSerializer(staffObj , data = getStaffData)
+                    if staffEditSerializer.is_valid():
+                        staffEditSerializer.save()
+                    else:
+                        transaction.savepoint_rollback(transactionSaveId)
+                        return Response(staffEditSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    staff = Staff.objects.filter(Person = id)
+                    if len(staff) == 0:
+                        staffAddSerializer = StaffSerializer(data = getStaffData)
+                        staffAddSerializer.initial_data['Person'] = id
+                        if staffAddSerializer.is_valid():
+                            staffAddSerializer.save()
+                        else:
+                            transaction.savepoint_rollback(transactionSaveId)
+                            return Response(staffAddSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
             getPersonEducationData = {}
             getPersonEducationData = request.data['PersonEducation']
             if len(getPersonEducationData) > 0:
@@ -220,6 +254,8 @@ class PersonWithPersonInformationDetails(APIView):
                         else:
                             transaction.savepoint_rollback(transaction)
                             return Response(personFamilyAddSerializer.error_messages , status = status.HTTP_400_BAD_REQUEST)
+
+            
 
 
             try:
