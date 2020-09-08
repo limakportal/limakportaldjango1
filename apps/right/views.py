@@ -111,7 +111,7 @@ class RightWithApproverAPIView(APIView):
             serializer = RightWithApproverSerializer(rights,many=True)
             return Response(serializer.data)
         else:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return Response([])
 
 class RightWithApproverDetail(APIView):
     def get(self,request,id):
