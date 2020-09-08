@@ -6,6 +6,7 @@ from rest_framework import status
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from rest_framework.decorators import api_view
+from django.db.models import Q
 import datetime
 
 
@@ -19,6 +20,9 @@ class VocationAPIView(APIView):
     def post(self,request):
         serializer = VocationDaysSerializer(data = request.data)
         if serializer.is_valid():
+            days = VocationDays.objects.filter(DateDay__date = serializer.validated_data['DateDay'].date())
+            if len(days) > 0:
+                return Response("Girilen tarihde tatil günü mevcuttur", status=status.HTTP_201_CREATED)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -41,6 +45,9 @@ class VocationDetails(APIView):
             vocationDays = self.get_object(id)
             serializer = VocationDaysSerializer(vocationDays, data=request.data)
             if serializer.is_valid():
+                days = VocationDays.objects.filter(~Q(id = id) & Q(DateDay__date = serializer.validated_data['DateDay'].date()))
+                if len(days) > 0:
+                   return Response("Girilen tarihde tatil günü mevcuttur", status=status.HTTP_201_CREATED)
                 serializer.save()
                 return Response(serializer.data)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
