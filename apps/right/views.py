@@ -43,7 +43,7 @@ class RightAPIView(APIView):
     def post(self,request):
         serializer = RightSerializer(data = request.data)
         if serializer.is_valid():
-            result = RightController(serializer.validated_data)
+            result = RightController(serializer.validated_data, 0)
             if result != "":
                 return Response(result,status=status.HTTP_404_NOT_FOUND)
             serializer.save()               
@@ -69,9 +69,9 @@ class RightDetails(APIView):
         right = self.get_object(id)
         serializer = RightSerializer(right, data=request.data)
         if serializer.is_valid():
-            # result = RightController(serializer.validated_data)
-            # if result != "":
-            #     return Response(result,status=status.HTTP_404_NOT_FOUND)
+            result = RightController(serializer.validated_data, id)
+            if result != "":
+                return Response(result,status=status.HTTP_404_NOT_FOUND)
             serializer.save()
             if  serializer.data['RightStatus'] == EnumRightStatus.Onaylandi:
                 person = Person.objects.get(id = serializer.data['Person'])
@@ -477,7 +477,7 @@ def TodayOnLeavePerson(request):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
 
-def RightController(data):
+def RightController(data,rightid):
     try:
         sonucmessage = ""
         if data:
@@ -494,7 +494,7 @@ def RightController(data):
             currentrights = []
 
             righttype = RightType.objects.get(id = righttypeid)
-            rights = Right.objects.filter(Q(Person = personid) & (Q(RightStatus = EnumRightStatus.Onaylandi) | Q(RightStatus = EnumRightStatus.OnayBekliyor)))  
+            rights = Right.objects.filter(Q(Person = personid) & ~Q(id = rightid) & (Q(RightStatus = EnumRightStatus.Onaylandi) | Q(RightStatus = EnumRightStatus.OnayBekliyor)))  
             for iright in rights:
                 currentrights.append([iright.StartDate,iright.EndDate])
 
@@ -537,8 +537,8 @@ def RightController(data):
             
             
         return sonucmessage
-    except:
-        Response("",status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        Response(str(e),status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['GET'])
