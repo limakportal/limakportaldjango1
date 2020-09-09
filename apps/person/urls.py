@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import PersonWithPersonInformationAPIView , PersonWithPersonInformationDetails , PersonViewSet
-from .businesrules import PersonApprover, bornTodayPerson, bornMonthPerson
+from .businesrules import PersonApprover, bornTodayPerson, bornMonthPerson,testSql
 
 from rest_framework import routers
 
@@ -15,6 +15,8 @@ urlpatterns = [
     path('personapprover/<int:id>', PersonApprover),
     path('borntodayperson', bornTodayPerson),
     path('bornmonthperson', bornMonthPerson),
+    path('testSql', testSql),
+
 ]
 
 urlpatterns += router.urls
