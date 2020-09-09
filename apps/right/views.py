@@ -23,7 +23,7 @@ from ..businessrules.views import mail_yolla
 from ..businessrules.views import GetResponsibleIkPersons , IsManager
 from ..person.businesrules import GetPersonApprover
 from ..personbusiness.models import PersonBusiness
-from ..businessrules.views import GetResponsiblePersonDetails, HasPermission,GetManagerPersonsDetail,GetManagerOrganizationsDetailNoneSerializer
+from ..businessrules.views import GetResponsiblePersonDetails, HasPermission,GetManagerPersonsDetail,GetManagerOrganizationsDetailNoneSerializer,GetPersonsByOrganizationId
 from ..title.models import Title
 from django.db.models import Q
 from ..vocationdays.models import VocationDays
@@ -204,23 +204,7 @@ def RightBalance(request,id):
         return Response({'total' : total})
     except RightLeave.DoesNotExist:
         return Response('Kişiye ait izin hakedişi bulunmamaktadır.',status=status.HTTP_404_NOT_FOUND)
-
-# def GetRightBalance(id):
-#         try:
-#             rightleave =  RightLeave.objects.filter(Person=id)
-#             if rightleave:
-#                 leave =  rightleave.aggregate(total=Sum('Earning'))
-#                 right  = Right.objects.filter(Person=id,RightStatus=EnumRightStatus.Onaylandi,RightType= EnumRightTypes.Yillik)
-#                 number = 0
-#                 if  right:
-#                     for r in right:
-#                       number +=  r.RightNumber
-#                 total = leave['total'] - number
-#             else:
-#                 return 0
-#             return total
-#         except RightLeave.DoesNotExist:
-#             return 0      
+  
 
 @api_view(['POST'])
 def RightDaysNumber(request):
@@ -383,6 +367,33 @@ def PersonRightInfo(request,id):
                     pass
 
             return Response(content)
+
+        result = GetPersonRightInfo(id)
+        content.append(result)
+        x,responsePersons,y = GetResponsiblePersonDetails(id)
+        if responsePersons != None:
+            for person in responsePersons:
+                result = GetPersonRightInfo(person["Person"]["id"])
+                content.append(result)
+        return Response(content)
+
+@api_view(['GET'])
+def PersonRightInfoPerson(request,id):
+        content = []
+        persons = []
+        if IsManager(id):
+            persons = GetManagerPersonsDetail(id)
+            return Response(content)
+        else:
+            staff = Staff.objects.get(Person_id = id)
+            persons = GetPersonsByOrganizationId(staff.Organization_id,persons)
+
+        for p in persons:
+                try:
+                    result = GetPersonRightInfo(p["id"])
+                    content.append(result)
+                except :
+                    pass
 
         result = GetPersonRightInfo(id)
         content.append(result)

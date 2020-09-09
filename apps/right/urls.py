@@ -14,7 +14,8 @@ from .views import(
     RightWithApproverDetail,
     ApproveRight,
     DenyRight,
-    TodayOnLeavePersonByPerson
+    TodayOnLeavePersonByPerson,
+    PersonRightInfoPerson
 )
 
 
@@ -28,6 +29,7 @@ urlpatterns = [
     path('rightsBalance/<int:id>', RightBalance),
     path('righsDayNumber', RightDaysNumber),
     path('personRightInfo/<int:id>', PersonRightInfo),
+    path('personRightInfoByPerson/<int:id>', PersonRightInfoPerson),
     path('getrightstatus/<int:status_id>', GetRightStatus),
     path('todayonleaveperson', TodayOnLeavePerson),
     path('todayonleaveperson/<int:id>', TodayOnLeavePersonByPerson),
