@@ -148,7 +148,7 @@ def PersonRightSummary(personId):
     return result
 
 def TotalApprovedRight(personId):
-    right  = Right.objects.filter(Person=personId,RightStatus=EnumRightStatus.Onaylandi,RightType= EnumRightTypes.Yillik)
+    right  = Right.objects.filter(Person=personId,RightStatus=EnumRightStatus.Onaylandi,RightType= EnumRightTypes.Yıllık)
     number = 0
     if  right:
         for r in right:
@@ -156,7 +156,7 @@ def TotalApprovedRight(personId):
     return number
 
 def TotalAwatingApprovelRight(personId):
-    right  = Right.objects.filter(Person=personId,RightStatus=EnumRightStatus.OnayBekliyor,RightType= EnumRightTypes.Yillik)
+    right  = Right.objects.filter(Person=personId,RightStatus=EnumRightStatus.OnayBekliyor,RightType= EnumRightTypes.Yıllık)
     number = 0
     if  right:
         for r in right:
@@ -169,7 +169,7 @@ def GetRightBalance(id):
             rightleave =  RightLeave.objects.filter(Person=id)
             if rightleave:
                 leave =  rightleave.aggregate(total=Sum('Earning'))
-                right  = Right.objects.filter(Person=id,RightStatus=EnumRightStatus.Onaylandi,RightType= EnumRightTypes.Yillik)
+                right  = Right.objects.filter(Person=id,RightStatus=EnumRightStatus.Onaylandi,RightType= EnumRightTypes.Yıllık)
                 number = 0
                 if  right:
                     for r in right:

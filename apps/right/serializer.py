@@ -110,7 +110,7 @@ class RightAllDetailsSerializer(serializers.ModelSerializer):
         rightleave =  RightLeave.objects.filter(Person=obj.id)
         if rightleave:
             leave =  rightleave.aggregate(total=Sum('Earning'))
-            right  = Right.objects.filter(Person=obj.id,RightStatus=EnumRightStatus.Onaylandi,RightType= EnumRightTypes.Yillik)
+            right  = Right.objects.filter(Person=obj.id,RightStatus=EnumRightStatus.Onaylandi,RightType= EnumRightTypes.Yıllık)
             number = 0
             if  right:
                 for r in right:
@@ -148,7 +148,7 @@ class RightAllDetailsSerializer2(serializers.ModelSerializer):
         rightleave =  RightLeave.objects.filter(Person=obj.Person_id)
         if rightleave:
             leave =  rightleave.aggregate(total=Sum('Earning'))
-            right  = Right.objects.filter(Person=obj.id,RightStatus=EnumRightStatus.Onaylandi,RightType= EnumRightTypes.Yillik)
+            right  = Right.objects.filter(Person=obj.id,RightStatus=EnumRightStatus.Onaylandi,RightType= EnumRightTypes.Yıllık)
             number = 0
             if  right:
                 for r in right:
