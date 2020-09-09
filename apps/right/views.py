@@ -383,7 +383,6 @@ def PersonRightInfoPerson(request,id):
         persons = []
         if IsManager(id):
             persons = GetManagerPersonsDetail(id)
-            return Response(content)
         else:
             staff = Staff.objects.get(Person_id = id)
             persons = GetPersonsByOrganizationId(staff.Organization_id,persons)
