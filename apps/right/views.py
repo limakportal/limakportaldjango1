@@ -545,6 +545,8 @@ def TodayOnLeavePersonByPerson(request,id):
                 data['RightType'] = EnumRightTypes(row[13]).name
                 data['Organization'] = row[17]
                 data['Title'] = row[18]
+                data['Manager'] = row[19]
+                data['DateOfReturn'] = row[5]
                 try:
                     data['PersonRightSummary'] = PersonRightSummary(id)
                 except :
@@ -650,14 +652,18 @@ def TodayOnLeaveByOrganizatinID(organizationID):
     try:
         with connection.cursor() as cursor:
             query = """
-            select p."Name",p."Surname",p."Email", r.*, o."Name", t."Name"
+            select p."Name",p."Surname",p."Email", r.*, o."Name", t."Name",
+            concat(pm."Name" ,' ',pm."Surname") as Manager
             from "Right" r
             inner join "Person" p on p.id = r."Person_id"
             inner join "Staff" s on p.id = s."Person_id"
             inner join "Organization" o on o.id = s."Organization_id"
             inner join "Title" t on t.id = s."Title_id"
+            inner  join "Staff" sm on sm."Title_id" = "ManagerTitle_id" and sm."Organization_id" = s."Organization_id"
+            inner  join "Person" pm on pm.id = sm."Person_id"
             where s."Organization_id" in (""" + organizationID + """) AND date_part('MONTH', now()) = date_part('MONTH', r."StartDate")
             AND date_part('YEAR', now()) = date_part('YEAR', r."StartDate") AND date_part('DAY', now()) = date_part('DAY', r."StartDate");
+            
             """
             cursor.execute(query)
             row = cursor.fetchall()
