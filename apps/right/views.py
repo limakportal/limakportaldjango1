@@ -469,23 +469,57 @@ def GetRightStatus(request,status_id):
         except:
            return Response(status=status.HTTP_404_NOT_FOUND)
 
+@api_view(['GET'])
+def TodayOnLeavePerson(request):
+        try:
+            today = datetime.date.today()       
+            rights = Right.objects.filter(StartDate__day = today.day, StartDate__month = today.month, StartDate__year = today.year)
+        
+            persons = []
+        
+            finallyData = []
+            for right in rights:
+                data = {}
+                person = Person.objects.get(id = right.Person_id)
+                data['Name'] = person.Name 
+                data['Surname'] = person.Surname
+                data['Email'] = person.Email
+                data['StartDate'] = right.StartDate.date()
+                data['EndDate'] = right.EndDate.date()
+                data['RightNumber'] = right.RightNumber
+                data['RightType'] = EnumRightTypes(right.RightType_id).name
+                try:
+                    staff = Staff.objects.get(Person=int(person.id))
+                    organization = Organization.objects.get(id = staff.Organization_id)
+                    title = Title.objects.get(id = staff.Title_id)
+                    data['Organization'] = organization.Name
+                    data['Title'] = title.Name
+                    # finallyData.append(data)
+                except:
+                    data['Organization'] = ''
+                    data['Title'] = ''
+                    # finallyData.append(data)
+                try:
+                    data['PersonRightSummary'] = PersonRightSummary(person.id)
+                except :
+                    data['PersonRightSummary'] = None
+                finallyData.append(data)              
+                
+                
+                 
+            return Response(finallyData)
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
 @api_view(['GET'])
-def TodayOnLeavePerson(request,id):
+def TodayOnLeavePersonByPerson(request,id):
         try:
             today = datetime.date.today()
-            if HasPermission(id,'IZIN_IK'):      
-                organizationarr = Organization.objects.all()
-                liste = []
-                for o in organizationarr:
-                    liste.append(str(o.id))
-                    deger = ",".join(liste)
-            else:
-                organizationarr = GetManagerOrganizationsDetailNoneSerializer(id)
-                liste = []
-                for o in organizationarr:
-                    liste.append(str(o.id))
-                    deger = ",".join(liste)
+            organizationarr = GetManagerOrganizationsDetailNoneSerializer(id)
+            liste = []
+            for o in organizationarr:
+                liste.append(str(o.id))
+                deger = ",".join(liste)
             rows = TodayOnLeaveByOrganizatinID(deger)
             persons = []
         
