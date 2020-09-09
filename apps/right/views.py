@@ -132,7 +132,7 @@ class RightDownloadApiView(APIView):
             personbusiness = PersonBusiness.objects.get(Person=right.Person.id)
             serializer = GetPersonApprover(person.id)
 
-            if  righttype.RightMainType.id == EnumRightTypes.Yillik:
+            if  righttype.RightMainType.id == EnumRightTypes.Yıllık:
                 filename = 'Yillik_izin_Formu.docx'
                 outputfile = "YillikResult.docx"
             if  righttype.RightMainType.id == EnumRightTypes.Mazeret:
@@ -286,7 +286,7 @@ def RightDaysNumber(request):
     else:
         return Response('Kadro tanımı yapılmamıştır.',status=status.HTTP_404_NOT_FOUND)
         
-    if righttypeid == EnumRightTypes.Yillik:
+    if righttypeid == EnumRightTypes.Yıllık:
         content = PersonRightSummary(personid)
         contentleave = content['BalanceRigth']
         contentleave = contentleave + 7 
@@ -410,7 +410,7 @@ def GetPersonRightInfo(id):
         if rightleave:
             totalleave = rightleave.aggregate(total=Sum('Earning'))['total']
         
-        rightapprove = Right.objects.filter(Person=id,RightStatus=EnumRightStatus.Onaylandi,RightType = EnumRightTypes.Yillik)
+        rightapprove = Right.objects.filter(Person=id,RightStatus=EnumRightStatus.Onaylandi,RightType = EnumRightTypes.Yıllık)
         if rightapprove:
             for r in rightapprove:
               totalright += r.RightNumber  
@@ -605,7 +605,7 @@ def RightController(data,rightid):
                 sonucmessage = "Seçilen tarihler arası izin bulunmaktadır."
                 return sonucmessage
                 
-            if righttypeid == EnumRightTypes.Yillik:
+            if righttypeid == EnumRightTypes.Yıllık:
                 content = PersonRightSummary(personid)
                 contentleave = content['BalanceRigth']
                 contentleave = contentleave + 7

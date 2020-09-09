@@ -1,9 +1,9 @@
 from enum import IntEnum
 
 class EnumRightTypes(IntEnum):
-      Yillik=1
+      Yıllık=1
       Mazeret=2
-      Ucretsiz=3
+      Ücretsiz=3
 
 class EnumRightStatus(IntEnum):
       OnayBekliyor=1
