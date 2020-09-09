@@ -205,18 +205,3 @@ def bornMonthPerson(request):
         return Response(finallyData)
     except:
         return Response(status=status.HTTP_404_NOT_FOUND)
-
-from django.db import connection
-@api_view(['GET'])
-def testSql(request):
-        with connection.cursor() as cursor:
-            query = """
-            select p."Name", p."Surname", r.*
-            from "Person" p
-            inner join "Staff" s on p.id = s."Person_id"
-            inner join "Right" r on p.id = s."Person_id"
-            where s."Organization_id" in (3, 5, 8);
-            """
-            cursor.execute(query)
-            row = cursor.fetchall()
-            all_count, yes_count = row

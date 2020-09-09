@@ -64,6 +64,20 @@ def GetPersonsByOrganizationId(organizationId, personArr):
     except:
         return None
 
+def GetOrganizationByID(organizationId, organizationArr):
+    try:
+        try:
+            organization = Organization.objects.get(id = organizationId)
+            organizationArr.append(organization)
+        except:
+            pass
+        altBirimler = Organization.objects.filter(UpperOrganization=organizationId)
+        for o in altBirimler:
+            GetOrganizationByID(o.id, organizationArr)
+        return organizationArr
+    except:
+        return None
+
 def GetManagerPersonsDetailNoneSerializer(personId):
     try:
         staff = Staff.objects.get(Person_id=personId)
@@ -72,6 +86,13 @@ def GetManagerPersonsDetailNoneSerializer(personId):
     except:
         return None
 
+def GetManagerOrganizationsDetailNoneSerializer(personId):
+    try:
+        staff = Staff.objects.get(Person_id=personId)
+        organizationArr = []
+        return GetOrganizationByID(staff.Organization_id, organizationArr)
+    except:
+        return None
 
 def GetManagerPersonsDetail(personId):
     try:

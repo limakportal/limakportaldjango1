@@ -23,14 +23,15 @@ from ..businessrules.views import mail_yolla
 from ..businessrules.views import GetResponsibleIkPersons , IsManager
 from ..person.businesrules import GetPersonApprover
 from ..personbusiness.models import PersonBusiness
-from ..businessrules.views import GetResponsiblePersonDetails, HasPermission,GetManagerPersonsDetail
+from ..businessrules.views import GetResponsiblePersonDetails, HasPermission,GetManagerPersonsDetail,GetManagerOrganizationsDetailNoneSerializer
 from ..title.models import Title
 from django.db.models import Q
 from ..vocationdays.models import VocationDays
 
 from ..businessrules.serializer import OrganizationWithPersonTreeSerializer
 
-from .bussinessrules import   GetRightBalance , PersonRightSummary 
+from .bussinessrules import   GetRightBalance , PersonRightSummary
+from django.db import connection
 
 
 
@@ -470,37 +471,38 @@ def GetRightStatus(request,status_id):
 
 
 @api_view(['GET'])
-def TodayOnLeavePerson(request):
+def TodayOnLeavePerson(request,id):
         try:
-            today = datetime.date.today()       
-            rights = Right.objects.filter(StartDate__day = today.day, StartDate__month = today.month, StartDate__year = today.year)
-        
+            today = datetime.date.today()
+            if HasPermission(id,'IZIN_IK'):      
+                organizationarr = Organization.objects.all()
+                liste = []
+                for o in organizationarr:
+                    liste.append(str(o.id))
+                    deger = ",".join(liste)
+            else:
+                organizationarr = GetManagerOrganizationsDetailNoneSerializer(id)
+                liste = []
+                for o in organizationarr:
+                    liste.append(str(o.id))
+                    deger = ",".join(liste)
+            rows = TodayOnLeaveByOrganizatinID(deger)
             persons = []
         
             finallyData = []
-            for right in rights:
+            for row in rows:
                 data = {}
-                person = Person.objects.get(id = right.Person_id)
-                data['Name'] = person.Name 
-                data['Surname'] = person.Surname
-                data['Email'] = person.Email
-                data['StartDate'] = right.StartDate.date()
-                data['EndDate'] = right.EndDate.date()
-                data['RightNumber'] = right.RightNumber
-                data['RightType'] = EnumRightTypes(right.RightType_id).name
+                data['Name'] = row[0] 
+                data['Surname'] = row[1]
+                data['Email'] = row[2]
+                data['StartDate'] = row[12].date()
+                data['EndDate'] = row[4].date()
+                data['RightNumber'] = row[8]
+                data['RightType'] = EnumRightTypes(row[13]).name
+                data['Organization'] = row[17]
+                data['Title'] = row[18]
                 try:
-                    staff = Staff.objects.get(Person=int(person.id))
-                    organization = Organization.objects.get(id = staff.Organization_id)
-                    title = Title.objects.get(id = staff.Title_id)
-                    data['Organization'] = organization.Name
-                    data['Title'] = title.Name
-                    # finallyData.append(data)
-                except:
-                    data['Organization'] = ''
-                    data['Title'] = ''
-                    # finallyData.append(data)
-                try:
-                    data['PersonRightSummary'] = PersonRightSummary(person.id)
+                    data['PersonRightSummary'] = PersonRightSummary(id)
                 except :
                     data['PersonRightSummary'] = None
                 finallyData.append(data)              
@@ -600,3 +602,21 @@ def RightSummary(request,id):
         result = None
     return Response(result)
 
+def TodayOnLeaveByOrganizatinID(organizationID):
+    try:
+        with connection.cursor() as cursor:
+            query = """
+            select p."Name",p."Surname",p."Email", r.*, o."Name", t."Name"
+            from "Right" r
+            inner join "Person" p on p.id = r."Person_id"
+            inner join "Staff" s on p.id = s."Person_id"
+            inner join "Organization" o on o.id = s."Organization_id"
+            inner join "Title" t on t.id = s."Title_id"
+            where s."Organization_id" in (""" + organizationID + """) AND date_part('MONTH', now()) = date_part('MONTH', r."StartDate")
+            AND date_part('YEAR', now()) = date_part('YEAR', r."StartDate") AND date_part('DAY', now()) = date_part('DAY', r."StartDate");
+            """
+            cursor.execute(query)
+            row = cursor.fetchall()
+        return row
+    except Exception as e :
+        return e

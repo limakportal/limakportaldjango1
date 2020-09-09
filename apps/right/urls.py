@@ -28,7 +28,7 @@ urlpatterns = [
     path('righsDayNumber', RightDaysNumber),
     path('personRightInfo/<int:id>', PersonRightInfo),
     path('getrightstatus/<int:status_id>', GetRightStatus),
-    path('todayonleaveperson', TodayOnLeavePerson),
+    path('todayonleaveperson/<int:id>', TodayOnLeavePerson),
     path('rightalldetails', RightAllDetails),
     path('rightsummary/<int:id>', RightSummary),
     path('approveright/<int:id>', ApproveRight),
