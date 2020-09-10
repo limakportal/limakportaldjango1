@@ -452,9 +452,12 @@ def GetPersonRightInfo(id):
     remainingleave = totalleave - totalright - approvelwaiting
 
     person = Person.objects.get(id=id)
-    personIdentity = PersonIdentity.objects.get(Person=id)
-    if personIdentity.Gender is not None:
-        Gender = personIdentity.Gender.Name
+    personIdentity = PersonIdentity.objects.filter(Person=id)
+    if len(personIdentity) > 0:
+        if personIdentity.Gender is not None:
+            Gender = personIdentity.Gender.Name
+        else:
+            Gender = "Tanımlanmamış"
     else:
         Gender = "Tanımlanmamış"
 
@@ -466,7 +469,10 @@ def GetPersonRightInfo(id):
         if len(organiaztion) > 0:
             organiaztion_id = organiaztion[0].id
             organiaztionName = organiaztion[0].Name
-            organiaztionTypeName = organiaztion[0].OrganizationType.Name
+            if organiaztion[0].OrganizationType is not None:
+                organiaztionTypeName = organiaztion[0].OrganizationType.Name
+            else:
+                organiaztionTypeName = ""
 
     detail = []
     for item in rightleave:
