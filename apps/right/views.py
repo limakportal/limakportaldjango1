@@ -453,13 +453,14 @@ def GetPersonRightInfo(id):
 
     person = Person.objects.get(id=id)
     personIdentity = PersonIdentity.objects.filter(Person=id)
+    gender = ""
     if len(personIdentity) > 0:
-        if personIdentity.Gender is not None:
-            Gender = personIdentity.Gender.Name
+        if personIdentity[0].Gender is not None:
+            gender = personIdentity[0].Gender.Name
         else:
-            Gender = "Tanımlanmamış"
+            gender = "Tanımlanmamış"
     else:
-        Gender = "Tanımlanmamış"
+        gender = "Tanımlanmamış"
 
     staff = Staff.objects.filter(Person=id)
     organiaztionName = ""
@@ -501,7 +502,7 @@ def GetPersonRightInfo(id):
                'PersonRightSummary': personRightSummary,
                'Organization': organiaztionName,
                "OrganizationType": organiaztionTypeName,
-               "Gender": Gender}
+               "Gender": gender}
     return content
 
 
