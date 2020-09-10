@@ -378,7 +378,11 @@ def PersonRightInfo(request, id):
                     pass
         return Response(content)
 
+
     x, responsePersons, y = GetResponsiblePersonDetails(id)
+    #liste boş gelirse kendisini ekledim (gokhan) neden yaptım bilmiyorm :d neden listeden boş geliyor.
+    if len(responsePersons) == 0:
+        responsePersons.append(y)
     if responsePersons != None:
         for person in responsePersons:
             result = GetPersonRightInfo(person["Person"]["id"])
