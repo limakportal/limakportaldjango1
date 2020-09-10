@@ -34,12 +34,12 @@ def PersonApprover(request, id):
                 return Response('Kişinin bağlı olduğu birimde yönetici bulunmamaktadır.',
                                 status=status.HTTP_404_NOT_FOUND)
 
-            ystaff = Staff.objects.get(Organization=organization.id, Title=organization.ManagerTitle.id)
+            ystaff = Staff.objects.filter(Organization=organization.id, Title=organization.ManagerTitle.id)
 
-            if ystaff is None:
+            if len(ystaff) == 0:
                 return Response('Kişinin bağlı olduğu birimde yönetici bulunmamaktadır.',
                                 status=status.HTTP_404_NOT_FOUND)
-            personel = Person.objects.get(id=ystaff.Person.id)
+            personel = Person.objects.get(id=ystaff[0].Person.id)
             if personel.id == id:
                 staffs = Staff.objects.filter(Organization=organization.UpperOrganization.id)
                 if len(staffs) == 0:
@@ -59,12 +59,12 @@ def PersonApprover(request, id):
         else:
             neworganization = Organization.objects.get(id=organization.UpperOrganization.id)
             if neworganization.CanApproveRight:
-                newstaff = Staff.objects.get(Organization=neworganization.id, Title=neworganization.ManagerTitle.id)
+                newstaff = Staff.objects.filter(Organization=neworganization.id, Title=neworganization.ManagerTitle.id)
 
-            if newstaff is None:
+            if len(newstaff) == 0:
                 return Response('Kişinin bağlı olduğum birimde yönetici bulunmamaktadır.',
                                 status=status.HTTP_404_NOT_FOUND)
-            personel = Person.objects.get(id=newstaff.Person.id)
+            personel = Person.objects.get(id=newstaff[0].Person.id)
             if personel.id == id:
                 if organization.UpperOrganization.id is None:
                     serializer = PersonSerializer(personel)
@@ -106,11 +106,11 @@ def GetPersonApprover(id):
         if organization.ManagerTitle == None:
             return Response('Kişinin bağlı olduğu birimde yönetici bulunmamaktadır.', status=status.HTTP_404_NOT_FOUND)
 
-        ystaff = Staff.objects.get(Organization=organization.id, Title=organization.ManagerTitle.id)
+        ystaff = Staff.objects.filter(Organization=organization.id, Title=organization.ManagerTitle.id)
 
-        if ystaff == None:
+        if len(ystaff) == 0:
             return Response('Kişinin bağlı olduğu birimde yönetici bulunmamaktadır.', status=status.HTTP_404_NOT_FOUND)
-        personel = Person.objects.get(id=ystaff.Person.id)
+        personel = Person.objects.get(id=ystaff[0].Person.id)
         if personel.id == id:
             staffs = Staff.objects.get(Organization=organization.UpperOrganization.id)
             personel = Person.objects.get(id=staffs.Person.id)
