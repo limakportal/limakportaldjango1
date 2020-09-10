@@ -366,6 +366,9 @@ def PersonRightInfo(request, id):
         # tum personları bul. sadece kendi birimi değil.
         persons = GetManagerPersonsDetail(staff.Organization_id)
 
+        result = GetPersonRightInfo(id)
+        content.append(result)
+
         if persons is not None:
             for p in persons:
                 try:
@@ -373,11 +376,8 @@ def PersonRightInfo(request, id):
                     content.append(result)
                 except:
                     pass
-
         return Response(content)
 
-    result = GetPersonRightInfo(id)
-    content.append(result)
     x, responsePersons, y = GetResponsiblePersonDetails(id)
     if responsePersons != None:
         for person in responsePersons:
@@ -453,7 +453,11 @@ def GetPersonRightInfo(id):
 
     person = Person.objects.get(id=id)
     personIdentity = PersonIdentity.objects.get(Person=id)
-    Gender = personIdentity.Gender.Name
+    if personIdentity.Gender is not None:
+        Gender = personIdentity.Gender.Name
+    else:
+        Gender = "Tanımlanmamış"
+
     staff = Staff.objects.filter(Person=id)
     organiaztionName = ""
     organiaztionTypeName = ""
