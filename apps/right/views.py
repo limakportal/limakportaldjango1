@@ -23,13 +23,15 @@ from ..organization.models import Organization
 from ..person.businesrules import GetPersonApprover
 from ..person.models import Person
 from ..personbusiness.models import PersonBusiness
+from ..personidentity.models import PersonIdentity
 from ..rightleave.models import RightLeave
 from ..righttype.models import RightType
 from ..staff.models import Staff
 from ..title.models import Title
 from ..utils.enums import EnumRightTypes, EnumRightStatus
 from ..vocationdays.models import VocationDays
-
+from ..organizationtype.serializer  import OrganizationTypeSerializer
+from ..organizationtype.models import OrganizationType
 
 class RightAPIView(APIView):
     def get(self, request):
@@ -403,8 +405,9 @@ def PersonRightInfoPerson(request, id):
         except:
             pass
 
-    result = GetPersonRightInfo(id)
-    content.append(result)
+    #Kendisi yukarıda geliyor.
+    # result = GetPersonRightInfo(id)
+    # content.append(result)
     # ismanager ise zaten alttakiler geliyor. bu yüzden çiftliyor. başka sebeptense ona göre yaparız.
     if yetkili is False:
         x, responsePersons, y = GetResponsiblePersonDetails(id)
@@ -441,6 +444,7 @@ def GetPersonRightInfo(id):
         jobstartdate = personbusiness[0].JobStartDate
         formerseniority = personbusiness[0].FormerSeniority
 
+
     rightwaiting = Right.objects.filter(Person=id, RightStatus=EnumRightStatus.OnayBekliyor)
     if rightwaiting:
         for r in rightwaiting:
@@ -449,11 +453,18 @@ def GetPersonRightInfo(id):
     remainingleave = totalleave - totalright - approvelwaiting
 
     person = Person.objects.get(id=id)
+    personIdentity= PersonIdentity.objects.get(Person=id)
+    Gender = personIdentity.Gender.Name
     staff = Staff.objects.filter(Person=id)
+    organiaztionName = ""
+    organiaztionTypeName = ""
     if len(staff) > 0:
         organiaztion = Organization.objects.filter(id=staff[0].Organization.id)
         if len(organiaztion) > 0:
             organiaztion_id = organiaztion[0].id
+            organiaztionName = organiaztion[0].Name
+            organiaztionTypeName =organiaztion[0].OrganizationType.Name
+
 
     detail = []
     for item in rightleave:
@@ -471,14 +482,20 @@ def GetPersonRightInfo(id):
         rightnumber = 0
         rightwaitingnumber = 0
 
+
     try:
         personRightSummary = PersonRightSummary(person.id)
     except:
         personRightSummary = None
+
+
     content = {'person_id': person.id, 'name': person.Name, 'surname': person.Surname,
                'organization_id': organiaztion_id, 'detail': detail,
                'RegisterNo': registerno, 'JobStartDate': jobstartdate, 'FormerSeniority': formerseniority,
-               'PersonRightSummary': personRightSummary}
+               'PersonRightSummary': personRightSummary,
+               'Organization': organiaztionName,
+               "OrganizationType": organiaztionTypeName,
+               "Gender": Gender}
     return content
 
 
