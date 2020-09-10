@@ -30,8 +30,7 @@ from ..staff.models import Staff
 from ..title.models import Title
 from ..utils.enums import EnumRightTypes, EnumRightStatus
 from ..vocationdays.models import VocationDays
-from ..organizationtype.serializer  import OrganizationTypeSerializer
-from ..organizationtype.models import OrganizationType
+
 
 class RightAPIView(APIView):
     def get(self, request):
@@ -367,12 +366,13 @@ def PersonRightInfo(request, id):
         # tum personları bul. sadece kendi birimi değil.
         persons = GetManagerPersonsDetail(staff.Organization_id)
 
-        for p in persons:
-            try:
-                result = GetPersonRightInfo(p["id"])
-                content.append(result)
-            except:
-                pass
+        if persons is not None:
+            for p in persons:
+                try:
+                    result = GetPersonRightInfo(p["id"])
+                    content.append(result)
+                except:
+                    pass
 
         return Response(content)
 
@@ -405,7 +405,7 @@ def PersonRightInfoPerson(request, id):
         except:
             pass
 
-    #Kendisi yukarıda geliyor.
+    # Kendisi yukarıda geliyor.
     # result = GetPersonRightInfo(id)
     # content.append(result)
     # ismanager ise zaten alttakiler geliyor. bu yüzden çiftliyor. başka sebeptense ona göre yaparız.
@@ -444,7 +444,6 @@ def GetPersonRightInfo(id):
         jobstartdate = personbusiness[0].JobStartDate
         formerseniority = personbusiness[0].FormerSeniority
 
-
     rightwaiting = Right.objects.filter(Person=id, RightStatus=EnumRightStatus.OnayBekliyor)
     if rightwaiting:
         for r in rightwaiting:
@@ -453,7 +452,7 @@ def GetPersonRightInfo(id):
     remainingleave = totalleave - totalright - approvelwaiting
 
     person = Person.objects.get(id=id)
-    personIdentity= PersonIdentity.objects.get(Person=id)
+    personIdentity = PersonIdentity.objects.get(Person=id)
     Gender = personIdentity.Gender.Name
     staff = Staff.objects.filter(Person=id)
     organiaztionName = ""
@@ -463,8 +462,7 @@ def GetPersonRightInfo(id):
         if len(organiaztion) > 0:
             organiaztion_id = organiaztion[0].id
             organiaztionName = organiaztion[0].Name
-            organiaztionTypeName =organiaztion[0].OrganizationType.Name
-
+            organiaztionTypeName = organiaztion[0].OrganizationType.Name
 
     detail = []
     for item in rightleave:
@@ -482,12 +480,10 @@ def GetPersonRightInfo(id):
         rightnumber = 0
         rightwaitingnumber = 0
 
-
     try:
         personRightSummary = PersonRightSummary(person.id)
     except:
         personRightSummary = None
-
 
     content = {'person_id': person.id, 'name': person.Name, 'surname': person.Surname,
                'organization_id': organiaztion_id, 'detail': detail,
