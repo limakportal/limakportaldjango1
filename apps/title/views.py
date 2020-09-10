@@ -7,7 +7,7 @@ from rest_framework import status
 
 class TitleAPIView(APIView):
     def get(self,request):
-        titles = Title.objects.all().order_by('id')
+        titles = Title.objects.all().order_by('Name')
         serializer = TitleSerializer(titles,many=True)
         return Response(serializer.data)
 
