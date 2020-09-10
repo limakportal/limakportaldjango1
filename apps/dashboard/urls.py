@@ -1,7 +1,8 @@
 from django.urls import path
 
-from .views import GetResponsiblePersons
+from .views import GetResponsiblePersons, GetPersonCountWithOrganization
 
-urlpatterns = [ 
+urlpatterns = [
     path('getresponsiblepersons/<int:id>', GetResponsiblePersons),
+    path('getpersoncountwithorganization', GetPersonCountWithOrganization),
 ]
