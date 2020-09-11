@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 from ..person.models import Person
 from apps.righttype.models import RightType
@@ -31,3 +32,11 @@ class Right(models.Model):
 
     def __str__(self):
         return self.Person.Name
+
+    def save(self, *args, **kwargs):
+        if not self.id:
+            self.CreatedDate = timezone.now()
+        else:
+            self.ModifiedDate = timezone.now()
+
+        return super(Right, self).save(*args,**kwargs)

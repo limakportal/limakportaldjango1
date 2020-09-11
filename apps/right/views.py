@@ -44,7 +44,7 @@ class RightAPIView(APIView):
             result = RightController(serializer.validated_data, 0)
             if result != "":
                 return Response(result, status=status.HTTP_404_NOT_FOUND)
-            serializer.save()
+            serializer.save(CreatedBy=self.request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -69,7 +69,7 @@ class RightDetails(APIView):
             result = RightController(serializer.validated_data, id)
             if result != "":
                 return Response(result, status=status.HTTP_404_NOT_FOUND)
-            serializer.save()
+            serializer.save(ModifiedBy=self.request.user)
             if serializer.data['RightStatus'] == EnumRightStatus.Onaylandi:
                 person = Person.objects.get(id=serializer.data['Person'])
                 personSerializer = PersonSerializer(person)
@@ -177,7 +177,7 @@ def ApproveRight(request, id):
         serializer = RightSerializer(right, data=getrequest)
         serializer.initial_data['RightStatus'] = int(EnumRightStatus.Onaylandi)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(ModifiedBy=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     except:
@@ -195,7 +195,7 @@ def DenyRight(request, id):
         serializer.initial_data['RightStatus'] = int(EnumRightStatus.Reddedildi)
         serializer.initial_data['DenyExplanation'] = request.data['DenyExplanation']
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(ModifiedBy=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
@@ -378,9 +378,8 @@ def PersonRightInfo(request, id):
                     pass
         return Response(content)
 
-
     x, responsePersons, y = GetResponsiblePersonDetails(id)
-    #liste boş gelirse kendisini ekledim (gokhan) neden yaptım bilmiyorm :d neden listeden boş geliyor.
+    # liste boş gelirse kendisini ekledim (gokhan) neden yaptım bilmiyorm :d neden listeden boş geliyor.
     if len(responsePersons) == 0:
         responsePersons.append(y)
     if responsePersons != None:
