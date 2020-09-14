@@ -77,6 +77,7 @@ INSTALLED_APPS = [
     'apps.announcmentorganization',
     'apps.staffhistory',
     # 'apps.businessrules',
+    'apps.personemployment',
 ]
 # google token
 # AUTHENTICATION_BACKENDS = (

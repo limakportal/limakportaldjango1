@@ -44,4 +44,5 @@ urlpatterns = [
     path('', include('apps.announcmentorganization.urls')),
     path('', include('apps.dashboard.urls')),
     path('', include('apps.staffhistory.urls')),
+    path('', include('apps.personemployment.urls')),
 ]
