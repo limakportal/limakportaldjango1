@@ -8,7 +8,8 @@ from .businesrules import (
     PersonPermissionControl,
     GetAllPersonsWithLen,
     IsManager,
-    GetPersonsWithLenManager
+    GetPersonsWithLenManager,
+    GetPersonsByOrganizationId
 )
 
 from ..person.models import Person
@@ -44,3 +45,13 @@ def GetPersonCountWithOrganization(request):
             organizationsArr.append(o)
     serializer = GetPersonCountWithOrganizationSerializer(organizationsArr, many=True)
     return Response(serializer.data)
+
+
+@api_view(['GET'])
+def GetOrganizationResponsiblePersons(request, organizationid):
+    """Get Organization id ye gore Staff lar"""
+    result = {}
+    personArr = []
+    persons = GetPersonsByOrganizationId(organizationid, personArr)
+    result['Persons'] = PersonSerializer(persons, many=True).data
+    return Response(result)
