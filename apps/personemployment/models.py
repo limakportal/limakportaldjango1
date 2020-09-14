@@ -10,9 +10,9 @@ class PersonEmployment(models.Model):
 
     Person = models.ForeignKey(Person,on_delete=models.CASCADE,blank=True, null=True)
     Organization = models.ForeignKey(Organization, on_delete = models.CASCADE,blank=True, null=True)
-    Title = models.ForeignKey(Title, on_delete=models.CASCADE)
-    StartDate = models.DateField(blank=True, null=True)
-    EndDate = models.DateField(blank=True, null=True)
+    Title = models.ForeignKey(Title, on_delete=models.CASCADE,blank=True, null=True)
+    StartDate = models.DateTimeField(blank=True, null=True)
+    EndDate = models.DateTimeField(blank=True, null=True)
     Status = models.ForeignKey(Status,on_delete=models.CASCADE,blank=True, null=True)
 
     def __str__(self):
