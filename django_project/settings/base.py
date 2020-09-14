@@ -16,7 +16,6 @@ from datetime import timedelta
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
@@ -26,13 +25,12 @@ SECRET_KEY = 'j!#7xkols%&2esg4*^q!a=uwveesg&yp93#jme2)@vdrsu!h$3'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['limakportalpython.herokuapp.com','127.0.0.1']
-
+ALLOWED_HOSTS = ['limakportalpython.herokuapp.com', '127.0.0.1']
 
 # Application definition
 
 INSTALLED_APPS = [
-    #django apps
+    # django apps
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -43,7 +41,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'corsheaders',
 
-    #project apps
+    # project apps
     'apps.person',
     'apps.gender',
     'apps.right',
@@ -77,9 +75,10 @@ INSTALLED_APPS = [
     'apps.shift',
     'apps.announcment',
     'apps.announcmentorganization',
+    'apps.staffhistory',
     # 'apps.businessrules',
 ]
-#google token
+# google token
 # AUTHENTICATION_BACKENDS = (
 #     ('django.contrib.auth.backends.ModelBackend'),
 # )
@@ -104,7 +103,7 @@ AUTH_USER_MODEL = 'account.Account'
 
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME' : timedelta(minutes=120)
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=120)
 }
 
 MIDDLEWARE = [
@@ -141,7 +140,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'django_project.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
@@ -167,7 +165,6 @@ DATABASES = {
         'PORT': '5432',
     }
 }
-
 
 # DATABASES = {
 #     'default': {
@@ -199,7 +196,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
@@ -213,17 +209,15 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 STATIC_URL = '/static/'
 
-
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-#mail yollama
+# mail yollama
 # if DEBUG:
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST_USER = "limakportal@gmail.com"
@@ -233,6 +227,6 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_PASSWORD = "Limakportal.1"
 
 # else:
-    # EMAIL_BACKEND = (
-    #     "django.core.mail.backends.console.EmailBackend"
-    # )
+# EMAIL_BACKEND = (
+#     "django.core.mail.backends.console.EmailBackend"
+# )
