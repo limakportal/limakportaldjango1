@@ -4,6 +4,8 @@ from ..organization.models import Organization
 from ..organizationtype.models import OrganizationType
 from ..staff.models import Staff
 
+from .businesrules import GetOrganizationAndLoweOrganization
+
 
 class GetPersonCountWithOrganizationSerializer(serializers.ModelSerializer):
     organization = serializers.SerializerMethodField()
@@ -68,8 +70,10 @@ class GetAllOrganizationtypeId2WithTotalStaffSerializer(serializers.ModelSeriali
             return None
 
     def get_personcount(self, obj):
-        try:
-            staff = Staff.objects.filter(Organization_id=obj.id)
-            return len(staff)
-        except:
-            return 0
+        organizationsArr = []
+        organizations = GetOrganizationAndLoweOrganization(obj.id, organizationsArr)
+        totalStaff = 0
+        for o in organizations:
+            staffs = Staff.objects.filter(Organization_id=o.id)
+            totalStaff = totalStaff + len(staffs)
+        return totalStaff
