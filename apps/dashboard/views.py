@@ -9,7 +9,7 @@ from .businesrules import (
     GetAllPersonsWithLen,
     IsManager,
     GetPersonsWithLenManager,
-    GetPersonsByOrganizationId
+    GetOrganizationAndLoweOrganization
 )
 
 from ..person.models import Person
@@ -49,9 +49,7 @@ def GetPersonCountWithOrganization(request):
 
 @api_view(['GET'])
 def GetOrganizationResponsiblePersons(request, organizationid):
-    """Get Organization id ye gore Staff lar"""
-    result = {}
-    personArr = []
-    persons = GetPersonsByOrganizationId(organizationid, personArr)
-    result['Persons'] = PersonSerializer(persons, many=True).data
-    return Response(result)
+    organizationsArr = []
+    organizations = GetOrganizationAndLoweOrganization(organizationid, organizationsArr)
+    serializers = GetPersonCountWithOrganizationSerializer(organizations, many=True)
+    return Response(serializers.data)

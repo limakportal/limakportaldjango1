@@ -9,13 +9,15 @@ class GetPersonCountWithOrganizationSerializer(serializers.ModelSerializer):
     organization = serializers.SerializerMethodField()
     organizationtype = serializers.SerializerMethodField()
     personcount = serializers.SerializerMethodField()
+    UpperOrganization = serializers.SerializerMethodField()
 
     class Meta:
         model = Organization
         fields = (
             'organization',
             'organizationtype',
-            'personcount'
+            'personcount',
+            'UpperOrganization'
         )
 
     def get_organization(self, obj):
@@ -23,14 +25,14 @@ class GetPersonCountWithOrganizationSerializer(serializers.ModelSerializer):
             organization = Organization.objects.get(id=obj.id)
             return organization.Name
         except:
-            return ''
+            return None
 
     def get_organizationtype(self, obj):
         try:
             organizationtype = OrganizationType.objects.get(id=obj.OrganizationType_id)
             return organizationtype.Name
         except:
-            return ''
+            return None
 
     def get_personcount(self, obj):
         try:
@@ -38,3 +40,10 @@ class GetPersonCountWithOrganizationSerializer(serializers.ModelSerializer):
             return len(staff)
         except:
             return 0
+
+    def get_UpperOrganization(self, obj):
+        try:
+            organization = Organization.objects.get(id=obj.id)
+            return organization.OrganizationType_id
+        except:
+            return None

@@ -77,3 +77,16 @@ def GetPersonsByOrganizationId(organizationId, personArr):
         return personArr
     except:
         return None
+
+
+def GetOrganizationAndLoweOrganization(organizationId, organizationArr):
+    """Organzation and lowerOrganization"""
+    try:
+        organization = Organization.objects.get(id=organizationId)
+        organizationArr.append(organization)
+    except:
+        pass
+    lowerOrganization = Organization.objects.filter(UpperOrganization=organizationId)
+    for o in lowerOrganization:
+        GetOrganizationAndLoweOrganization(o.id, organizationArr)
+    return organizationArr
