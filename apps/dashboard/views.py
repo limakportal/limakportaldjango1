@@ -53,3 +53,22 @@ def GetOrganizationResponsiblePersons(request, organizationid):
     organizations = GetOrganizationAndLoweOrganization(organizationid, organizationsArr)
     serializers = GetPersonCountWithOrganizationSerializer(organizations, many=True)
     return Response(serializers.data)
+
+
+@api_view(['GET'])
+def GetOrganizationWithTotalStaff(request, organizationid):
+    result = {}
+    try:
+        organization = Organization.objects.get(id=organizationid)
+        result['organization'] = organization.Name
+        organizationsArr = []
+        organizations = GetOrganizationAndLoweOrganization(organizationid, organizationsArr)
+        totalStaff = 0
+        for o in organizations:
+            staffs = Staff.objects.filter(Organization_id=o.id)
+            totalStaff = totalStaff + len(staffs)
+        result['totalstaff'] = str(totalStaff)
+    except:
+        result['organization'] = None
+        result['totalstaff'] = None
+    return Response(result)
