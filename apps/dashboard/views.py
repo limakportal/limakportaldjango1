@@ -2,7 +2,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 
-from .serializers import GetPersonCountWithOrganizationSerializer
+from .serializers import GetPersonCountWithOrganizationSerializer, GetAllOrganizationtypeId2WithTotalStaffSerializer
 
 from .businesrules import (
     PersonPermissionControl,
@@ -72,3 +72,10 @@ def GetOrganizationWithTotalStaff(request, organizationid):
         result['organization'] = None
         result['totalstaff'] = None
     return Response(result)
+
+
+@api_view(['GET'])
+def GetAllOrganizationtypeId2WithTotalStaff(request):
+    organization = Organization.objects.filter(OrganizationType_id=2)
+    serializers = GetAllOrganizationtypeId2WithTotalStaffSerializer(organization, many=True)
+    return Response(serializers.data)

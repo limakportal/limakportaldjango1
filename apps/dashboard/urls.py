@@ -4,7 +4,8 @@ from .views import (
     GetResponsiblePersons,
     GetPersonCountWithOrganization,
     GetOrganizationResponsiblePersons,
-    GetOrganizationWithTotalStaff
+    GetOrganizationWithTotalStaff,
+    GetAllOrganizationtypeId2WithTotalStaff
 )
 
 urlpatterns = [
@@ -12,4 +13,5 @@ urlpatterns = [
     path('getorganizationresponsiblepersons/<int:organizationid>', GetOrganizationResponsiblePersons),
     path('getorganizationwithtotalstaff/<int:organizationid>', GetOrganizationWithTotalStaff),
     path('getpersoncountwithorganization', GetPersonCountWithOrganization),
+    path('getallorganizationtypeid2withtotalstaff', GetAllOrganizationtypeId2WithTotalStaff),
 ]
