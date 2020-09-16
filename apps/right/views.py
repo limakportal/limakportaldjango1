@@ -586,7 +586,10 @@ def TodayOnLeavePersonByPerson(request, id):
             data['StartDate'] = row[12].date()
             data['EndDate'] = row[4].date()
             data['RightNumber'] = row[8]
-            data['RightType'] = EnumRightTypes(row[13]).name
+            try:
+                data['RightType'] = RightType.objects.get(id=row[13]).Name
+            except:
+                data['RightType'] = None
             data['Organization'] = row[17]
             data['Title'] = row[18]
             data['Manager'] = row[19]
