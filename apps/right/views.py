@@ -542,7 +542,10 @@ def TodayOnLeavePerson(request):
             data['StartDate'] = right.StartDate.date()
             data['EndDate'] = right.EndDate.date()
             data['RightNumber'] = right.RightNumber
-            data['RightType'] = EnumRightTypes(right.RightType_id).name
+            try:
+                data['RightType'] = RightType.objects.get(id=right.RightType).Name
+            except:
+                data['RightType'] = None
             try:
                 staff = Staff.objects.get(Person=int(person.id))
                 organization = Organization.objects.get(id=staff.Organization_id)
