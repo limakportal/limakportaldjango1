@@ -543,7 +543,7 @@ def TodayOnLeavePerson(request):
             data['EndDate'] = right.EndDate.date()
             data['RightNumber'] = right.RightNumber
             try:
-                data['RightType'] = RightType.objects.get(id=right.RightType).Name
+                data['RightType'] = RightType.objects.get(id=right.RightType_id).Name
             except:
                 data['RightType'] = None
             try:
