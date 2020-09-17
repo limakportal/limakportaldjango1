@@ -8,9 +8,10 @@ from django.db.models import Sum
 from django.http import HttpResponse
 from docxtpl import DocxTemplate
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
 
 from .bussinessrules import GetRightBalance, PersonRightSummary
 from .models import Right
@@ -28,7 +29,7 @@ from ..rightleave.models import RightLeave
 from ..righttype.models import RightType
 from ..staff.models import Staff
 from ..title.models import Title
-from ..utils.enums import EnumRightTypes, EnumRightStatus
+from ..utils.enums import EnumRightTypes, EnumRightStatus, EnumStatus
 from ..vocationdays.models import VocationDays
 
 
@@ -168,6 +169,7 @@ class RightDownloadApiView(APIView):
 
 
 @api_view(['PUT'])
+@permission_classes([IsAuthenticated])
 def ApproveRight(request, id):
     try:
         right = Right.objects.get(id=id)
@@ -185,6 +187,7 @@ def ApproveRight(request, id):
 
 
 @api_view(['PUT'])
+@permission_classes([IsAuthenticated])
 def DenyRight(request, id):
     try:
         right = Right.objects.get(id=id)
@@ -194,6 +197,25 @@ def DenyRight(request, id):
         serializer = RightSerializer(right, data=getrequest)
         serializer.initial_data['RightStatus'] = int(EnumRightStatus.Reddedildi)
         serializer.initial_data['DenyExplanation'] = request.data['DenyExplanation']
+        if serializer.is_valid():
+            serializer.save(ModifiedBy=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        Response(str(e), status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def HasField(request, id):
+    try:
+        right = Right.objects.get(id=id)
+        getrequest = RightSerializer(right).data
+        if getrequest['RightStatus'] != int(EnumRightStatus.Onaylandi):
+            return Response("Sadece onaylanan izinler dosyalanabilir.", status=status.HTTP_404_NOT_FOUND)
+        if getrequest['HrHasField'] == int(EnumStatus.Active):
+            return Response("Seçilen izin dosyalandı durumundadır.", status = status.HTTP_404_NOT_FOUND)
+        serializer = RightSerializer(right, data=getrequest)
+        serializer.initial_data['HrHasField'] = int(EnumStatus.Active)
         if serializer.is_valid():
             serializer.save(ModifiedBy=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
