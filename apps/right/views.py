@@ -616,8 +616,8 @@ def TodayOnLeavePersonByPerson(request, id):
             except:
                 data['RightType'] = None
             data['Organization'] = row[17]
-            data['Title'] = row[18]
-            data['Manager'] = row[19]
+            data['Title'] = row[22]
+            data['Manager'] = row[23]
             data['DateOfReturn'] = row[5]
             try:
                 data['PersonRightSummary'] = PersonRightSummary(id)
