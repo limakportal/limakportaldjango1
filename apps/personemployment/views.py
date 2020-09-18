@@ -3,6 +3,10 @@ from .serializer import PersonEmploymentSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from ..utils.enums import  EnumStatus
+
+import datetime
+import json
 
 
 class PersonEmploymentAPIView(APIView):
@@ -12,7 +16,19 @@ class PersonEmploymentAPIView(APIView):
         return Response(serializer.data)
 
     def post(self,request):
-        serializer = PersonEmploymentSerializer(data = request.data)
+        today = datetime.date.today()
+        # if 'EndDate' in json.loads(json.dumps(request.data))
+        enddate = request.data['EndDate']
+        if enddate != None:
+            enddate = datetime.datetime.strptime(request.data['EndDate'], '%Y-%m-%d')
+        data = request.data
+        
+        if enddate == None or enddate.date() > today:
+            data['Status'] = int(EnumStatus.Active)
+        else:
+            data['Status'] = int(EnumStatus.Passive)
+
+        serializer = PersonEmploymentSerializer(data = data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
