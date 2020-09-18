@@ -51,8 +51,16 @@ class PersonEmploymentDetails(APIView):
 
 
     def put(self, request,id):
+        today = datetime.date.today()
+        reqenddate = request.data['EndDate']
+        if reqenddate != None:
+            reqenddate = datetime.datetime.strptime(request.data['EndDate'], '%Y-%m-%d')
         personemployment = self.get_object(id)
         serializer = PersonEmploymentSerializer(personemployment, data=request.data)
+        if reqenddate == None or reqenddate.date() > today:
+            serializer.initial_data['Status'] = int(EnumStatus.Active)
+        else:
+            serializer.initial_data['Status'] = int(EnumStatus.Passive)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
