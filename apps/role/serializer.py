@@ -67,6 +67,7 @@ class RoleViewSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'Name',
+            'IsHierarchical',
             'Permissions',
             'Users'
         )
