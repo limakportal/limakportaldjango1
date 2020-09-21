@@ -31,13 +31,13 @@ class AccountsDetailSerializer(serializers.ModelSerializer):
             'email',
             'PersonId',
             'PersonName',
-            'PersonSurname'
+            'PersonSurname',
+
         )
 
     PersonId = serializers.SerializerMethodField()
     PersonName = serializers.SerializerMethodField()
     PersonSurname = serializers.SerializerMethodField()
-
 
     def get_PersonId(self, obj):
         try:
@@ -64,8 +64,6 @@ class AccountsDetailSerializer(serializers.ModelSerializer):
             return None
 
 
-
-
 class RoleViewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Role
@@ -90,10 +88,17 @@ class RoleViewSerializer(serializers.ModelSerializer):
         return PermissionSerializer(allPermission, many=True).data
 
     def get_Users(self, obj):
-        allAccounts = []
+        users = []
         userRoles = UserRole.objects.filter(Role_id=obj.id)
-        for userrole in userRoles:
-            account = Account.objects.filter(id=userrole.Account_id)
-            for user in account:
-                allAccounts.append(user)
-        return AccountsDetailSerializer(allAccounts, many=True).data
+        for u in userRoles:
+            try:
+                account = Account.objects.get(id=u.Account_id)
+                result = AccountsDetailSerializer(account).data
+                if u.Organizations != None:
+                    result['Organizations'] = u.Organizations
+                else:
+                    result['Organizations'] = None
+                users.append(result)
+            except:
+                result = None
+        return users
