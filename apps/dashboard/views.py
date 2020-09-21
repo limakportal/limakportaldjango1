@@ -30,7 +30,8 @@ def GetResponsiblePersons(request, id):
     elif PersonPermissionControl(id, 'IZN_IK'):
         return Response(GetAllIkResponsiblePersonWithLen(id))
     elif IsManager(id):
-        return Response(GetPersonsWithLenManager(id))
+        # return Response(GetPersonsWithLenManager(id))
+        return Response(GetAllIkResponsiblePersonWithLen(id))
     else:
         result = {}
         persons = Person.objects.filter(id=id)

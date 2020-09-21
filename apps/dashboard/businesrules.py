@@ -30,21 +30,32 @@ def PersonPermissionControl(personId, permissionCode):
 def GetAllIkResponsiblePersonWithLen(personId):
     result = {}
     try:
-        account = Account.objects.get(email=Person.objects.get(id=personId))
-        userrole = UserRole.objects.get(Account_id=account.id)
-        organizationIdArr = userrole.Organizations.split(",")
-        personArr = []
-        for o in organizationIdArr:
-            personsArr = []
-            persons = GetPersonsByOrganizationId(o, personsArr)
-            for p in persons:
-                personArr.append(p)
-        result['Persons'] = PersonSerializer(personArr, many=True).data
-        result['PersonsLen'] = len(personArr)
+        account = Account.objects.get(email=Person.objects.get(id=personId).Email)
+        userrole = UserRole.objects.filter(Account_id=account.id, Organizations__isnull=False)
+        if len(userrole) > 0:
+            personArr = []
 
+            for u in userrole:
+                if len(u.Organizations) > 1:
+                    organizationIdArr = u.Organizations.split(",")
+                    for o in organizationIdArr:
+                        personsArr = []
+                        persons = GetPersonsByOrganizationId(o, personsArr)
+                        for p in persons:
+                            personArr.append(p)
+                else:
+                    personsArr = []
+                    persons = GetPersonsByOrganizationId(u, personsArr)
+                    for p in persons:
+                        personArr.append(p)
+
+            result['Persons'] = PersonSerializer(personArr, many=True).data
+            result['PersonsLen'] = len(personArr)
     except:
         result['Persons'] = None
         result['PersonsLen'] = None
+
+    return result
 
 
 def GetAllPersonsWithLen():
