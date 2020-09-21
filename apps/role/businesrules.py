@@ -50,7 +50,7 @@ class RoleWithPermissionAPIView(APIView):
                         data = {}
                         data['Role'] = roleSerializer.data['id']
                         data['Account'] = accountData['id']
-                        if len(accountData['Organizations']) > 0:
+                        if 'Organizations' in json.loads(json.dumps(accountData)):
                             data['Organizations'] = accountData['Organizations']
                         userRoleSerializer = UserRoleSerializer(data=data)
                         if userRoleSerializer.is_valid():
@@ -118,7 +118,7 @@ class RoleWithPermissionDetails(APIView):
                         data = {}
                         data['Role'] = id
                         data['Account'] = accountData['id']
-                        if len(accountData['Organizations']) > 0:
+                        if 'Organizations' in json.loads(json.dumps(accountData)):
                             data['Organizations'] = accountData['Organizations']
                         userRoleSerializer = UserRoleSerializer(data=data)
                         if userRoleSerializer.is_valid():

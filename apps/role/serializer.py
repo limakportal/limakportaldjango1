@@ -31,14 +31,13 @@ class AccountsDetailSerializer(serializers.ModelSerializer):
             'email',
             'PersonId',
             'PersonName',
-            'PersonSurname',
-            'Organizations'
+            'PersonSurname'
         )
 
     PersonId = serializers.SerializerMethodField()
     PersonName = serializers.SerializerMethodField()
     PersonSurname = serializers.SerializerMethodField()
-    Organizations = serializers.SerializerMethodField()
+
 
     def get_PersonId(self, obj):
         try:
@@ -64,12 +63,7 @@ class AccountsDetailSerializer(serializers.ModelSerializer):
         except:
             return None
 
-    def get_Organizations(self, obj):
-        try:
-            userRole = UserRole.objects.get(Role_id=obj.id)
-            return userRole.Organizations
-        except:
-            return None
+
 
 
 class RoleViewSerializer(serializers.ModelSerializer):
