@@ -9,7 +9,8 @@ from .businesrules import (
     GetAllPersonsWithLen,
     IsManager,
     GetPersonsWithLenManager,
-    GetOrganizationAndLoweOrganization
+    GetOrganizationAndLoweOrganization,
+    GetAllIkResponsiblePersonWithLen
 )
 
 from ..person.models import Person
@@ -24,8 +25,10 @@ def GetResponsiblePersons(request, id):
     """ Sorumlu Olduğu Personeller """
     if PersonPermissionControl(id, 'ADMIN'):
         return Response(GetAllPersonsWithLen())
-    elif PersonPermissionControl(id, 'IZN_IK'):
+    elif PersonPermissionControl(id, 'ADMIN_IK'):
         return Response(GetAllPersonsWithLen())
+    elif PersonPermissionControl(id, 'IZN_IK'):
+        return Response(GetAllIkResponsiblePersonWithLen(id))
     elif IsManager(id):
         return Response(GetPersonsWithLenManager(id))
     else:

@@ -27,6 +27,26 @@ def PersonPermissionControl(personId, permissionCode):
         return False
 
 
+def GetAllIkResponsiblePersonWithLen(personId):
+    result = {}
+    try:
+        account = Account.objects.get(email=Person.objects.get(id=personId))
+        userrole = UserRole.objects.get(Account_id=account.id)
+        organizationIdArr = userrole.Organizations.split(",")
+        personArr = []
+        for o in organizationIdArr:
+            personsArr = []
+            persons = GetPersonsByOrganizationId(o, personsArr)
+            for p in persons:
+                personArr.append(p)
+        result['Persons'] = PersonSerializer(personArr, many=True).data
+        result['PersonsLen'] = len(personArr)
+
+    except:
+        result['Persons'] = None
+        result['PersonsLen'] = None
+
+
 def GetAllPersonsWithLen():
     """ Bütün Personeller ve Sayısı """
     result = {}
