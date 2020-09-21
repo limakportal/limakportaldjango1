@@ -9,6 +9,7 @@ from ..organization.models import Organization
 from ..person.serializer import PersonSerializer
 
 
+
 def PersonPermissionControl(personId, permissionCode):
     """ ADMIN ve IZN_IK Yetki Kontrol """
     try:
@@ -28,12 +29,12 @@ def PersonPermissionControl(personId, permissionCode):
 
 
 def GetAllIkResponsiblePersonWithLen(personId):
-    result = {}
     try:
         account = Account.objects.get(email=Person.objects.get(id=personId).Email)
         userrole = UserRole.objects.filter(Account_id=account.id, Organizations__isnull=False)
+        personArr = []
         if len(userrole) > 0:
-            personArr = []
+
 
             for u in userrole:
                 if len(u.Organizations) > 1:
@@ -49,22 +50,13 @@ def GetAllIkResponsiblePersonWithLen(personId):
                     for p in persons:
                         personArr.append(p)
 
-            result['Persons'] = PersonSerializer(personArr, many=True).data
-            result['PersonsLen'] = len(personArr)
+
     except:
-        result['Persons'] = None
-        result['PersonsLen'] = None
+        personArr = []
 
-    return result
+    return personArr
 
 
-def GetAllPersonsWithLen():
-    """ Bütün Personeller ve Sayısı """
-    result = {}
-    persons = Person.objects.all()
-    result['Persons'] = PersonSerializer(persons, many=True).data
-    result['PersonsLen'] = len(persons)
-    return result
 
 
 def IsManager(personId):
@@ -121,3 +113,17 @@ def GetOrganizationAndLoweOrganization(organizationId, organizationArr):
     for o in lowerOrganization:
         GetOrganizationAndLoweOrganization(o.id, organizationArr)
     return organizationArr
+
+
+def ListResponsiblePersons(personid):
+    """ Sorumlu Olduğu Personeller """
+    if PersonPermissionControl(personid, 'ADMIN'):
+        return Person.objects.all()
+    elif PersonPermissionControl(personid, 'IZN_IK'):
+        return GetAllIkResponsiblePersonWithLen(personid)
+    elif IsManager(personid):
+        # return Response(GetPersonsWithLenManager(personid))
+        return GetAllIkResponsiblePersonWithLen(personid)
+    else:
+        persons = Person.objects.filter(id=personid)
+        return persons

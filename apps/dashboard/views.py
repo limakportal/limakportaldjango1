@@ -3,41 +3,24 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from .serializers import GetPersonCountWithOrganizationSerializer, GetAllOrganizationtypeId2WithTotalStaffSerializer
+from ..person.serializer import PersonSerializer
 
 from .businesrules import (
-    PersonPermissionControl,
-    GetAllPersonsWithLen,
-    IsManager,
-    GetPersonsWithLenManager,
     GetOrganizationAndLoweOrganization,
-    GetAllIkResponsiblePersonWithLen
+    ListResponsiblePersons
 )
 
-from ..person.models import Person
 from ..organization.models import Organization
 from ..staff.models import Staff
-
-from ..person.serializer import PersonSerializer
 
 
 @api_view(['GET'])
 def GetResponsiblePersons(request, id):
-    """ Sorumlu Olduğu Personeller """
-    if PersonPermissionControl(id, 'ADMIN'):
-        return Response(GetAllPersonsWithLen())
-    elif PersonPermissionControl(id, 'ADMIN_IK'):
-        return Response(GetAllPersonsWithLen())
-    elif PersonPermissionControl(id, 'IZN_IK'):
-        return Response(GetAllIkResponsiblePersonWithLen(id))
-    elif IsManager(id):
-        # return Response(GetPersonsWithLenManager(id))
-        return Response(GetAllIkResponsiblePersonWithLen(id))
-    else:
-        result = {}
-        persons = Person.objects.filter(id=id)
-        result['Persons'] = PersonSerializer(persons, many=True).data
-        result['PersonsLen'] = len(persons)
-        return Response(result)
+    personArr = ListResponsiblePersons(id)
+    result = {}
+    result['Persons'] = PersonSerializer(personArr, many=True).data
+    result['PersonsLen'] = len(personArr)
+    return Response(result)
 
 
 @api_view(['GET'])

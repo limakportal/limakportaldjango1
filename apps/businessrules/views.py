@@ -22,23 +22,19 @@ from ..userrole.models import UserRole
 from ..organization.serializer import OrganizationSerializer, OrganizationTreeSerializer
 from ..businessrules.serializer import (OrganizationTreeByAccountId)
 from ..person.serializer import PersonSerializer, PersonViewSerializer
+from ..dashboard.businesrules import ListResponsiblePersons
 from ..organization.serializer import OrganizationTreeSerializer
 
 
 @api_view(['GET'])
 def ResponsiblePersonDetails(request, id):
     response = {}
-    if HasPermission(id, 'ADMIN'):
-        response['ResponsiblePersons'] = GetResponsibleAdminPersonDetails(id)
-        return Response(response, status=status.HTTP_200_OK)
-
-    elif HasPermission(id, 'IZN_IK'):
-        response['ResponsiblePersons'] = GetResponsibleIkPersonDetails(id)
-        return Response(response, status=status.HTTP_200_OK)
-
-    elif IsManager(id):
-        response['ResponsiblePersons'] = GetManagerPersonsDetail(id)
-        return Response(response, status=status.HTTP_200_OK)
+    try:
+        personArr = ListResponsiblePersons(id)
+        serializer = PersonViewSerializer(personArr, many=True).data
+        response['ResponsiblePersons'] = serializer
+    except:
+        response['ResponsiblePersons'] = None
 
     response['ResponsibleMenu'], response['ResponsiblePersons'], response['Person'] = GetResponsiblePersonDetails(id)
 
@@ -64,10 +60,11 @@ def GetPersonsByOrganizationId(organizationId, personArr):
     except:
         return None
 
+
 def GetOrganizationByID(organizationId, organizationArr):
     try:
         try:
-            organization = Organization.objects.get(id = organizationId)
+            organization = Organization.objects.get(id=organizationId)
             organizationArr.append(organization)
         except:
             pass
@@ -78,6 +75,7 @@ def GetOrganizationByID(organizationId, organizationArr):
     except:
         return None
 
+
 def GetManagerPersonsDetailNoneSerializer(personId):
     try:
         staff = Staff.objects.get(Person_id=personId)
@@ -86,6 +84,7 @@ def GetManagerPersonsDetailNoneSerializer(personId):
     except:
         return None
 
+
 def GetManagerOrganizationsDetailNoneSerializer(personId):
     try:
         staff = Staff.objects.get(Person_id=personId)
@@ -93,6 +92,7 @@ def GetManagerOrganizationsDetailNoneSerializer(personId):
         return GetOrganizationByID(staff.Organization_id, organizationArr)
     except:
         return None
+
 
 def GetManagerPersonsDetail(personId):
     try:
@@ -252,7 +252,7 @@ def ManagerPersons(request):
         if IsManager(person.id):
             managerpersons.append(person)
     return Response(PersonSerializer(managerpersons, many=True).data)
-                
+
 
 @api_view(['GET'])
 def AccountListDetails(request):

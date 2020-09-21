@@ -22,6 +22,8 @@ from ..businessrules.views import HasPermission, GetResponsibleAdminPersonDetail
 from ..staff.models import Staff
 from ..staff.serializer import StaffSerializer
 
+from ..dashboard.businesrules import ListResponsiblePersons
+
 
 class PersonViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
@@ -32,20 +34,28 @@ class PersonViewSet(ModelViewSet):
 class PersonWithPersonInformationAPIView(APIView):
     def get(self, request):
         if (request.user.is_authenticated):
-            p = Person.objects.get(Email=request.user.email)
-            if HasPermission(p.id, 'ADMIN'):
-                return Response(GetResponsibleAdminPersonDetails(p.id))
-            elif HasPermission(p.id, 'IZN_IK'):
-                return Response(GetResponsibleIkPersonDetails(p.id))
-            elif IsManager(p.id):
-                persons = GetManagerPersonsDetailNoneSerializer(p.id)
-                serializer = PersonViewSerializer(persons, many=True)
-                return Response(serializer.data)
-            else:
-                persons = []
-                persons.append(p)
-                serializer = PersonViewSerializer(persons, many=True)
-                return Response(serializer.data)
+            try:
+                p = Person.objects.get(Email=request.user.email)
+                personArr = ListResponsiblePersons(p.id)
+                serializer = PersonViewSerializer(personArr, many=True).data
+                return Response(serializer)
+
+            except:
+                return None
+            #
+            # if HasPermission(p.id, 'ADMIN'):
+            #     return Response(GetResponsibleAdminPersonDetails(p.id))
+            # elif HasPermission(p.id, 'IZN_IK'):
+            #     return Response(GetResponsibleIkPersonDetails(p.id))
+            # elif IsManager(p.id):
+            #     persons = GetManagerPersonsDetailNoneSerializer(p.id)
+            #     serializer = PersonViewSerializer(persons, many=True)
+            #     return Response(serializer.data)
+            # else:
+            #     persons = []
+            #     persons.append(p)
+            #     serializer = PersonViewSerializer(persons, many=True)
+            #     return Response(serializer.data)
 
         # yetkiye göre gelmeli.
         # persons = Person.objects.all().order_by('id')
