@@ -19,7 +19,10 @@ def GetResponsiblePersons(request, id):
     personArr = ListResponsiblePersons(id)
     result = {}
     result['Persons'] = PersonSerializer(personArr, many=True).data
-    result['PersonsLen'] = len(personArr)
+    if personArr == None:
+        result['PersonsLen'] = None
+    else:
+        result['PersonsLen'] = len(personArr)
     return Response(result)
 
 
