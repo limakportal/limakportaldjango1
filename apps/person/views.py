@@ -17,8 +17,6 @@ from apps.personidentity.models import PersonIdentity
 from apps.personidentity.serializer import PersonIdentitySerializer
 from .models import Person
 from .serializer import PersonSerializer, PersonViewSerializer, PersonViewDetailSerializer, PersonCreateUpdateSerializer
-from ..businessrules.views import HasPermission, GetResponsibleAdminPersonDetails, GetResponsibleIkPersonDetails, \
-    IsManager, GetManagerPersonsDetailNoneSerializer
 from ..staff.models import Staff
 from ..staff.serializer import StaffSerializer
 
@@ -42,25 +40,7 @@ class PersonWithPersonInformationAPIView(APIView):
 
             except:
                 return None
-            #
-            # if HasPermission(p.id, 'ADMIN'):
-            #     return Response(GetResponsibleAdminPersonDetails(p.id))
-            # elif HasPermission(p.id, 'IZN_IK'):
-            #     return Response(GetResponsibleIkPersonDetails(p.id))
-            # elif IsManager(p.id):
-            #     persons = GetManagerPersonsDetailNoneSerializer(p.id)
-            #     serializer = PersonViewSerializer(persons, many=True)
-            #     return Response(serializer.data)
-            # else:
-            #     persons = []
-            #     persons.append(p)
-            #     serializer = PersonViewSerializer(persons, many=True)
-            #     return Response(serializer.data)
 
-        # yetkiye göre gelmeli.
-        # persons = Person.objects.all().order_by('id')
-        # serializer = PersonViewSerializer(persons,many=True)
-        # return Response(serializer.data)
 
     @transaction.atomic
     def post(self, request):

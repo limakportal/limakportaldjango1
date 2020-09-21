@@ -5,9 +5,9 @@ from ..authority.models import Authority
 from ..permission.models import Permission
 from ..staff.models import Staff
 from ..organization.models import Organization
+from ..personemployment.models import PersonEmployment
 
 from ..person.serializer import PersonSerializer
-
 
 
 def PersonPermissionControl(personId, permissionCode):
@@ -35,7 +35,6 @@ def GetAllIkResponsiblePersonWithLen(personId):
         personArr = []
         if len(userrole) > 0:
 
-
             for u in userrole:
                 if len(u.Organizations) > 1:
                     organizationIdArr = u.Organizations.split(",")
@@ -57,8 +56,6 @@ def GetAllIkResponsiblePersonWithLen(personId):
     return personArr
 
 
-
-
 def IsManager(personId):
     """ Personel Yönetici Kontrol """
     try:
@@ -73,13 +70,17 @@ def IsManager(personId):
 
 def GetPersonsWithLenManager(personId):
     """ Yöneticinin Sorumlu Olduğu Personeller ve Sayısı """
-    result = {}
-    staff = Staff.objects.get(Person_id=personId)
-    personsArr = []
-    persons = GetPersonsByOrganizationId(staff.Organization_id, personsArr)
-    result['Persons'] = PersonSerializer(persons, many=True).data
-    result['PersonsLen'] = len(persons)
-    return result
+    personEmployment = PersonEmployment.objects.filter(Person_id=personId)
+
+    perArr = []
+
+    for pe in personEmployment:
+        personsArr = []
+        persons = GetPersonsByOrganizationId(pe.Organization_id, personsArr)
+        for p in persons:
+            perArr.append(p)
+
+    return perArr
 
 
 def GetPersonsByOrganizationId(organizationId, personArr):
@@ -122,8 +123,7 @@ def ListResponsiblePersons(personid):
     elif PersonPermissionControl(personid, 'IZN_IK'):
         return GetAllIkResponsiblePersonWithLen(personid)
     elif IsManager(personid):
-        # return Response(GetPersonsWithLenManager(personid))
-        return GetAllIkResponsiblePersonWithLen(personid)
+        GetPersonsWithLenManager(personid)
     else:
         persons = Person.objects.filter(id=personid)
         return persons
