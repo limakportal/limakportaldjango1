@@ -160,7 +160,7 @@ class RightDownloadApiView(APIView):
             if righttype.RightMainType.id == EnumRightTypes.Mazeret:
                 filename = 'Mazeret_izin_Formu.docx'
                 outputfile = "MazeretResult.docx"
-            if righttype.RightMainType.id == EnumRightTypes.Ucretsiz:
+            if righttype.RightMainType.id == EnumRightTypes.Ücretsiz:
                 filename = 'Ucretsiz_izin_formu.docx'
                 outputfile = "UcretsizResult.docx"
 
