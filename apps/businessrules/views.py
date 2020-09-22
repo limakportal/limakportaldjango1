@@ -23,13 +23,8 @@ from ..dashboard.businesrules import ListResponsiblePersons
 @permission_classes([IsAuthenticated])
 def ResponsiblePersonDetails(request, id):
     response = {}
-    try:
-        personArr = ListResponsiblePersons(id)
-        response['ResponsiblePersons'] = PersonViewSerializer(personArr, many=True).data
-    except:
-        response['ResponsiblePersons'] = None
 
-    response['ResponsibleMenu'], response['Person'] = GetResponsiblePersonDetails(id)
+    response['ResponsibleMenu'], response['ResponsiblePersons'], response['Person'] = GetResponsiblePersonDetails(id)
 
     return Response(response, status=status.HTTP_200_OK)
 
@@ -202,10 +197,18 @@ def GetResponsiblePersonDetails(id):
                     except:
                         person = None
 
+        try:
+            personArr = ListResponsiblePersons(id)
+            responsiblePersons = PersonViewSerializer(personArr, many=True).data
+        except:
+            responsiblePersons = None
+
+
+
 
     except:
         return None, None, None
-    return responsibleMenu, personRequest
+    return responsibleMenu, responsiblePersons, personRequest
 
 
 def GetResponsibleIkPersons():
