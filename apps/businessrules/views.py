@@ -1,13 +1,8 @@
-from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 
-from rest_framework import serializers
-from rest_framework.serializers import SerializerMethodField
-
 from django.core.mail import send_mail
-import json
 
 from .serializer import OrganizationWithPersonTreeSerializer, AccountsDetailSerializer
 
@@ -19,11 +14,8 @@ from ..permission.models import Permission
 from ..authority.models import Authority
 from ..userrole.models import UserRole
 
-from ..organization.serializer import OrganizationSerializer, OrganizationTreeSerializer
-from ..businessrules.serializer import (OrganizationTreeByAccountId)
 from ..person.serializer import PersonSerializer, PersonViewSerializer
 from ..dashboard.businesrules import ListResponsiblePersons
-from ..organization.serializer import OrganizationTreeSerializer
 
 
 @api_view(['GET'])
@@ -31,12 +23,11 @@ def ResponsiblePersonDetails(request, id):
     response = {}
     try:
         personArr = ListResponsiblePersons(id)
-        serializer = PersonViewSerializer(personArr, many=True).data
-        response['ResponsiblePersons'] = serializer
+        response['ResponsiblePersons'] = PersonViewSerializer(personArr, many=True).data
     except:
         response['ResponsiblePersons'] = None
 
-    response['ResponsibleMenu'], response['ResponsiblePersons'], response['Person'] = GetResponsiblePersonDetails(id)
+    response['ResponsibleMenu'], response['Person'] = GetResponsiblePersonDetails(id)
 
     return Response(response, status=status.HTTP_200_OK)
 
@@ -209,10 +200,10 @@ def GetResponsiblePersonDetails(id):
                     except:
                         person = None
 
-        responsiblePersons = PersonViewSerializer(persons, many=True).data
+
     except:
         return None, None, None
-    return responsibleMenu, responsiblePersons, personRequest
+    return responsibleMenu, personRequest
 
 
 def GetResponsibleIkPersons():
