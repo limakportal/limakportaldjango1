@@ -34,22 +34,15 @@ def GetAllIkResponsiblePersonWithLen(personId):
         userrole = UserRole.objects.filter(Account_id=account.id, Organizations__isnull=False)
         personArr = []
         if len(userrole) > 0:
-
             for u in userrole:
-                if len(u.Organizations) > 1:
+                if len(u.Organizations) > 0:
                     organizationIdArr = u.Organizations.split(",")
                     for o in organizationIdArr:
-                        personsArr = []
-                        persons = GetPersonsByOrganizationId(o, personsArr)
-                        for p in persons:
-                            personArr.append(p)
-                else:
-                    personsArr = []
-                    persons = GetPersonsByOrganizationId(u, personsArr)
-                    for p in persons:
-                        personArr.append(p)
-
-
+                        if len(o) > 0:
+                            personsArr = []
+                            persons = GetPersonsByOrganizationId(o, personsArr)
+                            for p in persons:
+                                personArr.append(p)
     except:
         personArr = []
 
