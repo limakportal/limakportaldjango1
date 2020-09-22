@@ -168,8 +168,8 @@ class RightDownloadApiView(APIView):
             total = personsummary["BalanceRigth"]
 
             context = {'Name': person.Name, 'Surname': person.Surname, 'No': right.RightNumber,
-                       'GetDate': datetime.date.today(),
-                       'SD': right.StartDate.date(), 'EndDate': right.EndDate.date(),
+                       'GetDate': datetime.datetime.strptime(datetime.date.today(), '%d-%m-%Y'),
+                       'SD': datetime.datetime.strptime(right.StartDate.date(), '%d-%m-%Y') , 'EndDate': datetime.datetime.strptime(right.EndDate.date(), '%d-%m-%Y'),
                        'AppName': serializer.data['Name'], 'AppSurname': serializer.data['Surname'],
                        'RD': right.DateOfReturn.date(), 'Tel': right.Telephone,
                        'Bak': total, 'Kal': total - right.RightNumber, 'JD': personbusiness.JobStartDate.date(),
@@ -460,6 +460,7 @@ def GetPersonRightInfo(id):
     organiaztionTypeName = ""
     if len(staff) > 0:
         organiaztion = Organization.objects.filter(id=staff[0].Organization.id)
+        # title = Title.objects.get(id=staff[0].Title.id)
         if len(organiaztion) > 0:
             organiaztion_id = organiaztion[0].id
             organiaztionName = organiaztion[0].Name
@@ -467,6 +468,7 @@ def GetPersonRightInfo(id):
                 organiaztionTypeName = organiaztion[0].OrganizationType.Name
             else:
                 organiaztionTypeName = ""
+            # titleName = title.Name
 
     detail = []
     for item in rightleave:
@@ -496,6 +498,7 @@ def GetPersonRightInfo(id):
                'Organization': organiaztionName,
                "OrganizationType": organiaztionTypeName,
                "Gender": gender}
+            #    , "Title": titleName}
     return content
 
 
