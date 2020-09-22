@@ -33,7 +33,7 @@ from ..utils.enums import EnumRightTypes, EnumRightStatus, EnumStatus
 from ..vocationdays.models import VocationDays
 
 from ..dashboard.businesrules import ListResponsiblePersons
-from ..person.serializer import PersonViewSerializer
+
 
 
 class RightAPIView(APIView):
@@ -132,7 +132,6 @@ class RightWithApproverAPIView(APIView):
             except:
                 return Response([])
         return Response([])
-
 
 
 class RightWithApproverDetail(APIView):
@@ -358,76 +357,25 @@ def RightDaysNumber(request):
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def PersonRightInfo(request, id):
     content = []
 
-    if HasPermission(id, 'ADMIN') or HasPermission(id, 'IZN_IK'):
-        person = Person.objects.all()
-        for p in person:
-            result = GetPersonRightInfo(p.id)
-            content.append(result)
-        return Response(content)
-
-    # elif HasPermission(id,'IZN_IK'):
-
-    #     person = Person.objects.get(id = id)
-    #     staff = Staff.objects.get(Person_id = person.id)
-
-    #     organizationObj = Organization.objects.get(id = staff.Organization_id)
-    #     serializer = OrganizationWithPersonTreeSerializer(organizationObj)
-    #     responsibleMenu = serializer.data
-
-    #     persons = []
-
-    #     sameStaffs =  Staff.objects.filter(Organization = staff.Organization_id)
-    #     for staff in sameStaffs:
-    #         try:
-    #             person = Person.objects.get(id = staff.Person_id)
-    #             persons.append(person)
-    #         except:
-    #             person = None
-
-    #     if responsibleMenu['ChildOrganization'] != None:
-    #         for child in responsibleMenu['ChildOrganization']:
-    #             staffs = Staff.objects.filter(Organization = child['id'])
-    #             for staff in staffs:
-    #                 try:
-    #                     person = Person.objects.get(id = staff.Person_id)
-    #                     persons.append(person)
-    #                 except:
-    #                     person = None
-
-    #     person = Person.objects.all()
-    #     for p in persons:
-    #        result = GetPersonRightInfo(p.id)
-    #        content.append(result)
-    #     return Response(content)
-
-    elif IsManager(id):
-        staff = Staff.objects.get(Person_id=id)
-        # tum personları bul. sadece kendi birimi değil.
-        persons = GetManagerPersonsDetail(staff.Organization_id)
-
-        result = GetPersonRightInfo(id)
+    """person admin,ik,manager yetkilerine göre sorumlu olduğu personları getirir"""
+    personArr = ListResponsiblePersons(id)
+    for p in personArr:
+        result = GetPersonRightInfo(p.id)
         content.append(result)
+    # return Response(content)
 
-        if persons is not None:
-            for p in persons:
-                try:
-                    result = GetPersonRightInfo(p["id"])
-                    content.append(result)
-                except:
-                    pass
-        return Response(content)
-
-    x, responsePersons, y = GetResponsiblePersonDetails(id)
-    # liste boş gelirse kendisini ekledim (gokhan) neden yaptım bilmiyorm :d neden listeden boş geliyor.
-    if len(responsePersons) == 0:
-        responsePersons.append(y)
-    if responsePersons != None:
-        for person in responsePersons:
-            result = GetPersonRightInfo(person["Person"]["id"])
-            content.append(result)
+    # x, responsePersons, y = GetResponsiblePersonDetails(id)
+    # # liste boş gelirse kendisini ekledim (gokhan) neden yaptım bilmiyorm :d neden listeden boş geliyor.
+    # if len(responsePersons) == 0:
+    #     responsePersons.append(y)
+    # if responsePersons != None:
+    #     for person in responsePersons:
+    #         result = GetPersonRightInfo(person["Person"]["id"])
+    #         content.append(result)
     return Response(content)
 
 
