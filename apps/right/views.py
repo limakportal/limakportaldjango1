@@ -35,7 +35,6 @@ from ..vocationdays.models import VocationDays
 from ..dashboard.businesrules import ListResponsiblePersons
 
 
-
 class RightAPIView(APIView):
     def get(self, request):
         rights = Right.objects.all().order_by('id')
@@ -169,10 +168,12 @@ class RightDownloadApiView(APIView):
 
             context = {'Name': person.Name, 'Surname': person.Surname, 'No': right.RightNumber,
                        'GetDate': datetime.date.today().strftime('%m-%d-%Y'),
-                       'SD': right.StartDate.date().strftime('%m-%d-%Y'), 'EndDate': right.EndDate.date().strftime('%m-%d-%Y'),
+                       'SD': right.StartDate.date().strftime('%m-%d-%Y'),
+                       'EndDate': right.EndDate.date().strftime('%m-%d-%Y'),
                        'AppName': serializer.data['Name'], 'AppSurname': serializer.data['Surname'],
                        'RD': right.DateOfReturn.date().strftime('%m-%d-%Y'), 'Tel': right.Telephone,
-                       'Bak': total, 'Kal': total - right.RightNumber, 'JD': personbusiness.JobStartDate.date().strftime('%m-%d-%Y'),
+                       'Bak': total, 'Kal': total - right.RightNumber,
+                       'JD': personbusiness.JobStartDate.date().strftime('%m-%d-%Y'),
                        'SCNO': personbusiness.RegisterNo,
                        'KIDEM': personsummary["NumberOfDaysSubjestToRight"]}
             doc.render(context)
@@ -380,34 +381,43 @@ def PersonRightInfo(request, id):
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def PersonRightInfoPerson(request, id):
     content = []
-    persons = []
-    yetkili = False
-    if IsManager(id):
-        yetkili = True
-        persons = GetManagerPersonsDetail(id)
-    else:
-        staff = Staff.objects.get(Person_id=id)
-        persons = GetPersonsByOrganizationId(staff.Organization_id, persons)
-
-    for p in persons:
+    personArr = ListResponsiblePersons(id)
+    for p in personArr:
         try:
-            result = GetPersonRightInfo(p["id"])
+            result = GetPersonRightInfo(p.id)
             content.append(result)
         except:
             pass
 
-    # Kendisi yukarıda geliyor.
-    # result = GetPersonRightInfo(id)
-    # content.append(result)
-    # ismanager ise zaten alttakiler geliyor. bu yüzden çiftliyor. başka sebeptense ona göre yaparız.
-    if yetkili is False:
-        x, responsePersons, y = GetResponsiblePersonDetails(id)
-        if responsePersons is not None:
-            for person in responsePersons:
-                result = GetPersonRightInfo(person["Person"]["id"])
-                content.append(result)
+    # persons = []
+    # yetkili = False
+    # if IsManager(id):
+    #     yetkili = True
+    #     persons = GetManagerPersonsDetail(id)
+    # else:
+    #     staff = Staff.objects.get(Person_id=id)
+    #     persons = GetPersonsByOrganizationId(staff.Organization_id, persons)
+    #
+    # for p in persons:
+    #     try:
+    #         result = GetPersonRightInfo(p["id"])
+    #         content.append(result)
+    #     except:
+    #         pass
+    #
+    # # Kendisi yukarıda geliyor.
+    # # result = GetPersonRightInfo(id)
+    # # content.append(result)
+    # # ismanager ise zaten alttakiler geliyor. bu yüzden çiftliyor. başka sebeptense ona göre yaparız.
+    # if yetkili is False:
+    #     x, responsePersons, y = GetResponsiblePersonDetails(id)
+    #     if responsePersons is not None:
+    #         for person in responsePersons:
+    #             result = GetPersonRightInfo(person["Person"]["id"])
+    #             content.append(result)
     return Response(content)
 
 
@@ -498,7 +508,7 @@ def GetPersonRightInfo(id):
                'Organization': organiaztionName,
                "OrganizationType": organiaztionTypeName,
                "Gender": gender}
-            #    , "Title": titleName}
+    #    , "Title": titleName}
     return content
 
 
