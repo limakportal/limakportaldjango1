@@ -34,6 +34,7 @@ from ..vocationdays.models import VocationDays
 
 from ..dashboard.businesrules import ListResponsiblePersons
 
+sendmail = False
 
 class RightAPIView(APIView):
     def get(self, request):
@@ -199,6 +200,23 @@ def ApproveRight(request, id):
         serializer.initial_data['RightStatus'] = int(EnumRightStatus.Onaylandi)
         if serializer.is_valid():
             serializer.save(ModifiedBy=request.user)
+            if sendmail:
+                person = Person.objects.get(id=serializer.data['Person'])
+                personSerializer = PersonSerializer(person)
+                baslik = 'İzin Kullanım Hakkında'
+                icerik = 'İzin talebiniz onaylanmıştır. Bakiyenizden ' + str(request.data[
+                'RightNumber']) + ' gün düşülmüştür. İzin sürecinizin tamamlanması için imzalı izin formunuzu izne ayrılmadan önce İnsan Kaynakları Direktörlüğüne iletiniz.'
+                # mail_yolla(baslik,icerik,personSerializer.data['Email'],[personSerializer.data['Email']])
+
+                IKPersons = GetResponsibleIkPersons()
+                if IKPersons != None:
+                    for i in IKPersons:
+                        if i['Email'] != "":
+                            baslik = 'İzin Kullanım Hakkında'
+                            icerik = personSerializer.data['Name'] + ' ' + personSerializer.data[
+                                'Surname'] + ' in ' + str(serializer.validated_data['StartDate'].date()) + '/' + str(
+                                serializer.validated_data['EndDate'].date()) + ' tarihleri arasındaki izni onaylanmıştır.'
+                                # mail_yolla(baslik,icerik,i['Email'],[i['Email']])
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     except:
@@ -218,10 +236,44 @@ def DenyRight(request, id):
         serializer.initial_data['DenyExplanation'] = request.data['DenyExplanation']
         if serializer.is_valid():
             serializer.save(ModifiedBy=request.user)
+            if sendmail:
+                person = Person.objects.get(id=serializer.data['Person'])
+                personSerializer = PersonSerializer(person)
+                baslik = 'İzin Kullanım Hakkında'
+                icerik = 'İzin talebiniz reddedilmiştir.'
+                # mail_yolla(baslik,icerik,personSerializer.data['Email'],[personSerializer.data['Email']])
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         Response(str(e), status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def CancelRight(request, id):
+    try:
+        right = Right.objects.get(id=id)
+        getrequest = RightSerializer(right).data
+        if getrequest['RightStatus'] == int(EnumRightStatus.Iptal):
+            return Response("İzin zaten iptal durumundadır.", status=status.HTTP_404_NOT_FOUND)
+        if getrequest['RightStatus'] == int(EnumRightStatus.Onaylandi) or getrequest['RightStatus'] == int(EnumRightStatus.Reddedildi):
+            return Response("Onaylanan ya da Reddedilen izin iptal edilemez.",status=status.HTTP_404_NOT_FOUND)
+        serializer = RightSerializer(right, data=getrequest)
+        serializer.initial_data['RightStatus'] = int(EnumRightStatus.Iptal)
+        if serializer.is_valid():
+            serializer.save(ModifiedBy=request.user)
+            if sendmail:
+                person = Person.objects.get(id=serializer.data['Person'])
+                personSerializer = PersonSerializer(person)
+                approver = GetPersonApprover(personSerializer.data['id'])
+                if approver != None:
+                    baslik = 'İzin Kullanım Hakkında'
+                    icerik = personSerializer.data['Name'] + ' ' + personSerializer.data['Surname'] + ' izin talebini geri çekmiştir.'
+                # mail_yolla(baslik,icerik,approver.data['Email'],[approver.data['Email']])
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    except:
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['PUT'])
