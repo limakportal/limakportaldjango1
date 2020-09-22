@@ -509,6 +509,10 @@ def GetPersonRightInfo(id):
     person = Person.objects.get(id=id)
     personIdentity = PersonIdentity.objects.filter(Person=id)
     gender = ""
+    approverfullname = ""
+    approverserializer = GetPersonApprover(id)
+    if approverserializer != None:
+        approverfullname = approverserializer.data['Name'] + ' ' + approverserializer.data['Surname']
     if len(personIdentity) > 0:
         if personIdentity[0].Gender is not None:
             gender = personIdentity[0].Gender.Name
@@ -522,7 +526,7 @@ def GetPersonRightInfo(id):
     organiaztionTypeName = ""
     if len(staff) > 0:
         organiaztion = Organization.objects.filter(id=staff[0].Organization.id)
-        # title = Title.objects.get(id=staff[0].Title.id)
+        title = Title.objects.get(id=staff[0].Title.id)
         if len(organiaztion) > 0:
             organiaztion_id = organiaztion[0].id
             organiaztionName = organiaztion[0].Name
@@ -530,7 +534,7 @@ def GetPersonRightInfo(id):
                 organiaztionTypeName = organiaztion[0].OrganizationType.Name
             else:
                 organiaztionTypeName = ""
-            # titleName = title.Name
+            titleName = title.Name
 
     detail = []
     for item in rightleave:
@@ -559,8 +563,7 @@ def GetPersonRightInfo(id):
                'PersonRightSummary': personRightSummary,
                'Organization': organiaztionName,
                "OrganizationType": organiaztionTypeName,
-               "Gender": gender}
-    #    , "Title": titleName}
+               "Gender": gender , "Title": titleName , "ApproverFullName" : approverfullname}
     return content
 
 
