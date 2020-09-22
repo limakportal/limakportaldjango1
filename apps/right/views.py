@@ -168,8 +168,8 @@ class RightDownloadApiView(APIView):
             total = personsummary["BalanceRigth"]
 
             context = {'Name': person.Name, 'Surname': person.Surname, 'No': right.RightNumber,
-                       'GetDate': datetime.datetime.strptime(datetime.date.today(), '%d-%m-%Y'),
-                       'SD': datetime.datetime.strptime(right.StartDate.date(), '%d-%m-%Y') , 'EndDate': datetime.datetime.strptime(right.EndDate.date(), '%d-%m-%Y'),
+                       'GetDate': datetime.date.today(),
+                       'SD': right.StartDate.date(), 'EndDate': right.EndDate.date(),
                        'AppName': serializer.data['Name'], 'AppSurname': serializer.data['Surname'],
                        'RD': right.DateOfReturn.date(), 'Tel': right.Telephone,
                        'Bak': total, 'Kal': total - right.RightNumber, 'JD': personbusiness.JobStartDate.date(),
