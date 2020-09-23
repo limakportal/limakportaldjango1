@@ -22,6 +22,7 @@ class Organization(models.Model):
     WorkStartTime = models.DateTimeField(blank=True, null=True)
     WorkEndTime = models.DateTimeField(blank=True, null=True)
     Shift = models.ForeignKey(Shift, on_delete = models.CASCADE,blank=True, null=True)
+    Email = models.CharField(blank=True, null=True, max_length=50)
 
 
 
