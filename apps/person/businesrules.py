@@ -97,34 +97,20 @@ def PersonApprover(request, id):
 
 
 def GetPersonApprover(id):
-    staff = Staff.objects.get(Person=id)
-    organization = Organization.objects.get(id=staff.Organization.id)
-    if organization.CanApproveRight:
-        if organization.ManagerTitle == None:
-            return Response('Kişinin bağlı olduğu birimde yönetici bulunmamaktadır.', status=status.HTTP_404_NOT_FOUND)
+    try:
+        staff = Staff.objects.get(Person=id)
+        organization = Organization.objects.get(id=staff.Organization.id)
+        if organization.CanApproveRight:
+            if organization.ManagerTitle == None:
+                # return Response('Kişinin bağlı olduğu birimde yönetici bulunmamaktadır.', status=status.HTTP_404_NOT_FOUND)
+                return ""
 
-        ystaff = Staff.objects.filter(Organization=organization.id, Title=organization.ManagerTitle.id)
+            ystaff = Staff.objects.filter(Organization=organization.id, Title=organization.ManagerTitle.id)
 
-        if len(ystaff) == 0:
-            return Response('Kişinin bağlı olduğu birimde yönetici bulunmamaktadır.', status=status.HTTP_404_NOT_FOUND)
-        personel = Person.objects.get(id=ystaff[0].Person.id)
-        if personel.id == id:
-            try:
-                staffs = Staff.objects.get(Organization=organization.UpperOrganization.id)
-                personel = Person.objects.get(id=staffs.Person.id)
-                serializer = PersonSerializer(personel)
-                return serializer
-            except:
-                return ""    
-        serializer = PersonSerializer(personel)
-        return serializer
-    else:
-        neworganization = Organization.objects.get(id=organization.UpperOrganization.id)
-        if neworganization.CanApproveRight:
-            newstaff = Staff.objects.get(Organization=neworganization.id, Title=neworganization.ManagerTitle.id)
-            if newstaff == None:
-                return Response('Kişinin bağlı olduğum birimde yönetici bulunmamaktadır.', status=status.HTTP_404_NOT_FOUND)
-            personel = Person.objects.get(id=newstaff.Person.id)
+            if len(ystaff) == 0:
+                # return Response('Kişinin bağlı olduğu birimde yönetici bulunmamaktadır.', status=status.HTTP_404_NOT_FOUND)
+                return ""
+            personel = Person.objects.get(id=ystaff[0].Person.id)
             if personel.id == id:
                 try:
                     staffs = Staff.objects.get(Organization=organization.UpperOrganization.id)
@@ -132,9 +118,29 @@ def GetPersonApprover(id):
                     serializer = PersonSerializer(personel)
                     return serializer
                 except:
-                    return ""
+                    return ""    
             serializer = PersonSerializer(personel)
             return serializer
+        else:
+            neworganization = Organization.objects.get(id=organization.UpperOrganization.id)
+            if neworganization.CanApproveRight:
+                newstaff = Staff.objects.get(Organization=neworganization.id, Title=neworganization.ManagerTitle.id)
+                if newstaff == None:
+                    # return Response('Kişinin bağlı olduğum birimde yönetici bulunmamaktadır.', status=status.HTTP_404_NOT_FOUND)
+                    return ""
+                personel = Person.objects.get(id=newstaff.Person.id)
+                if personel.id == id:
+                    try:
+                        staffs = Staff.objects.get(Organization=organization.UpperOrganization.id)
+                        personel = Person.objects.get(id=staffs.Person.id)
+                        serializer = PersonSerializer(personel)
+                        return serializer
+                    except:
+                        return ""
+                serializer = PersonSerializer(personel)
+                return serializer
+    except:
+        pass
 
         # staff = Staff.objects.get(Person = id)
         # organization = Organization.objects.get(id = staff.Organization.id)
