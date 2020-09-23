@@ -596,16 +596,31 @@ def GetRightStatus(request, status_id):
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def TodayOnLeavePerson(request):
     try:
         today = datetime.date.today()
-        rights = Right.objects.filter(StartDate__day=today.day, StartDate__month=today.month,
-                                      StartDate__year=today.year)
+
+        account = request.user
+        person_queryset = Person.objects.get(Email=account.email)
+        response_Person_Arr = ListResponsiblePersons(person_queryset.id)
+        right_Arr = []
+        for p in response_Person_Arr:
+            try:
+                right_queryset = Right.objects.get(StartDate__day=today.day, StartDate__month=today.month,
+                                      StartDate__year=today.year,Person_id = p.id)
+                right_Arr.append(right_queryset)
+            except:
+                pass
+        #
+        # rights = Right.objects.filter(StartDate__day=today.day, StartDate__month=today.month,
+        #                               StartDate__year=today.year)
 
         persons = []
 
         finallyData = []
-        for right in rights:
+        # for right in rights:
+        for right in right_Arr:
             data = {}
             person = Person.objects.get(id=right.Person_id)
             data['Name'] = person.Name
