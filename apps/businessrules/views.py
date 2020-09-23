@@ -241,13 +241,50 @@ def IsManager(personId):
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def ManagerPersons(request):
-    managerpersons = []
-    persons = Person.objects.all()
-    for person in persons:
-        if IsManager(person.id):
-            managerpersons.append(person)
-    return Response(PersonSerializer(managerpersons, many=True).data)
+    account = request.user
+    try:
+        person_queryset = Person.objects.get(Email=account.email)
+
+        personArr = []
+        staff_queryset = Staff.objects.get(Person_id=person_queryset.id)
+        staffs_queryset = Staff.objects.filter(Organization_id=staff_queryset.Organization)
+        for s in staffs_queryset:
+            try:
+                person_queryset = Person.objects.get(id=s.Person_id)
+                personArr.append(person_queryset)
+            except:
+                pass
+
+        userRole_queryset = UserRole.objects.filter(Account_id=account.id, Organizations__isnull=False)
+        if len(userRole_queryset) > 0:
+            for ur in userRole_queryset:
+                if len(ur.Organizations) > 0:
+                    organizationIdArr = ur.Organizations.split(",")
+                    for o in organizationIdArr:
+                        staffs_queryset = Staff.objects.filter(Organization_id=o)
+                        for s in staffs_queryset:
+                            try:
+                                person_queryset = Person.objects.get(id=s.Person_id)
+                                personArr.append(person_queryset)
+                            except:
+                                pass
+
+        managerpersons = []
+        # persons = Person.objects.all()
+        # for person in persons:
+        #     if IsManager(person.id):
+        #         managerpersons.append(person)
+        # return Response(PersonSerializer(managerpersons, many=True).data)
+
+        for person in personArr:
+            if IsManager(person.id):
+                managerpersons.append(person)
+        return Response(PersonSerializer(managerpersons, many=True).data)
+
+    except:
+        Response([])
 
 
 @api_view(['GET'])
