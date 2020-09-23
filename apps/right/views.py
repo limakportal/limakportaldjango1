@@ -525,7 +525,7 @@ def GetPersonRightInfo(id):
     gender = ""
     approverfullname = ""
     approverserializer = GetPersonApprover(id)
-    if approverserializer != None:
+    if approverserializer != None and approverserializer != "":
         approverfullname = approverserializer.data['Name'] + ' ' + approverserializer.data['Surname']
     if len(personIdentity) > 0:
         if personIdentity[0].Gender is not None:
