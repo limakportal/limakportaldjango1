@@ -1,4 +1,5 @@
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -12,6 +13,8 @@ from .businesrules import (
 
 from ..organization.models import Organization
 from ..staff.models import Staff
+from ..person.models import Person
+from ..userrole.models import UserRole
 
 
 @api_view(['GET'])
@@ -65,7 +68,33 @@ def GetOrganizationWithTotalStaff(request, organizationid):
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def GetAllOrganizationtypeId2WithTotalStaff(request):
-    organization = Organization.objects.filter(OrganizationType_id=2)
-    serializers = GetAllOrganizationtypeId2WithTotalStaffSerializer(organization, many=True)
-    return Response(serializers.data)
+    account = request.user
+    try:
+        person_queryset = Person.objects.get(Email=account.email)
+        staff_queryset = Staff.objects.get(Person_id=person_queryset.id)
+        organizationArr = []
+        organizationArr = GetOrganizationAndLoweOrganization(staff_queryset.Organization_id, organizationArr)
+
+        userRole_queryset = UserRole.objects.filter(Account_id=account.id, Organizations__isnull=False)
+
+        for ur in userRole_queryset:
+            if len(ur.Organizations) > 0:
+                organizationIdArr = ur.Organizations.split(",")
+                for o in organizationIdArr:
+                    organizationArr = GetOrganizationAndLoweOrganization(o, organizationArr)
+
+        organizationType2Arr = []
+        for oa in organizationArr:
+            if oa.OrganizationType_id == 2:
+                organizationType2Arr.append(oa)
+
+        if len(organizationType2Arr) > 0:
+            # organization = Organization.objects.filter(OrganizationType_id=2)
+            # serializers = GetAllOrganizationtypeId2WithTotalStaffSerializer(organization, many=True)
+            serializers = GetAllOrganizationtypeId2WithTotalStaffSerializer(organizationType2Arr, many=True)
+            return Response(serializers.data)
+    except:
+        pass
+    return Response([])
