@@ -1,49 +1,60 @@
 from .models import Organization
-from .serializer import OrganizationSerializer , OrganizationTreeSerializer
+from .serializer import OrganizationSerializer, OrganizationTreeSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 
 
 class OrganizationAPIView(APIView):
-    def get(self,request):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
         organizations = Organization.objects.all().order_by('id')
-        serializer = OrganizationSerializer(organizations,many=True)
+        serializer = OrganizationSerializer(organizations, many=True)
         return Response(serializer.data)
 
-    def post(self,request):
-        serializer = OrganizationSerializer(data = request.data)
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = OrganizationSerializer(data=request.data)
         if serializer.is_valid():
-            organization = Organization.objects.filter(UpperOrganization = request.data['UpperOrganization'], Name = request.data['Name'])
+            organization = Organization.objects.filter(UpperOrganization=request.data['UpperOrganization'],
+                                                       Name=request.data['Name'])
             if len(organization):
-                return Response('Bu birimde aynı isimli organizasyon tanımlıdır.',status=status.HTTP_404_NOT_FOUND)
+                return Response('Bu birimde aynı isimli organizasyon tanımlıdır.', status=status.HTTP_404_NOT_FOUND)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class OrganizationTreeList(APIView):
-    def get(self,request):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
         organizations = Organization.objects.filter(UpperOrganization=None)
-        serializer = OrganizationTreeSerializer(organizations,many=True)
+        serializer = OrganizationTreeSerializer(organizations, many=True)
         return Response(serializer.data)
 
 
 class OrganizationDetails(APIView):
 
-    def get_object(self,id):
+    def get_object(self, id):
         try:
             return Organization.objects.get(id=id)
         except Organization.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, id):
         organization = self.get_object(id)
         serializer = OrganizationSerializer(organization)
         return Response(serializer.data)
 
+    permission_classes = [IsAuthenticated]
 
-    def put(self, request,id):
+    def put(self, request, id):
         organization = self.get_object(id)
         serializer = OrganizationSerializer(organization, data=request.data)
         if serializer.is_valid():
@@ -51,6 +62,7 @@ class OrganizationDetails(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    permission_classes = [IsAuthenticated]
 
     def delete(self, request, id):
         organization = self.get_object(id)

@@ -1,12 +1,10 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.decorators import api_view , permission_classes
-
+from rest_framework.decorators import api_view, permission_classes
 
 from .serializer import RegistrationSerializer
 from rest_framework.authtoken.models import Token
-
 
 from rest_framework import parsers, renderers
 from rest_framework.authtoken.models import Token
@@ -24,23 +22,23 @@ from ..permission.models import Permission
 from ..permission.serializer import PermissionSerializer
 
 
-
 @api_view(['POST', ])
 # @permission_classes([IsAuthenticated])
 def registration_view(request):
-	if request.method == 'POST':
-		serializer = RegistrationSerializer(data=request.data)
-		data = {}
-		if serializer.is_valid():
-			account = serializer.save()
-			data['response'] = 'successfully registered new user.'
-			data['email'] = account.email
-			data['username'] = account.username
-			token = Token.objects.get(user=account).key
-			data['token'] = token
-		else:
-			data = serializer.errors
-		return Response(data)
+    if request.method == 'POST':
+        serializer = RegistrationSerializer(data=request.data)
+        data = {}
+        if serializer.is_valid():
+            account = serializer.save()
+            data['response'] = 'successfully registered new user.'
+            data['email'] = account.email
+            data['username'] = account.username
+            token = Token.objects.get(user=account).key
+            data['token'] = token
+        else:
+            data = serializer.errors
+        return Response(data)
+
 
 class ObtainAuthToken(APIView):
     throttle_classes = ()
@@ -73,11 +71,12 @@ class ObtainAuthToken(APIView):
             encoding="application/json",
         )
 
-    def get_object(self,id):
+    def get_object(self, id):
         try:
             return Person.objects.get(id=id)
         except Person.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
+
     # permission_classes = [IsAuthenticated]
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data,
@@ -94,24 +93,24 @@ class ObtainAuthToken(APIView):
         response['User'] = responseUser
 
         try:
-            person = Person.objects.get(Email = user.email)
+            person = Person.objects.get(Email=user.email)
             responsePerson = {}
             responsePerson['id'] = person.id
             responsePerson['Name'] = person.Name
             responsePerson['Surname'] = person.Surname
             response['Person'] = responsePerson
-        except :
+        except:
             response['Person'] = None
-            
-        requestPermission = {} 
+
+        requestPermission = {}
         allPermissions = []
-        userRoles = UserRole.objects.filter(Account_id = user.id)
+        userRoles = UserRole.objects.filter(Account_id=user.id)
         for userRole in userRoles:
-            authorityes = Authority.objects.filter(Role_id = userRole.Role_id , Active = True)
+            authorityes = Authority.objects.filter(Role_id=userRole.Role_id, Active=True)
             for authority in authorityes:
-                permissions = Permission.objects.filter(id = authority.Permission_id)
+                permissions = Permission.objects.filter(id=authority.Permission_id)
                 for permission in permissions:
-                    allPermissions.append(permission);    
+                    allPermissions.append(permission);
                     requestPermission = serializer.data
         response['permissions'] = PermissionSerializer(allPermissions, many=True).data
         return Response(response)
