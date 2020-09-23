@@ -1,14 +1,14 @@
 from django.urls import path
-from .views import( 
-    RightAPIView , 
-    RightDetails , 
-    RightWithApproverAPIView, 
-    RightDownloadApiView, 
-    RightBalance, 
-    RightDaysNumber ,
-    PersonRightInfo, 
-    GetRightStatus, 
-    TodayOnLeavePerson, 
+from .views import (
+    RightAPIView,
+    RightDetails,
+    RightWithApproverAPIView,
+    RightDownloadApiView,
+    RightBalance,
+    RightDaysNumber,
+    PersonRightInfo,
+    GetRightStatus,
+    TodayOnLeavePerson,
     RightAllDetails,
     RightSummary,
     RightWithApproverDetail,
@@ -17,12 +17,11 @@ from .views import(
     CancelRight,
     TodayOnLeavePersonByPerson,
     PersonRightInfoPerson,
-    HasField
+    HasField,
+    GetPersonRightInfoPersonel
 )
 
-
-
-urlpatterns = [ 
+urlpatterns = [
     path('rights', RightAPIView.as_view()),
     path('rights/<int:id>', RightDetails.as_view()),
     path('rightsDesc', RightWithApproverAPIView.as_view()),
@@ -32,6 +31,7 @@ urlpatterns = [
     path('righsDayNumber', RightDaysNumber),
     path('personRightInfo/<int:id>', PersonRightInfo),
     path('personRightInfoByPerson/<int:id>', PersonRightInfoPerson),
+    path('getpersonrightinfopersonel/<int:id>', GetPersonRightInfoPersonel),
     path('getrightstatus/<int:status_id>', GetRightStatus),
     path('todayonleaveperson', TodayOnLeavePerson),
     path('todayonleaveperson/<int:id>', TodayOnLeavePersonByPerson),
@@ -41,5 +41,5 @@ urlpatterns = [
     path('denyright/<int:id>', DenyRight),
     path('cancelright/<int:id>', CancelRight),
     path('hasfield/<int:id>', HasField),
-  
+
 ]

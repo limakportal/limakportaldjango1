@@ -36,6 +36,7 @@ from ..dashboard.businesrules import ListResponsiblePersons
 
 sendmail = False
 
+
 class RightAPIView(APIView):
     def get(self, request):
         rights = Right.objects.all().order_by('id')
@@ -205,7 +206,7 @@ def ApproveRight(request, id):
                 personSerializer = PersonSerializer(person)
                 baslik = 'İzin Kullanım Hakkında'
                 icerik = 'İzin talebiniz onaylanmıştır. Bakiyenizden ' + str(request.data[
-                'RightNumber']) + ' gün düşülmüştür. İzin sürecinizin tamamlanması için imzalı izin formunuzu izne ayrılmadan önce İnsan Kaynakları Direktörlüğüne iletiniz.'
+                                                                                 'RightNumber']) + ' gün düşülmüştür. İzin sürecinizin tamamlanması için imzalı izin formunuzu izne ayrılmadan önce İnsan Kaynakları Direktörlüğüne iletiniz.'
                 # mail_yolla(baslik,icerik,personSerializer.data['Email'],[personSerializer.data['Email']])
 
                 IKPersons = GetResponsibleIkPersons()
@@ -215,8 +216,9 @@ def ApproveRight(request, id):
                             baslik = 'İzin Kullanım Hakkında'
                             icerik = personSerializer.data['Name'] + ' ' + personSerializer.data[
                                 'Surname'] + ' in ' + str(serializer.validated_data['StartDate'].date()) + '/' + str(
-                                serializer.validated_data['EndDate'].date()) + ' tarihleri arasındaki izni onaylanmıştır.'
-                                # mail_yolla(baslik,icerik,i['Email'],[i['Email']])
+                                serializer.validated_data[
+                                    'EndDate'].date()) + ' tarihleri arasındaki izni onaylanmıştır.'
+                            # mail_yolla(baslik,icerik,i['Email'],[i['Email']])
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     except:
@@ -256,8 +258,9 @@ def CancelRight(request, id):
         getrequest = RightSerializer(right).data
         if getrequest['RightStatus'] == int(EnumRightStatus.Iptal):
             return Response("İzin zaten iptal durumundadır.", status=status.HTTP_404_NOT_FOUND)
-        if getrequest['RightStatus'] == int(EnumRightStatus.Onaylandi) or getrequest['RightStatus'] == int(EnumRightStatus.Reddedildi):
-            return Response("Onaylanan ya da Reddedilen izin iptal edilemez.",status=status.HTTP_404_NOT_FOUND)
+        if getrequest['RightStatus'] == int(EnumRightStatus.Onaylandi) or getrequest['RightStatus'] == int(
+                EnumRightStatus.Reddedildi):
+            return Response("Onaylanan ya da Reddedilen izin iptal edilemez.", status=status.HTTP_404_NOT_FOUND)
         serializer = RightSerializer(right, data=getrequest)
         serializer.initial_data['RightStatus'] = int(EnumRightStatus.Iptal)
         if serializer.is_valid():
@@ -268,7 +271,8 @@ def CancelRight(request, id):
                 approver = GetPersonApprover(personSerializer.data['id'])
                 if approver != None:
                     baslik = 'İzin Kullanım Hakkında'
-                    icerik = personSerializer.data['Name'] + ' ' + personSerializer.data['Surname'] + ' izin talebini geri çekmiştir.'
+                    icerik = personSerializer.data['Name'] + ' ' + personSerializer.data[
+                        'Surname'] + ' izin talebini geri çekmiştir.'
                 # mail_yolla(baslik,icerik,approver.data['Email'],[approver.data['Email']])
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -473,6 +477,16 @@ def PersonRightInfoPerson(request, id):
     return Response(content)
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def GetPersonRightInfoPersonel(request, id):
+    try:
+        result = GetPersonRightInfo(id)
+        return Response(result)
+    except:
+        return Response({})
+
+
 def GetPersonRightInfo(id):
     totalleave = totalright = remainingleave = nextyear = nextleave = approvelwaiting = rightnumber = organiaztion_id = rightwaitingnumber = 0
     registerno = jobstartdate = formerseniority = ""
@@ -563,7 +577,7 @@ def GetPersonRightInfo(id):
                'PersonRightSummary': personRightSummary,
                'Organization': organiaztionName,
                "OrganizationType": organiaztionTypeName,
-               "Gender": gender , "Title": titleName , "ApproverFullName" : approverfullname}
+               "Gender": gender, "Title": titleName, "ApproverFullName": approverfullname}
     return content
 
 
