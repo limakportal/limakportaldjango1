@@ -20,6 +20,7 @@ from ..userrole.models import UserRole
 @api_view(['GET'])
 def GetResponsiblePersons(request, id):
     personArr = ListResponsiblePersons(id)
+    personArr.sort(key=lambda x:x.Name.lower())
     result = {}
     result['Persons'] = PersonSerializer(personArr, many=True).data
     if personArr == None:
