@@ -784,6 +784,20 @@ def RightAllDetails(request):
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def GetApproverPersonRight(request,id):
+    try:
+        rights = Right.objects.filter(Approver1 = id)
+        if len(rights) > 0:
+            serializer = RightWithApproverSerializer(rights,many=True)
+            return Response(serializer.data)
+        return Response({})
+
+    except:
+        return Response({})
+
+
+@api_view(['GET'])
 def RightSummary(request, id):
     try:
         result = PersonRightSummary(id)

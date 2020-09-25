@@ -18,7 +18,8 @@ from .views import (
     TodayOnLeavePersonByPerson,
     PersonRightInfoPerson,
     HasField,
-    GetPersonRightInfoPersonel
+    GetPersonRightInfoPersonel,
+    GetApproverPersonRight
 )
 
 urlpatterns = [
@@ -41,5 +42,6 @@ urlpatterns = [
     path('denyright/<int:id>', DenyRight),
     path('cancelright/<int:id>', CancelRight),
     path('hasfield/<int:id>', HasField),
+    path('approverpersonright/<int:id>', GetApproverPersonRight),
 
 ]
