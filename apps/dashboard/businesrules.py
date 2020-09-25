@@ -5,9 +5,6 @@ from ..authority.models import Authority
 from ..permission.models import Permission
 from ..staff.models import Staff
 from ..organization.models import Organization
-from ..personemployment.models import PersonEmployment
-
-from ..person.serializer import PersonSerializer
 
 
 def PersonPermissionControl(personId, permissionCode):
@@ -63,17 +60,28 @@ def IsManager(personId):
 
 def GetPersonsWithLenManager(personId):
     """ Yöneticinin Sorumlu Olduğu Personeller ve Sayısı """
-    personEmployment = PersonEmployment.objects.filter(Person_id=personId)
+    person_Arr = []
 
-    perArr = []
+    try:
+        staff_queryset = Staff.objects.get(Person_id=personId)
+        person_Arr = GetPersonsByOrganizationId(staff_queryset.Organization_id, person_Arr)
 
-    for pe in personEmployment:
-        personsArr = []
-        persons = GetPersonsByOrganizationId(pe.Organization_id, personsArr)
-        for p in persons:
-            perArr.append(p)
+    except:
+        pass
 
-    return perArr
+    return person_Arr
+
+    # personEmployment = PersonEmployment.objects.filter(Person_id=personId)
+    #
+    # perArr = []
+    #
+    # for pe in personEmployment:
+    #     personsArr = []
+    #     persons = GetPersonsByOrganizationId(pe.Organization_id, personsArr)
+    #     for p in persons:
+    #         perArr.append(p)
+    #
+    # return perArr
 
 
 def GetPersonsByOrganizationId(organizationId, personArr):
