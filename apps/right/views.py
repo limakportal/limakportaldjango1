@@ -168,16 +168,16 @@ class RightDownloadApiView(APIView):
             personsummary = PersonRightSummary(person.id)
             total = personsummary["BalanceRigth"]
 
-            context = {'Name': person.Name, 'Surname': person.Surname, 'No': right.RightNumber,
-                       'GetDate': datetime.date.today().strftime('%m-%d-%Y'),
-                       'SD': right.StartDate.date().strftime('%m-%d-%Y'),
-                       'EndDate': right.EndDate.date().strftime('%m-%d-%Y'),
-                       'AppName': serializer.data['Name'], 'AppSurname': serializer.data['Surname'],
-                       'RD': right.DateOfReturn.date().strftime('%m-%d-%Y'), 'Tel': right.Telephone,
-                       'Bak': total, 'Kal': total - right.RightNumber,
-                       'JD': personbusiness.JobStartDate.date().strftime('%m-%d-%Y'),
-                       'SCNO': personbusiness.RegisterNo,
-                       'KIDEM': personsummary["NumberOfDaysSubjestToRight"]}
+            context = {'Name': person.Name, 'Surname': person.Surname, 'No': str(right.RightNumber).replace(".0",""),
+                    'GetDate': datetime.date.today().strftime('%d-%m-%Y'),
+                    'SD': right.StartDate.date().strftime('%d-%m-%Y'),
+                    'EndDate': right.EndDate.date().strftime('%d-%m-%Y'),
+                    'AppName': serializer.data['Name'], 'AppSurname': serializer.data['Surname'],
+                    'RD': right.DateOfReturn.date().strftime('%d-%m-%Y'), 'Tel': right.Telephone,
+                    'Bak': str(total).replace(".0",""), 'Kal': str(total - right.RightNumber).replace(".0",""),
+                    'JD': personbusiness.JobStartDate.date().strftime('%d-%m-%Y'),
+                    'SCNO': personbusiness.RegisterNo,
+                    'KIDEM': personsummary["NumberOfDaysSubjestToRight"]}
             doc.render(context)
             doc.save(outputfile)
 
