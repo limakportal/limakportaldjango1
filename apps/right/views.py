@@ -678,6 +678,61 @@ def TodayOnLeavePerson(request):
 
 @api_view(['GET'])
 def TodayOnLeavePersonByPerson(request, id):
+    persons = []
+    if businesrules.IsManager(id):
+        persons = businesrules.GetPersonsWithLenManager(id)
+    else:
+        persons = Person.objects.filter(id=id)
+    dataArray = []
+    for p in persons:
+        data = GetTodayOnLeavePersonByPerson(p.id)
+        dataArray.append(data)
+    newarray = []
+    for d in dataArray:
+        if len(d) > 0:
+            newarray.append(d)
+    return Response(newarray)
+
+
+    # try:
+        # today = datetime.date.today()
+        # organizationarr = GetManagerOrganizationsDetailNoneSerializer(id)
+        # liste = []
+        # for o in organizationarr:
+        #     liste.append(str(o.id))
+        #     deger = ",".join(liste)
+        # rows = TodayOnLeaveByOrganizatinID(deger)
+        # persons = []
+
+        # finallyData = []
+        # for row in rows:
+        #     data = {}
+        #     data['Name'] = row[0]
+        #     data['Surname'] = row[1]
+        #     data['Email'] = row[2]
+        #     data['StartDate'] = row[12].date()
+        #     data['EndDate'] = row[4].date()
+        #     data['RightNumber'] = row[8]
+        #     try:
+        #         data['RightType'] = RightType.objects.get(id=row[13]).Name
+        #     except:
+        #         data['RightType'] = None
+        #     data['Organization'] = row[17]
+        #     data['Title'] = row[22]
+        #     data['Manager'] = row[23]
+        #     data['DateOfReturn'] = row[5]
+        #     try:
+        #         data['PersonRightSummary'] = PersonRightSummary(id)
+        #     except:
+        #         data['PersonRightSummary'] = None
+        #     finallyData.append(data)
+
+        # return Response(finallyData)
+    # except:
+        # return Response(status=status.HTTP_404_NOT_FOUND)
+
+def GetTodayOnLeavePersonByPerson(id):
+    finallyData = []
     try:
         today = datetime.date.today()
         organizationarr = GetManagerOrganizationsDetailNoneSerializer(id)
@@ -685,36 +740,38 @@ def TodayOnLeavePersonByPerson(request, id):
         for o in organizationarr:
             liste.append(str(o.id))
             deger = ",".join(liste)
-        rows = TodayOnLeaveByOrganizatinID(deger)
-        persons = []
+        try:
+            rows = TodayOnLeaveByOrganizatinID(deger)
 
-        finallyData = []
-        for row in rows:
-            data = {}
-            data['Name'] = row[0]
-            data['Surname'] = row[1]
-            data['Email'] = row[2]
-            data['StartDate'] = row[12].date()
-            data['EndDate'] = row[4].date()
-            data['RightNumber'] = row[8]
-            try:
-                data['RightType'] = RightType.objects.get(id=row[13]).Name
-            except:
-                data['RightType'] = None
-            data['Organization'] = row[17]
-            data['Title'] = row[22]
-            data['Manager'] = row[23]
-            data['DateOfReturn'] = row[5]
-            try:
-                data['PersonRightSummary'] = PersonRightSummary(id)
-            except:
-                data['PersonRightSummary'] = None
-            finallyData.append(data)
+            persons = []
 
-        return Response(finallyData)
+        
+            for row in rows:
+                data = {}
+                data['Name'] = row[0]
+                data['Surname'] = row[1]
+                data['Email'] = row[2]
+                data['StartDate'] = row[12].date()
+                data['EndDate'] = row[4].date()
+                data['RightNumber'] = row[8]
+                try:
+                    data['RightType'] = RightType.objects.get(id=row[13]).Name
+                except:
+                    data['RightType'] = None
+                data['Organization'] = row[17]
+                data['Title'] = row[22]
+                data['Manager'] = row[23]
+                data['DateOfReturn'] = row[5]
+                try:
+                    data['PersonRightSummary'] = PersonRightSummary(id)
+                except:
+                    data['PersonRightSummary'] = None
+                finallyData.append(data) 
+        except: 
+            pass      
     except:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-
+        pass
+    return finallyData
 
 def RightController(data, rightid):
     try:
