@@ -32,6 +32,8 @@ from ..title.models import Title
 from ..utils.enums import EnumRightTypes, EnumRightStatus, EnumStatus
 from ..vocationdays.models import VocationDays
 
+from ..dashboard import businesrules
+
 from ..dashboard.businesrules import ListResponsiblePersons
 
 sendmail = False
@@ -168,16 +170,16 @@ class RightDownloadApiView(APIView):
             personsummary = PersonRightSummary(person.id)
             total = personsummary["BalanceRigth"]
 
-            context = {'Name': person.Name, 'Surname': person.Surname, 'No': str(right.RightNumber).replace(".0",""),
-                    'GetDate': datetime.date.today().strftime('%d-%m-%Y'),
-                    'SD': right.StartDate.date().strftime('%d-%m-%Y'),
-                    'EndDate': right.EndDate.date().strftime('%d-%m-%Y'),
-                    'AppName': serializer.data['Name'], 'AppSurname': serializer.data['Surname'],
-                    'RD': right.DateOfReturn.date().strftime('%d-%m-%Y'), 'Tel': right.Telephone,
-                    'Bak': str(total).replace(".0",""), 'Kal': str(total - right.RightNumber).replace(".0",""),
-                    'JD': personbusiness.JobStartDate.date().strftime('%d-%m-%Y'),
-                    'SCNO': personbusiness.RegisterNo,
-                    'KIDEM': personsummary["NumberOfDaysSubjestToRight"]}
+            context = {'Name': person.Name, 'Surname': person.Surname, 'No': str(right.RightNumber).replace(".0", ""),
+                       'GetDate': datetime.date.today().strftime('%d-%m-%Y'),
+                       'SD': right.StartDate.date().strftime('%d-%m-%Y'),
+                       'EndDate': right.EndDate.date().strftime('%d-%m-%Y'),
+                       'AppName': serializer.data['Name'], 'AppSurname': serializer.data['Surname'],
+                       'RD': right.DateOfReturn.date().strftime('%d-%m-%Y'), 'Tel': right.Telephone,
+                       'Bak': str(total).replace(".0", ""), 'Kal': str(total - right.RightNumber).replace(".0", ""),
+                       'JD': personbusiness.JobStartDate.date().strftime('%d-%m-%Y'),
+                       'SCNO': personbusiness.RegisterNo,
+                       'KIDEM': personsummary["NumberOfDaysSubjestToRight"]}
             doc.render(context)
             doc.save(outputfile)
 
@@ -480,11 +482,21 @@ def PersonRightInfoPerson(request, id):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def GetPersonRightInfoPersonel(request, id):
-    try:
-        result = GetPersonRightInfo(id)
-        return Response(result)
-    except:
-        return Response({})
+    personArr = []
+    if businesrules.IsManager(id):
+        personArr = businesrules.GetPersonsWithLenManager(id)
+    else:
+        persons = Person.objects.filter(id=id)
+        personArr.append(persons)
+
+    data = []
+    for p in personArr:
+        try:
+            result = GetPersonRightInfo(p.id)
+            data.append(result)
+        except:
+            pass
+    return Response(data)
 
 
 def GetPersonRightInfo(id):
@@ -613,7 +625,7 @@ def TodayOnLeavePerson(request):
         for p in response_Person_Arr:
             try:
                 right_queryset = Right.objects.get(StartDate__day=today.day, StartDate__month=today.month,
-                                      StartDate__year=today.year,Person_id = p.id)
+                                                   StartDate__year=today.year, Person_id=p.id)
                 right_Arr.append(right_queryset)
             except:
                 pass
@@ -644,8 +656,8 @@ def TodayOnLeavePerson(request):
                 title = Title.objects.get(id=staff.Title_id)
                 data['Organization'] = organization.Name
                 data['Title'] = title.Name
-                managerstaff = Staff.objects.filter(Title="ManagerTitle_id",Organization=staff.Organization_id)
-                if len(managerstaff) > 0 :
+                managerstaff = Staff.objects.filter(Title="ManagerTitle_id", Organization=staff.Organization_id)
+                if len(managerstaff) > 0:
                     managerperson = Person.objects.get(id=managerstaff.Person_id)
                     data['Manager'] = managerperson.Name + ' ' + managerperson.Surname
                 # finallyData.append(data)
