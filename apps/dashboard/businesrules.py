@@ -124,7 +124,7 @@ def ListResponsiblePersons(personid):
     elif PersonPermissionControl(personid, 'IZN_IK'):
         return GetAllIkResponsiblePersonWithLen(personid)
     elif IsManager(personid):
-        GetPersonsWithLenManager(personid)
+        return GetPersonsWithLenManager(personid)
     else:
         persons = Person.objects.filter(id=personid)
         return persons
