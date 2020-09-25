@@ -644,6 +644,10 @@ def TodayOnLeavePerson(request):
                 title = Title.objects.get(id=staff.Title_id)
                 data['Organization'] = organization.Name
                 data['Title'] = title.Name
+                managerstaff = Staff.objects.filter(Title="ManagerTitle_id",Organization=staff.Organization_id)
+                if len(managerstaff) > 0 :
+                    managerperson = Person.objects.get(id=managerstaff.Person_id)
+                    data['Manager'] = managerperson.Name + ' ' + managerperson.Surname
                 # finallyData.append(data)
             except:
                 data['Organization'] = ''
