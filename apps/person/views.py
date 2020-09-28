@@ -35,6 +35,7 @@ class PersonWithPersonInformationAPIView(APIView):
             try:
                 p = Person.objects.get(Email=request.user.email)
                 personArr = ListResponsiblePersons(p.id)
+                personArr.sort(key=lambda x:x.Name.lower())
                 serializer = PersonViewSerializer(personArr, many=True).data
                 return Response(serializer)
 
