@@ -15,9 +15,9 @@ from rest_framework.permissions import IsAuthenticated
 
 from .bussinessrules import GetRightBalance, PersonRightSummary
 from .models import Right
-from .serializer import PersonSerializer
-from .serializer import RightSerializer, RightWithApproverSerializer, RightAllDetailsSerializer2
-from ..businessrules.views import GetResponsibleIkPersons, IsManager
+from .serializer import RightSerializer, RightWithApproverSerializer, RightAllDetailsSerializer2, PersonSerializer, \
+    TodayOnLeavePersonByPersonSerializer
+from ..businessrules.views import GetResponsibleIkPersons
 from ..businessrules.views import GetResponsiblePersonDetails, HasPermission, GetManagerPersonsDetail, \
     GetManagerOrganizationsDetailNoneSerializer, GetPersonsByOrganizationId
 from ..organization.models import Organization
@@ -34,7 +34,7 @@ from ..vocationdays.models import VocationDays
 
 from ..dashboard import businesrules
 
-from ..dashboard.businesrules import ListResponsiblePersons
+from ..dashboard.businesrules import ListResponsiblePersons, IsManager
 
 sendmail = False
 
@@ -676,6 +676,56 @@ def TodayOnLeavePerson(request):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
 
+def GetTodayOnLeavePersonByPerson2(rightQuerySet):
+    right_queryset = rightQuerySet
+    data = {}
+    try:
+        person_queryset = Person.objects.get(id=right_queryset.Person_id)
+        data['Name'] = person_queryset.Name
+        data['Surname'] = person_queryset.Surname
+        data['Email'] = person_queryset.Email
+        data['StartDate'] = right_queryset.StartDate
+        data['EndDate'] = right_queryset.EndDate
+        data['RightNumber'] = right_queryset.RightNumber
+        try:
+            rightType_queryset = RightType.objects.get(id=right_queryset.RightType_id)
+            data['RightType'] = rightType_queryset.Name
+        except:
+            data['RightType'] = None
+        try:
+            staff_queryset = Staff.objects.get(Person_id=person_queryset.id)
+            data['Organization'] = staff_queryset.Organization_id
+        except:
+            data['Organization'] = None
+        try:
+            title_queryset = Title.objects.get(id=staff_queryset.Title_id)
+            data['Title'] = title_queryset.Name
+        except:
+            data['Title'] = None
+
+        try:
+            staff_in_organization_queryset = Staff.objects.filter(Organization_id=staff_queryset.Organization_id)
+            for s in staff_in_organization_queryset:
+                if IsManager(s.Person_id):
+                    try:
+                        manager_queryset = Person.objects.get(id=s.Person_id)
+                        data['Manager'] = manager_queryset.Name
+                    except:
+                        data['Manager'] = None
+        except:
+            data['Manager'] = None
+
+        data['DateOfReturn'] = right_queryset.DateOfReturn
+        try:
+            data['PersonRightSummary'] = PersonRightSummary(right_queryset.Person_id)
+        except:
+            data['PersonRightSummary'] = None
+
+    except:
+        pass
+    return data
+
+
 @api_view(['GET'])
 def TodayOnLeavePersonByPerson(request, id):
     persons = []
@@ -683,53 +733,79 @@ def TodayOnLeavePersonByPerson(request, id):
         persons = businesrules.GetPersonsWithLenManager(id)
     else:
         persons = Person.objects.filter(id=id)
-    dataArray = []
-    for p in persons:
-        data = GetTodayOnLeavePersonByPerson(p.id)
-        dataArray.append(data)
-    newarray = []
-    for d in dataArray:
-        if len(d) > 0:
-            newarray.append(d)
-    return Response(newarray)
 
+    today = datetime.date.today()
+
+    # right_queryset = Right.objects.filter(StartDate__lte=str(today))
+    right_queryset = Right.objects.all()
+    right_Arr = []
+    for r in right_queryset:
+        if int(r.StartDate.year) <= today.year and int(r.StartDate.month) <= today.month and int(
+                r.StartDate.day) <= today.day \
+                and int(r.EndDate.year) >= today.year and int(r.EndDate.month) >= today.month \
+                and int(r.EndDate.day) >= today.day:
+            right_Arr.append(r)
+
+    data_Arr = []
+    for r in right_Arr:
+        data_Arr.append(GetTodayOnLeavePersonByPerson2(r))
+    return Response(data_Arr)
+
+    # right_queryset = Right.objects.filter(StartDate__lte=str(today),EndDate__gte=str(today))
+    # for r in right_queryset:
+    #     print(r.id)
+    #
+    #
+    # todayOnLeavePersonByPerson_serializer_class = TodayOnLeavePersonByPersonSerializer(persons,many=True)
+    # return Response(todayOnLeavePersonByPerson_serializer_class.data)
+
+    # dataArray = []
+    # for p in persons:
+    #     data = GetTodayOnLeavePersonByPerson(p.id)
+    #     dataArray.append(data)
+    # newarray = []
+    # for d in dataArray:
+    #     if len(d) > 0:
+    #         newarray.append(d)
+    # return Response(newarray)
 
     # try:
-        # today = datetime.date.today()
-        # organizationarr = GetManagerOrganizationsDetailNoneSerializer(id)
-        # liste = []
-        # for o in organizationarr:
-        #     liste.append(str(o.id))
-        #     deger = ",".join(liste)
-        # rows = TodayOnLeaveByOrganizatinID(deger)
-        # persons = []
+    # today = datetime.date.today()
+    # organizationarr = GetManagerOrganizationsDetailNoneSerializer(id)
+    # liste = []
+    # for o in organizationarr:
+    #     liste.append(str(o.id))
+    #     deger = ",".join(liste)
+    # rows = TodayOnLeaveByOrganizatinID(deger)
+    # persons = []
 
-        # finallyData = []
-        # for row in rows:
-        #     data = {}
-        #     data['Name'] = row[0]
-        #     data['Surname'] = row[1]
-        #     data['Email'] = row[2]
-        #     data['StartDate'] = row[12].date()
-        #     data['EndDate'] = row[4].date()
-        #     data['RightNumber'] = row[8]
-        #     try:
-        #         data['RightType'] = RightType.objects.get(id=row[13]).Name
-        #     except:
-        #         data['RightType'] = None
-        #     data['Organization'] = row[17]
-        #     data['Title'] = row[22]
-        #     data['Manager'] = row[23]
-        #     data['DateOfReturn'] = row[5]
-        #     try:
-        #         data['PersonRightSummary'] = PersonRightSummary(id)
-        #     except:
-        #         data['PersonRightSummary'] = None
-        #     finallyData.append(data)
+    # finallyData = []
+    # for row in rows:
+    #     data = {}
+    #     data['Name'] = row[0]
+    #     data['Surname'] = row[1]
+    #     data['Email'] = row[2]
+    #     data['StartDate'] = row[12].date()
+    #     data['EndDate'] = row[4].date()
+    #     data['RightNumber'] = row[8]
+    #     try:
+    #         data['RightType'] = RightType.objects.get(id=row[13]).Name
+    #     except:
+    #         data['RightType'] = None
+    #     data['Organization'] = row[17]
+    #     data['Title'] = row[22]
+    #     data['Manager'] = row[23]
+    #     data['DateOfReturn'] = row[5]
+    #     try:
+    #         data['PersonRightSummary'] = PersonRightSummary(id)
+    #     except:
+    #         data['PersonRightSummary'] = None
+    #     finallyData.append(data)
 
-        # return Response(finallyData)
+    # return Response(finallyData)
     # except:
-        # return Response(status=status.HTTP_404_NOT_FOUND)
+    # return Response(status=status.HTTP_404_NOT_FOUND)
+
 
 def GetTodayOnLeavePersonByPerson(id):
     finallyData = []
@@ -745,7 +821,6 @@ def GetTodayOnLeavePersonByPerson(id):
 
             persons = []
 
-        
             for row in rows:
                 data = {}
                 data['Name'] = row[0]
@@ -766,12 +841,13 @@ def GetTodayOnLeavePersonByPerson(id):
                     data['PersonRightSummary'] = PersonRightSummary(id)
                 except:
                     data['PersonRightSummary'] = None
-                finallyData.append(data) 
-        except: 
-            pass      
+                finallyData.append(data)
+        except:
+            pass
     except:
         pass
     return finallyData
+
 
 def RightController(data, rightid):
     try:
@@ -854,11 +930,11 @@ def RightAllDetails(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def GetApproverPersonRight(request,id):
+def GetApproverPersonRight(request, id):
     try:
-        rights = Right.objects.filter(Approver1 = id)
+        rights = Right.objects.filter(Approver1=id)
         if len(rights) > 0:
-            serializer = RightWithApproverSerializer(rights,many=True)
+            serializer = RightWithApproverSerializer(rights, many=True)
             return Response(serializer.data)
         return Response({})
 
