@@ -16,7 +16,7 @@ from ..authority.models import Authority
 from ..userrole.models import UserRole
 
 from ..person.serializer import PersonSerializer, PersonViewSerializer
-from ..dashboard.businesrules import ListResponsiblePersons
+from ..dashboard.businesrules import ListResponsiblePersons, IsManager, GetPersonsWithLenManager
 
 
 @api_view(['GET'])
@@ -229,62 +229,99 @@ def GetResponsibleIkPersons():
     return PersonSerializer(ikPersons, many=True).data
 
 
-def IsManager(personId):
-    try:
-        staff = Staff.objects.get(Person_id=personId)
-        organization = Organization.objects.get(id=staff.Organization_id)
-        if organization.ManagerTitle_id == staff.Title_id and staff.Organization_id == organization.id:
-            return True
-        return False
-    except:
-        return False
-
-
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def ManagerPersons(request):
-    account = request.user
+    manager_Arr = []
     try:
+        account = request.user
         person_queryset = Person.objects.get(Email=account.email)
-
-        personArr = []
-        staff_queryset = Staff.objects.get(Person_id=person_queryset.id)
-        staffs_queryset = Staff.objects.filter(Organization_id=staff_queryset.Organization)
-        for s in staffs_queryset:
+        if IsManager(person_queryset.id):
             try:
-                person_queryset = Person.objects.get(id=s.Person_id)
-                personArr.append(person_queryset)
+                staff_queryset = Staff.objects.get(Person_id=person_queryset.id)
+                try:
+                    organization_queryset = Organization.objects.get(
+                        id=Organization.objects.get(UpperOrganization=staff_queryset.Organization_id))
+                    staff_in_organization_queryset = Staff.objects.filter(Organization_id=organization_queryset.id)
+                    for s in staff_in_organization_queryset:
+                        if IsManager(s.Person_id):
+                            try:
+                                manager_Arr.append(Person.objects.get(id=s.Person_id))
+                            except:
+                                pass
+                except:
+                    pass
+                try:
+                    userRole_queryset = UserRole.objects.filter(Account_id=account.id,
+                                                                Organizations__isnull=False)
+                    if len(userRole_queryset) > 0:
+                        for ur in userRole_queryset:
+                            if len(ur.Organizations) > 0:
+                                organizationIdArr = ur.Organizations.split(",")
+                                for o in organizationIdArr:
+                                    staffs_queryset = Staff.objects.filter(Organization_id=o)
+                                    for s in staffs_queryset:
+                                        if IsManager(s.Person_id):
+                                            try:
+                                                manager_Arr.append(Person.objects.get(id=s.Person_id))
+                                            except:
+                                                pass
+
+                except:
+                    pass
+
             except:
                 pass
 
-        userRole_queryset = UserRole.objects.filter(Account_id=account.id, Organizations__isnull=False)
-        if len(userRole_queryset) > 0:
-            for ur in userRole_queryset:
-                if len(ur.Organizations) > 0:
-                    organizationIdArr = ur.Organizations.split(",")
-                    for o in organizationIdArr:
-                        staffs_queryset = Staff.objects.filter(Organization_id=o)
-                        for s in staffs_queryset:
-                            try:
-                                person_queryset = Person.objects.get(id=s.Person_id)
-                                personArr.append(person_queryset)
-                            except:
-                                pass
+        else:
+            person_all_organization_arr = GetPersonsWithLenManager(person_queryset.id)
+            for p in person_all_organization_arr:
+                if IsManager(p.id):
+                    manager_Arr.append(p)
+        return Response(PersonSerializer(manager_Arr, many=True).data)
 
-        managerpersons = []
-        # persons = Person.objects.all()
-        # for person in persons:
-        #     if IsManager(person.id):
-        #         managerpersons.append(person)
-        # return Response(PersonSerializer(managerpersons, many=True).data)
 
-        for person in personArr:
-            if IsManager(person.id):
-                managerpersons.append(person)
-        return Response(PersonSerializer(managerpersons, many=True).data)
 
     except:
-        Response([])
+        Response(manager_Arr)
+
+    # account = request.user
+    # try:
+    #     person_queryset = Person.objects.get(Email=account.email)
+    #
+    #     personArr = []
+    #     staff_queryset = Staff.objects.get(Person_id=person_queryset.id)
+    #     staffs_queryset = Staff.objects.filter(Organization_id=staff_queryset.Organization)
+    #     for s in staffs_queryset:
+    #         try:
+    #             person_queryset = Person.objects.get(id=s.Person_id)
+    #             personArr.append(person_queryset)
+    #         except:
+    #             pass
+    #
+    #     userRole_queryset = UserRole.objects.filter(Account_id=account.id, Organizations__isnull=False)
+    #     if len(userRole_queryset) > 0:
+    #         for ur in userRole_queryset:
+    #             if len(ur.Organizations) > 0:
+    #                 organizationIdArr = ur.Organizations.split(",")
+    #                 for o in organizationIdArr:
+    #                     staffs_queryset = Staff.objects.filter(Organization_id=o)
+    #                     for s in staffs_queryset:
+    #                         try:
+    #                             person_queryset = Person.objects.get(id=s.Person_id)
+    #                             personArr.append(person_queryset)
+    #                         except:
+    #                             pass
+    #
+    #     managerpersons = []
+    #
+    #     for person in personArr:
+    #         if IsManager(person.id):
+    #             managerpersons.append(person)
+    #     return Response(PersonSerializer(managerpersons, many=True).data)
+    #
+    # except:
+    #     Response([])
 
 
 @api_view(['GET'])

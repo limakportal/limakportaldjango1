@@ -66,22 +66,31 @@ def GetPersonsWithLenManager(personId):
         staff_queryset = Staff.objects.get(Person_id=personId)
         person_Arr = GetPersonsByOrganizationId(staff_queryset.Organization_id, person_Arr)
 
+        try:
+            account_queryset = Account.objects.get(email=Person.objects.get(id=personId).Email)
+            userRole_queryset = UserRole.objects.filter(Account_id=account_queryset.id, Organizations__isnull=False)
+            if len(userRole_queryset) > 0:
+                for ur in userRole_queryset:
+                    if len(ur.Organizations) > 0:
+                        organizationIdArr = ur.Organizations.split(",")
+                        for o in organizationIdArr:
+                            staffs_queryset = Staff.objects.filter(Organization_id=o)
+                            for s in staffs_queryset:
+                                try:
+                                    person_queryset = Person.objects.get(id=s.Person_id)
+                                    if person_queryset in person_Arr:
+                                        break
+                                    person_Arr.append(person_queryset)
+                                except:
+                                    pass
+
+        except:
+            pass
+
     except:
         pass
 
     return person_Arr
-
-    # personEmployment = PersonEmployment.objects.filter(Person_id=personId)
-    #
-    # perArr = []
-    #
-    # for pe in personEmployment:
-    #     personsArr = []
-    #     persons = GetPersonsByOrganizationId(pe.Organization_id, personsArr)
-    #     for p in persons:
-    #         perArr.append(p)
-    #
-    # return perArr
 
 
 def GetPersonsByOrganizationId(organizationId, personArr):
