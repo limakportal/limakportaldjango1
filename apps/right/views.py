@@ -623,8 +623,8 @@ def TodayOnLeavePerson(request):
         if PersonPermissionControl(person_queryset.id, 'IZN_IK'):
             persons = businesrules.GetAllIkResponsiblePersonWithLen(person_queryset.id)
         else:
-            return Response([])
-            # persons = Person.objects.filter(id=person_queryset.id)
+            # return Response([])
+            persons = Person.objects.filter(id=person_queryset.id)
 
         today = datetime.date.today()
         right_Arr = []
@@ -652,14 +652,14 @@ def TodayOnLeavePerson(request):
 
         data_Arr = []
         for r in right_Arr:
-            data_Arr.append(GetTodayOnLeavePersonByPerson2(r))
+            data_Arr.append(GetTodayOnLeavePersonByPerson2(r, person_queryset.id))
         return Response(data_Arr)
 
     except:
         return Response([])
 
 
-def GetTodayOnLeavePersonByPerson2(rightQuerySet):
+def GetTodayOnLeavePersonByPerson2(rightQuerySet, personId):
     right_queryset = rightQuerySet
     data = {}
     try:
@@ -688,16 +688,46 @@ def GetTodayOnLeavePersonByPerson2(rightQuerySet):
 
         try:
             staff_in_organization_queryset = Staff.objects.filter(Organization_id=staff_queryset.Organization_id)
-            for s in staff_in_organization_queryset:
-                if IsManager(s.Person_id):
-                    try:
-                        manager_queryset = Person.objects.get(id=s.Person_id)
-                        data['Manager'] = manager_queryset.Name + ' ' + manager_queryset.Surname
-                        break
-                    except:
+            if len(staff_in_organization_queryset) > 1:
+                for s in staff_in_organization_queryset:
+                    if IsManager(s.Person_id):
+                        if s.Person_id == personId:
+                            organization_queryset = Organization.objects.get(id=s.Organization_id)
+                            upper_organization_queryset = Organization.objects.get(
+                                id=organization_queryset.UpperOrganization_id)
+                            staff_in_upper_organization_queryset = Staff.objects.filter(
+                                Organization_id=upper_organization_queryset.id)
+                            for ss in staff_in_upper_organization_queryset:
+                                if IsManager(ss.Person_id):
+                                    try:
+                                        manager_queryset = Person.objects.get(id=ss.Person_id)
+                                        data['Manager'] = manager_queryset.Name + ' ' + manager_queryset.Surname
+                                        break
+                                    except:
+                                        data['Manager'] = ''
+
+                        else:
+                            try:
+                                manager_queryset = Person.objects.get(id=s.Person_id)
+                                data['Manager'] = manager_queryset.Name + ' ' + manager_queryset.Surname
+                                break
+                            except:
+                                data['Manager'] = ''
+                    else:
                         data['Manager'] = ''
-                else:
-                    data['Manager'] = ''
+            else:
+                organization_queryset = Organization.objects.get(id=staff_in_organization_queryset[0].Organization_id)
+                upper_organization_queryset = Organization.objects.get(id=organization_queryset.UpperOrganization_id)
+                staff_in_upper_organization_queryset = Staff.objects.filter(
+                    Organization_id=upper_organization_queryset.id)
+                for ss in staff_in_upper_organization_queryset:
+                    if IsManager(ss.Person_id):
+                        try:
+                            manager_queryset = Person.objects.get(id=ss.Person_id)
+                            data['Manager'] = manager_queryset.Name + ' ' + manager_queryset.Surname
+                            break
+                        except:
+                            data['Manager'] = ''
         except:
             data['Manager'] = ''
 
@@ -720,8 +750,8 @@ def TodayOnLeavePersonByPerson(request, id):
         if businesrules.IsManager(id):
             persons = businesrules.GetPersonsWithLenManager(id)
         else:
-            return Response([])
-            # persons = Person.objects.filter(id=id)
+            # return Response([])
+            persons = Person.objects.filter(id=id)
 
         today = datetime.date.today()
         right_Arr = []
@@ -749,7 +779,7 @@ def TodayOnLeavePersonByPerson(request, id):
 
         data_Arr = []
         for r in right_Arr:
-            data_Arr.append(GetTodayOnLeavePersonByPerson2(r))
+            data_Arr.append(GetTodayOnLeavePersonByPerson2(r, id))
         return Response(data_Arr)
 
     except:
