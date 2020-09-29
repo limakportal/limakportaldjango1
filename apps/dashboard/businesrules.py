@@ -129,7 +129,7 @@ def GetOrganizationAndLoweOrganization(organizationId, organizationArr):
 def ListResponsiblePersons(personid):
     """ Sorumlu Olduğu Personeller """
     if PersonPermissionControl(personid, 'ADMIN'):
-        return Person.objects.all()
+        return list(Person.objects.all())
     elif PersonPermissionControl(personid, 'IZN_IK'):
         return GetAllIkResponsiblePersonWithLen(personid)
     elif IsManager(personid):

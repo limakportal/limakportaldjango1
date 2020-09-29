@@ -18,9 +18,11 @@ from ..userrole.models import UserRole
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def GetResponsiblePersons(request, id):
     personArr = ListResponsiblePersons(id)
-    personArr.sort(key=lambda x:x.Name.lower())
+    if len(personArr) > 1:
+        personArr.sort(key=lambda x:x.Name.lower())
     result = {}
     result['Persons'] = PersonSerializer(personArr, many=True).data
     if personArr == None:
@@ -31,6 +33,7 @@ def GetResponsiblePersons(request, id):
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def GetPersonCountWithOrganization(request):
     organizationsArr = []
     organizations = Organization.objects.all()
@@ -42,6 +45,7 @@ def GetPersonCountWithOrganization(request):
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def GetOrganizationResponsiblePersons(request, organizationid):
     organizationsArr = []
     organizations = GetOrganizationAndLoweOrganization(organizationid, organizationsArr)
@@ -50,6 +54,7 @@ def GetOrganizationResponsiblePersons(request, organizationid):
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def GetOrganizationWithTotalStaff(request, organizationid):
     result = {}
     try:

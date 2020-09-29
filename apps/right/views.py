@@ -119,12 +119,12 @@ class RightWithApproverAPIView(APIView):
                 p = Person.objects.get(Email=request.user.email)
                 personArr = ListResponsiblePersons(p.id)
                 rightArr = []
-                for p in personArr:
-                    try:
-                        rights = Right.objects.get(Person_id=p.id)
-                        rightArr.append(rights)
-                    except:
-                        pass
+                for p in personArr:                    
+                    rights = Right.objects.filter(Person_id=p.id)
+                    if len(rights) > 0:
+                        for r in rights:
+                            rightArr.append(r)                    
+                        
                 if len(rightArr) > 0:
                     serializer = RightWithApproverSerializer(rightArr, many=True)
                     return Response(serializer.data)

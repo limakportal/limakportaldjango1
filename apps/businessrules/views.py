@@ -199,7 +199,8 @@ def GetResponsiblePersonDetails(id):
 
         try:
             personArr = ListResponsiblePersons(id)
-            personArr.sort(key=lambda x:x.Name.lower())
+            if len(personArr) > 1:
+                personArr.sort(key=lambda x:x.Name.lower())
             responsiblePersons = PersonViewSerializer(personArr, many=True).data
         except:
             responsiblePersons = None
