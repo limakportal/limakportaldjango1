@@ -692,11 +692,14 @@ def GetTodayOnLeavePersonByPerson2(rightQuerySet):
                 if IsManager(s.Person_id):
                     try:
                         manager_queryset = Person.objects.get(id=s.Person_id)
-                        data['Manager'] = manager_queryset.Name
+                        data['Manager'] = manager_queryset.Name + ' ' + manager_queryset.Surname
+                        break
                     except:
-                        data['Manager'] = None
+                        data['Manager'] = ''
+                else:
+                    data['Manager'] = ''
         except:
-            data['Manager'] = None
+            data['Manager'] = ''
 
         data['DateOfReturn'] = right_queryset.DateOfReturn
         try:
