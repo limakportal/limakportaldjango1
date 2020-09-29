@@ -238,16 +238,20 @@ def ManagerPersons(request):
         person_queryset = Person.objects.get(Email=account.email)
         staff_queryset = Staff.objects.get(Person_id=person_queryset.id)
         if IsManager(person_queryset.id):
-            upper_organization_queryset = Organization.objects.filter(UpperOrganization=staff_queryset.Organization_id)
-            for o in upper_organization_queryset:
-                staff_in_organization_queryset = Staff.objects.filter(Organization_id=o.id)
-                for s in staff_in_organization_queryset:
-                    if IsManager(s.Person_id):
-                        try:
-                            manager_queryset = Person.objects.get(id=s.Person_id)
-                            manager_Arr.append(manager_queryset)
-                        except:
-                            pass
+            try:
+                organization_queryset = Organization.objects.get(id=staff_queryset.Organization_id)
+                upper_organization_queryset = Organization.objects.filter(id=organization_queryset.UpperOrganization_id)
+                for o in upper_organization_queryset:
+                    staff_in_organization_queryset = Staff.objects.filter(Organization_id=o.id)
+                    for s in staff_in_organization_queryset:
+                        if IsManager(s.Person_id):
+                            try:
+                                manager_queryset = Person.objects.get(id=s.Person_id)
+                                manager_Arr.append(manager_queryset)
+                            except:
+                                pass
+            except:
+                pass
         else:
             staff_in_organization_queryset = Staff.objects.filter(Organization_id=staff_queryset.Organization_id)
             for s in staff_in_organization_queryset:
