@@ -623,7 +623,8 @@ def TodayOnLeavePerson(request):
         if PersonPermissionControl(person_queryset.id, 'IZN_IK'):
             persons = businesrules.GetAllIkResponsiblePersonWithLen(person_queryset.id)
         else:
-            persons = Person.objects.filter(id=person_queryset.id)
+            return Response([])
+            # persons = Person.objects.filter(id=person_queryset.id)
 
         today = datetime.date.today()
         right_Arr = []
@@ -656,67 +657,6 @@ def TodayOnLeavePerson(request):
 
     except:
         return Response([])
-
-    #
-    # try:
-    #     today = datetime.date.today()
-    #
-    #     account = request.user
-    #     person_queryset = Person.objects.get(Email=account.email)
-    #     response_Person_Arr = ListResponsiblePersons(person_queryset.id)
-    #     right_Arr = []
-    #     for p in response_Person_Arr:
-    #         try:
-    #             right_queryset = Right.objects.get(StartDate__day=today.day, StartDate__month=today.month,
-    #                                                StartDate__year=today.year, Person_id=p.id)
-    #             right_Arr.append(right_queryset)
-    #         except:
-    #             pass
-    #     #
-    #     # rights = Right.objects.filter(StartDate__day=today.day, StartDate__month=today.month,
-    #     #                               StartDate__year=today.year)
-    #
-    #     persons = []
-    #
-    #     finallyData = []
-    #     # for right in rights:
-    #     for right in right_Arr:
-    #         data = {}
-    #         person = Person.objects.get(id=right.Person_id)
-    #         data['Name'] = person.Name
-    #         data['Surname'] = person.Surname
-    #         data['Email'] = person.Email
-    #         data['StartDate'] = right.StartDate.date()
-    #         data['EndDate'] = right.EndDate.date()
-    #         data['RightNumber'] = right.RightNumber
-    #         try:
-    #             data['RightType'] = RightType.objects.get(id=right.RightType_id).Name
-    #         except:
-    #             data['RightType'] = None
-    #         try:
-    #             staff = Staff.objects.get(Person=int(person.id))
-    #             organization = Organization.objects.get(id=staff.Organization_id)
-    #             title = Title.objects.get(id=staff.Title_id)
-    #             data['Organization'] = organization.Name
-    #             data['Title'] = title.Name
-    #             managerstaff = Staff.objects.filter(Title="ManagerTitle_id", Organization=staff.Organization_id)
-    #             if len(managerstaff) > 0:
-    #                 managerperson = Person.objects.get(id=managerstaff.Person_id)
-    #                 data['Manager'] = managerperson.Name + ' ' + managerperson.Surname
-    #             # finallyData.append(data)
-    #         except:
-    #             data['Organization'] = ''
-    #             data['Title'] = ''
-    #             # finallyData.append(data)
-    #         try:
-    #             data['PersonRightSummary'] = PersonRightSummary(person.id)
-    #         except:
-    #             data['PersonRightSummary'] = None
-    #         finallyData.append(data)
-    #
-    #     return Response(finallyData)
-    # except:
-    #     return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 def GetTodayOnLeavePersonByPerson2(rightQuerySet):
@@ -777,7 +717,8 @@ def TodayOnLeavePersonByPerson(request, id):
         if businesrules.IsManager(id):
             persons = businesrules.GetPersonsWithLenManager(id)
         else:
-            persons = Person.objects.filter(id=id)
+            return Response([])
+            # persons = Person.objects.filter(id=id)
 
         today = datetime.date.today()
         right_Arr = []
