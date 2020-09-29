@@ -39,7 +39,7 @@ def PersonApprover(request, id):
             pass
 
         for oa in organization_Arr:
-            data = GetPersonApprover2(oa)
+            data = GetPersonApprover2(oa,id)
             dataArr.append(data)
 
 
@@ -48,15 +48,14 @@ def PersonApprover(request, id):
 
     newDataArr = []
     for da in dataArr:
-        if da in newDataArr:
-            break
-        if da["FullName"] != "":
-            newDataArr.append(da)
+        # if da in newDataArr:
+        #     break
+        newDataArr.append(da)
 
     return Response(newDataArr)
 
 
-def GetPersonApprover2(organizationId):
+def GetPersonApprover2(organizationId,id):
     global newstaff
     try:
         organization = Organization.objects.get(id=organizationId)
@@ -82,16 +81,16 @@ def GetPersonApprover2(organizationId):
                     data['id'] = ""
                     data['FullName'] = ""
                     return data
+
+
                 personel = Person.objects.get(id=staffs[0].Person.id)
-                serializer = PersonSerializer(personel)
                 data = {}
-                data['id'] = serializer.data['id']
-                data['FullName'] = serializer.data['Name'] + ' ' + serializer.data['Surname']
-                return Response(data)
-            serializer = PersonSerializer(personel)
+                data['id'] = personel.id
+                data['FullName'] = personel.Name + ' ' + personel.Surname
+                return data
             data = {}
-            data['id'] = serializer.data['id']
-            data['FullName'] = serializer.data['Name'] + ' ' + serializer.data['Surname']
+            data['id'] = personel.id
+            data['FullName'] = personel.Name + ' ' + personel.Surname
             return data
         else:
             neworganization = Organization.objects.get(id=organization.UpperOrganization.id)
@@ -105,10 +104,9 @@ def GetPersonApprover2(organizationId):
                 personel = Person.objects.get(id=newstaff[0].Person.id)
                 if personel.id == id:
                     if organization.UpperOrganization.id is None:
-                        serializer = PersonSerializer(personel)
                         data = {}
-                        data['id'] = serializer.data['id']
-                        data['FullName'] = serializer.data['Name'] + ' ' + serializer.data['Surname']
+                        data['id'] = personel.id
+                        data['FullName'] = personel.Name + ' ' + personel.Surname
                         return data
                     staffs = Staff.objects.filter(Organization=organization.UpperOrganization.id)
                     if len(staffs) == 0:
@@ -117,15 +115,14 @@ def GetPersonApprover2(organizationId):
                         data['FullName'] = ""
                         return data
                     personel = Person.objects.get(id=staffs[0].Person.id)
-                    serializer = PersonSerializer(personel)
                     data = {}
-                    data['id'] = serializer.data['id']
-                    data['FullName'] = serializer.data['Name'] + ' ' + serializer.data['Surname']
+                    data['id'] = personel.id
+                    data['FullName'] = personel.Name + ' ' + personel.Surname
                     return data
-            serializer = PersonSerializer(personel)
-            data = {}
-            data['id'] = serializer.data['id']
-            data['FullName'] = serializer.data['Name'] + ' ' + serializer.data['Surname']
+                serializer = PersonSerializer(personel)
+                data = {}
+                data['id'] = personel.id
+                data['FullName'] = personel.Name + ' ' + personel.Surname
             return data
 
 
