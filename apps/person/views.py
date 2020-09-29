@@ -30,18 +30,20 @@ class PersonViewSet(ModelViewSet):
 
 
 class PersonWithPersonInformationAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
         if (request.user.is_authenticated):
             try:
                 p = Person.objects.get(Email=request.user.email)
                 personArr = ListResponsiblePersons(p.id)
-                personArr.sort(key=lambda x:x.Name.lower())
+                if len(personArr) > 1:
+                    personArr.sort(key=lambda x: x.Name.lower())
                 serializer = PersonViewSerializer(personArr, many=True).data
                 return Response(serializer)
 
             except:
                 return None
-
 
     @transaction.atomic
     def post(self, request):
