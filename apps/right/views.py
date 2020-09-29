@@ -15,11 +15,10 @@ from rest_framework.permissions import IsAuthenticated
 
 from .bussinessrules import GetRightBalance, PersonRightSummary
 from .models import Right
-from .serializer import RightSerializer, RightWithApproverSerializer, RightAllDetailsSerializer2, PersonSerializer, \
-    TodayOnLeavePersonByPersonSerializer
+from .serializer import RightSerializer, RightWithApproverSerializer, RightAllDetailsSerializer2, PersonSerializer
+
 from ..businessrules.views import GetResponsibleIkPersons
-from ..businessrules.views import GetResponsiblePersonDetails, HasPermission, GetManagerPersonsDetail, \
-    GetManagerOrganizationsDetailNoneSerializer, GetPersonsByOrganizationId
+from ..businessrules.views import GetManagerOrganizationsDetailNoneSerializer
 from ..organization.models import Organization
 from ..person.businesrules import GetPersonApprover
 from ..person.models import Person
@@ -34,7 +33,8 @@ from ..vocationdays.models import VocationDays
 
 from ..dashboard import businesrules
 
-from ..dashboard.businesrules import ListResponsiblePersons, IsManager
+from ..dashboard.businesrules import ListResponsiblePersons, IsManager, GetAllIkResponsiblePersonWithLen, \
+    PersonPermissionControl
 
 sendmail = False
 
@@ -119,12 +119,12 @@ class RightWithApproverAPIView(APIView):
                 p = Person.objects.get(Email=request.user.email)
                 personArr = ListResponsiblePersons(p.id)
                 rightArr = []
-                for p in personArr:                    
+                for p in personArr:
                     rights = Right.objects.filter(Person_id=p.id)
                     if len(rights) > 0:
                         for r in rights:
-                            rightArr.append(r)                    
-                        
+                            rightArr.append(r)
+
                 if len(rightArr) > 0:
                     serializer = RightWithApproverSerializer(rightArr, many=True)
                     return Response(serializer.data)
@@ -615,65 +615,108 @@ def GetRightStatus(request, status_id):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def TodayOnLeavePerson(request):
+    account = request.user
     try:
-        today = datetime.date.today()
-
-        account = request.user
         person_queryset = Person.objects.get(Email=account.email)
-        response_Person_Arr = ListResponsiblePersons(person_queryset.id)
-        right_Arr = []
-        for p in response_Person_Arr:
-            try:
-                right_queryset = Right.objects.get(StartDate__day=today.day, StartDate__month=today.month,
-                                                   StartDate__year=today.year, Person_id=p.id)
-                right_Arr.append(right_queryset)
-            except:
-                pass
-        #
-        # rights = Right.objects.filter(StartDate__day=today.day, StartDate__month=today.month,
-        #                               StartDate__year=today.year)
 
         persons = []
+        if PersonPermissionControl(person_queryset.id, 'IZN_IK'):
+            persons = businesrules.GetAllIkResponsiblePersonWithLen(person_queryset.id)
+        else:
+            persons = Person.objects.filter(id=person_queryset.id)
 
-        finallyData = []
-        # for right in rights:
-        for right in right_Arr:
-            data = {}
-            person = Person.objects.get(id=right.Person_id)
-            data['Name'] = person.Name
-            data['Surname'] = person.Surname
-            data['Email'] = person.Email
-            data['StartDate'] = right.StartDate.date()
-            data['EndDate'] = right.EndDate.date()
-            data['RightNumber'] = right.RightNumber
-            try:
-                data['RightType'] = RightType.objects.get(id=right.RightType_id).Name
-            except:
-                data['RightType'] = None
-            try:
-                staff = Staff.objects.get(Person=int(person.id))
-                organization = Organization.objects.get(id=staff.Organization_id)
-                title = Title.objects.get(id=staff.Title_id)
-                data['Organization'] = organization.Name
-                data['Title'] = title.Name
-                managerstaff = Staff.objects.filter(Title="ManagerTitle_id", Organization=staff.Organization_id)
-                if len(managerstaff) > 0:
-                    managerperson = Person.objects.get(id=managerstaff.Person_id)
-                    data['Manager'] = managerperson.Name + ' ' + managerperson.Surname
-                # finallyData.append(data)
-            except:
-                data['Organization'] = ''
-                data['Title'] = ''
-                # finallyData.append(data)
-            try:
-                data['PersonRightSummary'] = PersonRightSummary(person.id)
-            except:
-                data['PersonRightSummary'] = None
-            finallyData.append(data)
+        today = datetime.date.today()
+        right_Arr = []
 
-        return Response(finallyData)
+        for p in persons:
+            right_queryset = Right.objects.filter(StartDate__year=str(today.year), StartDate__month=str(today.month),
+                                                  StartDate__day__lte=str(today.day),
+                                                  EndDate__year__gte=str(today.year),
+                                                  EndDate__month__gte=str(today.month),
+                                                  EndDate__day__gte=str(today.day),
+                                                  Person_id=p.id)
+
+            if len(right_queryset) > 0:
+                for r in right_queryset:
+                    right_Arr.append(r)
+
+        # right_queryset = Right.objects.all()
+
+        # for r in right_queryset:
+        #     if int(r.StartDate.year) <= today.year and int(r.StartDate.month) <= today.month and int(
+        #             r.StartDate.day) <= today.day \
+        #             and int(r.EndDate.year) >= today.year and int(r.EndDate.month) >= today.month \
+        #             and int(r.EndDate.day) >= today.day:
+        #         right_Arr.append(r)
+
+        data_Arr = []
+        for r in right_Arr:
+            data_Arr.append(GetTodayOnLeavePersonByPerson2(r))
+        return Response(data_Arr)
+
     except:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+        return Response([])
+
+    #
+    # try:
+    #     today = datetime.date.today()
+    #
+    #     account = request.user
+    #     person_queryset = Person.objects.get(Email=account.email)
+    #     response_Person_Arr = ListResponsiblePersons(person_queryset.id)
+    #     right_Arr = []
+    #     for p in response_Person_Arr:
+    #         try:
+    #             right_queryset = Right.objects.get(StartDate__day=today.day, StartDate__month=today.month,
+    #                                                StartDate__year=today.year, Person_id=p.id)
+    #             right_Arr.append(right_queryset)
+    #         except:
+    #             pass
+    #     #
+    #     # rights = Right.objects.filter(StartDate__day=today.day, StartDate__month=today.month,
+    #     #                               StartDate__year=today.year)
+    #
+    #     persons = []
+    #
+    #     finallyData = []
+    #     # for right in rights:
+    #     for right in right_Arr:
+    #         data = {}
+    #         person = Person.objects.get(id=right.Person_id)
+    #         data['Name'] = person.Name
+    #         data['Surname'] = person.Surname
+    #         data['Email'] = person.Email
+    #         data['StartDate'] = right.StartDate.date()
+    #         data['EndDate'] = right.EndDate.date()
+    #         data['RightNumber'] = right.RightNumber
+    #         try:
+    #             data['RightType'] = RightType.objects.get(id=right.RightType_id).Name
+    #         except:
+    #             data['RightType'] = None
+    #         try:
+    #             staff = Staff.objects.get(Person=int(person.id))
+    #             organization = Organization.objects.get(id=staff.Organization_id)
+    #             title = Title.objects.get(id=staff.Title_id)
+    #             data['Organization'] = organization.Name
+    #             data['Title'] = title.Name
+    #             managerstaff = Staff.objects.filter(Title="ManagerTitle_id", Organization=staff.Organization_id)
+    #             if len(managerstaff) > 0:
+    #                 managerperson = Person.objects.get(id=managerstaff.Person_id)
+    #                 data['Manager'] = managerperson.Name + ' ' + managerperson.Surname
+    #             # finallyData.append(data)
+    #         except:
+    #             data['Organization'] = ''
+    #             data['Title'] = ''
+    #             # finallyData.append(data)
+    #         try:
+    #             data['PersonRightSummary'] = PersonRightSummary(person.id)
+    #         except:
+    #             data['PersonRightSummary'] = None
+    #         finallyData.append(data)
+    #
+    #     return Response(finallyData)
+    # except:
+    #     return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 def GetTodayOnLeavePersonByPerson2(rightQuerySet):
@@ -728,83 +771,45 @@ def GetTodayOnLeavePersonByPerson2(rightQuerySet):
 
 @api_view(['GET'])
 def TodayOnLeavePersonByPerson(request, id):
-    persons = []
-    if businesrules.IsManager(id):
-        persons = businesrules.GetPersonsWithLenManager(id)
-    else:
-        persons = Person.objects.filter(id=id)
+    try:
 
-    today = datetime.date.today()
+        persons = []
+        if businesrules.IsManager(id):
+            persons = businesrules.GetPersonsWithLenManager(id)
+        else:
+            persons = Person.objects.filter(id=id)
 
-    # right_queryset = Right.objects.filter(StartDate__lte=str(today))
-    right_queryset = Right.objects.all()
-    right_Arr = []
-    for r in right_queryset:
-        if int(r.StartDate.year) <= today.year and int(r.StartDate.month) <= today.month and int(
-                r.StartDate.day) <= today.day \
-                and int(r.EndDate.year) >= today.year and int(r.EndDate.month) >= today.month \
-                and int(r.EndDate.day) >= today.day:
-            right_Arr.append(r)
+        today = datetime.date.today()
+        right_Arr = []
 
-    data_Arr = []
-    for r in right_Arr:
-        data_Arr.append(GetTodayOnLeavePersonByPerson2(r))
-    return Response(data_Arr)
+        for p in persons:
+            right_queryset = Right.objects.filter(StartDate__year=str(today.year), StartDate__month=str(today.month),
+                                                  StartDate__day__lte=str(today.day),
+                                                  EndDate__year__gte=str(today.year),
+                                                  EndDate__month__gte=str(today.month),
+                                                  EndDate__day__gte=str(today.day),
+                                                  Person_id=p.id)
 
-    # right_queryset = Right.objects.filter(StartDate__lte=str(today),EndDate__gte=str(today))
-    # for r in right_queryset:
-    #     print(r.id)
-    #
-    #
-    # todayOnLeavePersonByPerson_serializer_class = TodayOnLeavePersonByPersonSerializer(persons,many=True)
-    # return Response(todayOnLeavePersonByPerson_serializer_class.data)
+            if len(right_queryset) > 0:
+                for r in right_queryset:
+                    right_Arr.append(r)
 
-    # dataArray = []
-    # for p in persons:
-    #     data = GetTodayOnLeavePersonByPerson(p.id)
-    #     dataArray.append(data)
-    # newarray = []
-    # for d in dataArray:
-    #     if len(d) > 0:
-    #         newarray.append(d)
-    # return Response(newarray)
+        # right_queryset = Right.objects.all()
 
-    # try:
-    # today = datetime.date.today()
-    # organizationarr = GetManagerOrganizationsDetailNoneSerializer(id)
-    # liste = []
-    # for o in organizationarr:
-    #     liste.append(str(o.id))
-    #     deger = ",".join(liste)
-    # rows = TodayOnLeaveByOrganizatinID(deger)
-    # persons = []
+        # for r in right_queryset:
+        #     if int(r.StartDate.year) <= today.year and int(r.StartDate.month) <= today.month and int(
+        #             r.StartDate.day) <= today.day \
+        #             and int(r.EndDate.year) >= today.year and int(r.EndDate.month) >= today.month \
+        #             and int(r.EndDate.day) >= today.day:
+        #         right_Arr.append(r)
 
-    # finallyData = []
-    # for row in rows:
-    #     data = {}
-    #     data['Name'] = row[0]
-    #     data['Surname'] = row[1]
-    #     data['Email'] = row[2]
-    #     data['StartDate'] = row[12].date()
-    #     data['EndDate'] = row[4].date()
-    #     data['RightNumber'] = row[8]
-    #     try:
-    #         data['RightType'] = RightType.objects.get(id=row[13]).Name
-    #     except:
-    #         data['RightType'] = None
-    #     data['Organization'] = row[17]
-    #     data['Title'] = row[22]
-    #     data['Manager'] = row[23]
-    #     data['DateOfReturn'] = row[5]
-    #     try:
-    #         data['PersonRightSummary'] = PersonRightSummary(id)
-    #     except:
-    #         data['PersonRightSummary'] = None
-    #     finallyData.append(data)
+        data_Arr = []
+        for r in right_Arr:
+            data_Arr.append(GetTodayOnLeavePersonByPerson2(r))
+        return Response(data_Arr)
 
-    # return Response(finallyData)
-    # except:
-    # return Response(status=status.HTTP_404_NOT_FOUND)
+    except:
+        return Response([])
 
 
 def GetTodayOnLeavePersonByPerson(id):
