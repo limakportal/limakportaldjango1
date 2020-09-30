@@ -634,7 +634,7 @@ def TodayOnLeavePerson(request):
                                                   EndDate__year__gte=str(today.year),
                                                   EndDate__month__gte=str(today.month),
                                                   EndDate__day__gte=str(today.day),
-                                                  Person_id=p.id)
+                                                  Person_id=p.id, RightStatus_id=2)
 
             if len(right_queryset) > 0:
                 for r in right_queryset:
@@ -651,8 +651,7 @@ def TodayOnLeavePerson(request):
 
         data_Arr = []
         for r in right_Arr:
-            if r.RightStatus.id != 4:
-                data_Arr.append(GetTodayOnLeavePersonByPerson2(r, r.Person_id))
+            data_Arr.append(GetTodayOnLeavePersonByPerson2(r, r.Person_id))
         return Response(data_Arr)
 
     except:
@@ -749,7 +748,7 @@ def TodayOnLeavePersonByPerson(request, id):
                                                   EndDate__year__gte=str(today.year),
                                                   EndDate__month__gte=str(today.month),
                                                   EndDate__day__gte=str(today.day),
-                                                  Person_id=p.id)
+                                                  Person_id=p.id, RightStatus_id=2)
 
             if len(right_queryset) > 0:
                 for r in right_queryset:
