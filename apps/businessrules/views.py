@@ -275,7 +275,8 @@ def ManagerPersons(request):
                             if IsManager(s.Person_id):
                                 try:
                                     manager_queryset = Person.objects.get(id=s.Person_id)
-                                    manager_Arr.append(manager_queryset)
+                                    if manager_queryset not in manager_Arr: ## Bu person array de yok ise ekleme yapıyor
+                                        manager_Arr.append(manager_queryset)
                                 except:
                                     pass
 
