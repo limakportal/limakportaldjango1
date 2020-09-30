@@ -651,7 +651,8 @@ def TodayOnLeavePerson(request):
 
         data_Arr = []
         for r in right_Arr:
-            data_Arr.append(GetTodayOnLeavePersonByPerson2(r, r.Person_id))
+            if r.RightStatus.id != 4:
+                data_Arr.append(GetTodayOnLeavePersonByPerson2(r, r.Person_id))
         return Response(data_Arr)
 
     except:
