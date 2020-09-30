@@ -9,6 +9,7 @@ from .serializer import PersonSerializer
 from .models import Person
 from ..organization.models import Organization
 from ..personidentity.models import PersonIdentity
+from ..personemployment.models import PersonEmployment
 from ..staff.models import Staff
 from ..title.models import Title
 from ..account.models import Account
@@ -24,17 +25,23 @@ def PersonApprover(request, id):
         organization_Arr.append(staff.Organization_id)
 
         try:
-            account_queryset = Account.objects.get(email=Person.objects.get(id=id).Email)
-            userRoles_queryset = UserRole.objects.filter(Account_id=account_queryset.id, Organizations__isnull=False)
+            personemployment = PersonEmployment.objects.filter(Person = id)
+            if len(personemployment) > 0 :
+                for pemp in personemployment:
+                    if pemp.Organization.id in organization_Arr:
+                        break
+                    organization_Arr.append(pemp.Organization.id)
+            # account_queryset = Account.objects.get(email=Person.objects.get(id=id).Email)
+            # userRoles_queryset = UserRole.objects.filter(Account_id=account_queryset.id, Organizations__isnull=False)
 
-            if len(userRoles_queryset) > 0:
-                for u in userRoles_queryset:
-                    if len(u.Organizations) > 0:
-                        organizationIdArr = u.Organizations.split(",")
-                        for o in organizationIdArr:
-                            if o in organization_Arr:
-                                break
-                            organization_Arr.append(o)
+            # if len(userRoles_queryset) > 0:
+            #     for u in userRoles_queryset:
+            #         if len(u.Organizations) > 0:
+            #             organizationIdArr = u.Organizations.split(",")
+            #             for o in organizationIdArr:
+            #                 if o in organization_Arr:
+            #                     break
+            #                 organization_Arr.append(o)
         except:
             pass
 
@@ -46,13 +53,13 @@ def PersonApprover(request, id):
     except:
         pass
 
-    newDataArr = []
-    for da in dataArr:
-        # if da in newDataArr:
-        #     break
-        newDataArr.append(da)
+    # newDataArr = []
+    # for da in dataArr:
+    #     # if da in newDataArr:
+    #     #     break
+    #     newDataArr.append(da)
 
-    return Response(newDataArr)
+    return Response(dataArr)
 
 
 def GetPersonApprover2(organizationId,id):
