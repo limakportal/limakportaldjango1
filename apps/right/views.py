@@ -765,7 +765,7 @@ def TodayOnLeavePersonByPerson(request, id):
 
         data_Arr = []
         for r in right_Arr:
-            data_Arr.append(GetTodayOnLeavePersonByPerson2(r, id))
+            data_Arr.append(GetTodayOnLeavePersonByPerson2(r, r.Person_id))
         return Response(data_Arr)
 
     except:
