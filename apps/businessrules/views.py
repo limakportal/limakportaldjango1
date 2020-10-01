@@ -200,7 +200,7 @@ def GetResponsiblePersonDetails(id):
         try:
             personArr = ListResponsiblePersons(id)
             if len(personArr) > 1:
-                personArr.sort(key=lambda x: x.Name.lower())
+                personArr.sort(key=lambda x:x.Name.lower())
             responsiblePersons = PersonViewSerializer(personArr, many=True).data
         except:
             responsiblePersons = None
@@ -247,6 +247,8 @@ def ManagerPersons(request):
                         manager_Arr.append(person_queryset)
                     except:
                         pass
+
+
 
     except:
         pass
