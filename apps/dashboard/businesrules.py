@@ -107,7 +107,8 @@ def GetPersonsByOrganizationId(organizationId, personArr):
         for s in staffs:
             try:
                 person = Person.objects.get(id=s.Person_id)
-                personArr.append(person)
+                if person not in personArr:
+                    personArr.append(person)
             except:
                 pass
 
