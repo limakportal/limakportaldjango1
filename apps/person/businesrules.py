@@ -6,14 +6,14 @@ from rest_framework.response import Response
 
 from .serializer import PersonSerializer
 
+from ..dashboard.businesrules import GetOrganizationAndUpperOrganization
+
 from .models import Person
 from ..organization.models import Organization
 from ..personidentity.models import PersonIdentity
 from ..personemployment.models import PersonEmployment
 from ..staff.models import Staff
 from ..title.models import Title
-from ..account.models import Account
-from ..userrole.models import UserRole
 
 
 @api_view(['GET'])
@@ -25,44 +25,27 @@ def PersonApprover(request, id):
         organization_Arr.append(staff.Organization_id)
 
         try:
-            personemployment = PersonEmployment.objects.filter(Person = id)
-            if len(personemployment) > 0 :
+            personemployment = PersonEmployment.objects.filter(Person=id)
+            if len(personemployment) > 0:
                 for pemp in personemployment:
                     if pemp.Organization.id in organization_Arr:
                         break
                     organization_Arr.append(pemp.Organization.id)
-            # account_queryset = Account.objects.get(email=Person.objects.get(id=id).Email)
-            # userRoles_queryset = UserRole.objects.filter(Account_id=account_queryset.id, Organizations__isnull=False)
-
-            # if len(userRoles_queryset) > 0:
-            #     for u in userRoles_queryset:
-            #         if len(u.Organizations) > 0:
-            #             organizationIdArr = u.Organizations.split(",")
-            #             for o in organizationIdArr:
-            #                 if o in organization_Arr:
-            #                     break
-            #                 organization_Arr.append(o)
         except:
             pass
 
         for oa in organization_Arr:
-            data = GetPersonApprover2(oa,id)
+            data = GetPersonApprover2(oa, id)
             dataArr.append(data)
 
 
     except:
         pass
 
-    # newDataArr = []
-    # for da in dataArr:
-    #     # if da in newDataArr:
-    #     #     break
-    #     newDataArr.append(da)
-
     return Response(dataArr)
 
 
-def GetPersonApprover2(organizationId,id):
+def GetPersonApprover2(organizationId, id):
     global newstaff
     try:
         organization = Organization.objects.get(id=organizationId)
@@ -89,7 +72,6 @@ def GetPersonApprover2(organizationId,id):
                     data['FullName'] = ""
                     return data
 
-
                 personel = Person.objects.get(id=staffs[0].Person.id)
                 data = {}
                 data['id'] = personel.id
@@ -101,36 +83,42 @@ def GetPersonApprover2(organizationId,id):
             return data
         else:
             neworganization = Organization.objects.get(id=organization.UpperOrganization.id)
-            if neworganization.CanApproveRight:
-                newstaff = Staff.objects.filter(Organization=neworganization.id, Title=neworganization.ManagerTitle.id)
-                if len(newstaff) == 0:
-                    data = {}
-                    data['id'] = ""
-                    data['FullName'] = ""
-                    return data
-                personel = Person.objects.get(id=newstaff[0].Person.id)
-                if personel.id == id:
-                    if organization.UpperOrganization.id is None:
-                        data = {}
-                        data['id'] = personel.id
-                        data['FullName'] = personel.Name + ' ' + personel.Surname
-                        return data
-                    staffs = Staff.objects.filter(Organization=organization.UpperOrganization.id)
-                    if len(staffs) == 0:
+            upper_organization_Arr = []
+            upper_organization_Arr = GetOrganizationAndUpperOrganization(neworganization.id, upper_organization_Arr)
+
+            for uo in upper_organization_Arr:
+
+                # if neworganization.CanApproveRight:
+                if uo.CanApproveRight:
+                    newstaff = Staff.objects.filter(Organization=uo.id, Title=uo.ManagerTitle.id)
+                    if len(newstaff) == 0:
                         data = {}
                         data['id'] = ""
                         data['FullName'] = ""
                         return data
-                    personel = Person.objects.get(id=staffs[0].Person.id)
+                    personel = Person.objects.get(id=newstaff[0].Person.id)
+                    if personel.id == id:
+                        if organization.UpperOrganization.id is None:
+                            data = {}
+                            data['id'] = personel.id
+                            data['FullName'] = personel.Name + ' ' + personel.Surname
+                            return data
+                        staffs = Staff.objects.filter(Organization=organization.UpperOrganization.id)
+                        if len(staffs) == 0:
+                            data = {}
+                            data['id'] = ""
+                            data['FullName'] = ""
+                            return data
+                        personel = Person.objects.get(id=staffs[0].Person.id)
+                        data = {}
+                        data['id'] = personel.id
+                        data['FullName'] = personel.Name + ' ' + personel.Surname
+                        return data
+                    serializer = PersonSerializer(personel)
                     data = {}
                     data['id'] = personel.id
                     data['FullName'] = personel.Name + ' ' + personel.Surname
                     return data
-                serializer = PersonSerializer(personel)
-                data = {}
-                data['id'] = personel.id
-                data['FullName'] = personel.Name + ' ' + personel.Surname
-            return data
 
 
     except:

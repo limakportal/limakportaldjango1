@@ -133,6 +133,19 @@ def GetOrganizationAndLoweOrganization(organizationId, organizationArr):
     return organizationArr
 
 
+def GetOrganizationAndUpperOrganization(organizationId, organizationArr):
+    """Organzation and  UpperOrganization"""
+    try:
+        organization = Organization.objects.get(id=organizationId)
+        organizationArr.append(organization)
+    except:
+        pass
+    UpperOrganization = Organization.objects.filter(id=organization.UpperOrganization_id)
+    for o in UpperOrganization:
+        GetOrganizationAndUpperOrganization(o.id, organizationArr)
+    return organizationArr
+
+
 def ListResponsiblePersons(personid):
     """ Sorumlu Olduğu Personeller """
     if PersonPermissionControl(personid, 'ADMIN'):
