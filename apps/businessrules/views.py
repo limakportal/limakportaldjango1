@@ -16,7 +16,7 @@ from ..userrole.models import UserRole
 from .serializer import OrganizationWithPersonTreeSerializer, AccountsDetailSerializer
 from ..person.serializer import PersonSerializer, PersonViewSerializer
 
-from ..dashboard.businesrules import ListResponsiblePersons, IsManager
+from ..dashboard.businesrules import ListResponsiblePersons, IsManager, GetAllIkResponsiblePersonWithLen
 
 
 @api_view(['GET'])
@@ -200,7 +200,7 @@ def GetResponsiblePersonDetails(id):
         try:
             personArr = ListResponsiblePersons(id)
             if len(personArr) > 1:
-                personArr.sort(key=lambda x:x.Name.lower())
+                personArr.sort(key=lambda x: x.Name.lower())
             responsiblePersons = PersonViewSerializer(personArr, many=True).data
         except:
             responsiblePersons = None
@@ -237,49 +237,16 @@ def ManagerPersons(request):
     manager_Arr = []
     account = request.user
     try:
-        person_queryset = Person.objects.get(Email=account.email)
-        staff_queryset = Staff.objects.get(Person_id=person_queryset.id)
-        if IsManager(person_queryset.id):
-            try:
-                organization_queryset = Organization.objects.get(id=staff_queryset.Organization_id)
-                upper_organization_queryset = Organization.objects.filter(id=organization_queryset.UpperOrganization_id)
-                for o in upper_organization_queryset:
-                    staff_in_organization_queryset = Staff.objects.filter(Organization_id=o.id)
-                    for s in staff_in_organization_queryset:
-                        if IsManager(s.Person_id):
-                            try:
-                                manager_queryset = Person.objects.get(id=s.Person_id)
-                                manager_Arr.append(manager_queryset)
-                            except:
-                                pass
-            except:
-                pass
-        else:
-            staff_in_organization_queryset = Staff.objects.filter(Organization_id=staff_queryset.Organization_id)
-            for s in staff_in_organization_queryset:
-                if IsManager(s.Person_id):
+        person_repository_in_organization_Arr = GetAllIkResponsiblePersonWithLen(
+            Person.objects.get(Email=account.email).id)
+        if len(person_repository_in_organization_Arr) > 0:
+            for p in person_repository_in_organization_Arr:
+                if IsManager(p.id):
                     try:
-                        manager_queryset = Person.objects.get(id=s.Person_id)
-                        manager_Arr.append(manager_queryset)
+                        person_queryset = Person.objects.get(id=p.id)
+                        manager_Arr.append(person_queryset)
                     except:
                         pass
-
-        userRole_queryset = UserRole.objects.filter(Account_id=account.id, Organizations__isnull=False)
-        if len(userRole_queryset) > 0:
-            for ur in userRole_queryset:
-                if len(ur.Organizations) > 0:
-                    organizationIdArr = ur.Organizations.split(",")
-                    for o in organizationIdArr:
-                        staff_in_organization_queryset = Staff.objects.filter(Organization_id=o)
-                        for s in staff_in_organization_queryset:
-                            if IsManager(s.Person_id):
-                                try:
-                                    manager_queryset = Person.objects.get(id=s.Person_id)
-                                    manager_Arr.append(manager_queryset)
-                                except:
-                                    pass
-
-
 
     except:
         pass

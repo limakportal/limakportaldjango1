@@ -26,19 +26,26 @@ def PersonPermissionControl(personId, permissionCode):
 
 
 def GetAllIkResponsiblePersonWithLen(personId):
+    personArr = []
+    try:
+        staff_queryset = Staff.objects.get(Person_id=personId)
+        personArr = GetPersonsByOrganizationId(staff_queryset.Organization_id, personArr)
+    except:
+        pass
+
     try:
         account = Account.objects.get(email=Person.objects.get(id=personId).Email)
         userrole = UserRole.objects.filter(Account_id=account.id, Organizations__isnull=False)
-        personArr = []
         if len(userrole) > 0:
             for u in userrole:
                 if len(u.Organizations) > 0:
                     organizationIdArr = u.Organizations.split(",")
                     for o in organizationIdArr:
                         if len(o) > 0:
-                            personsArr = []
-                            persons = GetPersonsByOrganizationId(o, personsArr)
+                            persons = GetPersonsByOrganizationId(o, personArr)
                             for p in persons:
+                                if p in personArr:
+                                    break
                                 personArr.append(p)
     except:
         personArr = []
