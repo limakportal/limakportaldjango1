@@ -575,13 +575,32 @@ def GetPersonRightInfo(id):
         for r in rightwaiting:
             if r.StartDate.year == item.Year:
                 rightwaitingnumber += r.RightNumber
-
         det = {'year': item.Year, 'rightleave': item.Earning, 'rightnumber': rightnumber,
                'remaining': item.Earning - rightnumber, 'personid': item.Person_id, 'rightleaveid': item.id,
                'approvelwaiting': rightwaitingnumber}
         detail.append(det)
         rightnumber = 0
         rightwaitingnumber = 0
+    
+    tempyear = {}
+    for r in rightapprove:
+        if len(rightleave.filter(Year=r.StartDate.year)) == 0:
+            if r.StartDate.year in tempyear:
+                tempyear[r.StartDate.year] = {'rightnumber' :tempyear[r.StartDate.year]['rightnumber'] + r.RightNumber, 'approvelwaiting':0 }
+            else:
+                tempyear[r.StartDate.year] = {'rightnumber' : r.RightNumber, 'approvelwaiting':0 }
+    for rw in rightwaiting:
+        if len(rightleave.filter(Year=rw.StartDate.year)) == 0:
+            if rw.StartDate.year in tempyear:
+                tempyear[rw.StartDate.year] = {'approvelwaiting' :tempyear[rw.StartDate.year]['approvelwaiting'] + rw.RightNumber, 'rightnumber':tempyear[r.StartDate.year]['rightnumber'] }
+            else:
+                tempyear[rw.StartDate.year] = {'approvelwaiting' : rw.RightNumber,'rightnumber':0}
+
+    for item in tempyear:
+        det = {'year': item, 'rightleave': 0, 'rightnumber': tempyear[item]['rightnumber'],
+               'remaining': 0, 'personid': id, 'rightleaveid': '',
+               'approvelwaiting': tempyear[item]['approvelwaiting']}
+        detail.append(det)
 
     try:
         personRightSummary = PersonRightSummary(person.id)
