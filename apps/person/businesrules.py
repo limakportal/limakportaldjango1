@@ -14,7 +14,7 @@ from ..personidentity.models import PersonIdentity
 from ..personemployment.models import PersonEmployment
 from ..staff.models import Staff
 from ..title.models import Title
-
+from ..utils.enums import EnumStatus
 
 @api_view(['GET'])
 def PersonApprover(request, id):
@@ -25,7 +25,7 @@ def PersonApprover(request, id):
         organization_Arr.append(staff.Organization_id)
 
         try:
-            personemployment = PersonEmployment.objects.filter(Person=id)
+            personemployment = PersonEmployment.objects.filter(Person=id, Status = int(EnumStatus.Active))
             if len(personemployment) > 0:
                 for pemp in personemployment:
                     if pemp.Organization.id in organization_Arr:
